@@ -1,0 +1,82 @@
+<html>
+    <body>
+        <h1>@Item!.FullName Namespace</h1>
+
+        @if (Item.Types.Any(t => t.TypeName == "Class"))
+        {
+            <h2>Classes</h2>
+
+            <table>
+                <tbody>
+                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Class"))
+                    {
+                        <tr>
+                            <td>@type.Name</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Item.Types.Any(t => t.TypeName == "Struct"))
+        {
+            <h2>Structs</h2>
+
+            <table>
+                <tbody>
+                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Struct"))
+                    {
+                        <tr>
+                            <td>@type.Name</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Item.Types.Any(t => t.TypeName == "Interface"))
+        {
+            <h2>Interfaces</h2>
+
+            <table>
+                <tbody>
+                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Interface"))
+                    {
+                        <tr>
+                            <td>@type.Name</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Item.Types.Any(t => t.TypeName == "Enum"))
+        {
+            <h2>Enums</h2>
+
+            <table>
+                <tbody>
+                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Enum"))
+                    {
+                        <tr>
+                            <td>@type.Name</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </body>
+</html>
+
+@code {
+    [Parameter]
+    public Model.DotNet.DotNetNamespace? Item 
+    { 
+        get; 
+        set; 
+    }
+}

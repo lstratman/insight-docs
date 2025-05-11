@@ -1,0 +1,37 @@
+<html>
+    <body>
+        <h1>@Item!.DisplayTitle</h1>
+
+        <h2>Definition</h2>
+
+        <div class="metadata">
+            @if (Item.Namespace != null)
+            {
+                <dl class="attributeList">
+                    <dt>Namespace:</dt>
+                    <dd>@Item.Namespace.FullName</dd>
+                </dl>
+            }
+        </div>
+
+        @if (Item.TypeParameters != null && Item.TypeParameters.Count > 0)
+        {
+            <h4>Type Parameters</h4>
+
+            // TODO: type parameters
+        }
+
+        <!-- TODO: base classes -->
+
+        <!-- TODO: implemented interfaces -->
+    </body>
+</html>
+
+@code {
+    [Parameter]
+    public Model.DotNet.DotNetType? Item 
+    { 
+        get; 
+        set; 
+    }
+}

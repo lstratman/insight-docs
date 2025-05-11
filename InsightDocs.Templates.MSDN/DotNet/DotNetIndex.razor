@@ -1,0 +1,32 @@
+<html>
+    <body>
+        <h2>.NET API Reference</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Model.DotNet.DotNetNamespace ns in Item!.Namespaces)
+                {
+                    <tr>
+                        <td>@ns.FullName Namespace</td>
+                        <td></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </body>
+</html>
+
+@code {
+    [Parameter]
+    public Model.DotNet.DotNetIndex? Item
+    { 
+        get; 
+        set; 
+    }
+}
