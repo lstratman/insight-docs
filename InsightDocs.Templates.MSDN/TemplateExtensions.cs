@@ -1,5 +1,7 @@
+using InsightDocs.Abstractions;
 using InsightDocs.Extensions;
 using InsightDocs.Model.DotNet;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Templates.MSDN;
 
@@ -10,6 +12,8 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<DotNetIndex, DotNet.DotNetIndex>();
         builder.RegisterRazorItemTemplate<DotNetNamespace, DotNet.DotNetNamespace>();
         builder.RegisterRazorItemTemplate<DotNetType, DotNet.DotNetType>();
+        
+        builder.Services.AddSingleton<ITemplateAssetProvider, TemplateAssetProvider>();
 
         return builder;
     }

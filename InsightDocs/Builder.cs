@@ -26,8 +26,14 @@ public class Builder(IServiceCollection services)
     {
         IServiceProvider serviceProvider = Services.BuildServiceProvider();
         IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
+        ITemplateAssetProvider? templateAssetProvider = serviceProvider.GetService<ITemplateAssetProvider>();
 
         await publisher.Initialize();
         await TocRoot.Execute(serviceProvider);
+
+        if (templateAssetProvider != null)
+        {
+            await templateAssetProvider.PublishAssets();
+        }
     }
 }

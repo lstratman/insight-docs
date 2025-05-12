@@ -2,26 +2,37 @@
 @using Microsoft.Extensions.DependencyInjection
 
 <html>
+    <head>
+        <link rel="stylesheet" href="../../msdn.css"/>
+    </head>
     <body>
-        <h2>.NET API Reference</h2>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">					
+			<div data-main-column="" class="padding-sm padding-top-none">
+				<div class="content">
+					<div class="container is-max-desktop padding-top-md">
+                        <h2 class="api-search-results-heading font-size-h3">.NET API Reference</h2>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (Model.DotNet.DotNetNamespace ns in Item!.Namespaces)
-                {
-                    <tr>
-                        <td>@RazorTemplate.GetLink(ns, ns.FullName, ServiceProvider!) Namespace</td>
-                        <td></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        <table class="table api-search-results">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (Model.DotNet.DotNetNamespace ns in Item!.Namespaces)
+                                {
+                                    <tr>
+                                        <td>@RazorTemplate.GetLink(ns, ns.FullName, ServiceProvider!) Namespace</td>
+                                        <td></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
     </body>
 </html>
 
