@@ -1,3 +1,6 @@
+@using InsightDocs.Abstractions
+@using Microsoft.Extensions.DependencyInjection
+
 <html>
     <body>
         <h2>.NET API Reference</h2>
@@ -13,7 +16,7 @@
                 @foreach (Model.DotNet.DotNetNamespace ns in Item!.Namespaces)
                 {
                     <tr>
-                        <td>@ns.FullName Namespace</td>
+                        <td>@RazorTemplate.GetLink(ns, ns.FullName, ServiceProvider!) Namespace</td>
                         <td></td>
                     </tr>
                 }
@@ -25,6 +28,13 @@
 @code {
     [Parameter]
     public Model.DotNet.DotNetIndex? Item
+    { 
+        get; 
+        set; 
+    }
+
+    [Parameter]
+    public IServiceProvider? ServiceProvider
     { 
         get; 
         set; 
