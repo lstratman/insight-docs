@@ -3,10 +3,11 @@ using InsightDocs.Abstractions;
 using InsightDocs.Model.DotNet;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.Logging;
 
 namespace InsightDocs.Extensions;
 
-public class DotNetTocItem : TocItem
+public partial class DotNetTocItem : TocItem
 {
     protected TocItem _baseTocItem;
     public Dictionary<string, Matcher>? RootedAssemblyGlobMatchers;
@@ -71,10 +72,16 @@ public class DotNetTocItem : TocItem
         _baseTocItem.RegisterExecutor(executor);
     }
 
+    [LoggerMessage(LogLevel.Information, "Loading {assemblyPath}")]
+    public static partial void LogAssemblyLoad(ILogger logger, string assemblyPath);
+
     public async Task DotNetExecutor(IServiceProvider serviceProvider)
     {
         if (AssemblyGlobMatcher != null || RootedAssemblyGlobMatchers != null)
         {
+            using ILoggerFactory loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
+            
+            ILogger logger = loggerFactory.CreateLogger("DotNet");
             List<string> assemblyPaths = [];
 
             if (AssemblyGlobMatcher != null)
@@ -95,15 +102,19 @@ public class DotNetTocItem : TocItem
 
             PathAssemblyResolver pathAssemblyResolver = 
                 new(
+                    // Directory
+                    //     .GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll")
                     Directory
                         .GetFiles(@"C:\Windows\Microsoft.NET\Framework\v4.0.30319", "*.dll")
-                        .Concat(Directory.GetFiles(@"C:\Windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35", "*.dll"))
-                        .Concat(Directory.GetFiles(@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PresentationFramework\v4.0_4.0.0.0__31bf3856ad364e35", "*.dll"))
+                        // .Concat(Directory.GetFiles(@"C:\Windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35", "*.dll"))
+                        // .Concat(Directory.GetFiles(@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PresentationFramework\v4.0_4.0.0.0__31bf3856ad364e35", "*.dll"))
                         .Concat(assemblyPaths)
                 );
 
             foreach (string assemblyPath in assemblyPaths)
             {
+                LogAssemblyLoad(logger, assemblyPath);
+
                 MetadataLoadContext metadataLoadContext = new(pathAssemblyResolver);
                 Assembly assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
 
@@ -111,7 +122,7 @@ public class DotNetTocItem : TocItem
 
                 foreach (Type type in assembly.GetTypes())
                 {
-                    if (type.Name.StartsWith('<'))
+                    if (type.Name.StartsWith('<') || type.Name.StartsWith("_Closure$"))
                     {
                         continue;
                     }
@@ -138,13 +149,13 @@ public class DotNetTocItem : TocItem
                 Namespaces = [.. namespaces.Values]
             };
             
-            IItemTemplateProvider<DotNetIndex> dotNetIndexTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetIndex>>()!;
-            IItemTemplateProvider<DotNetNamespace> dotNetNamespaceTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetNamespace>>()!;
-            IItemTemplateProvider<DotNetType> dotNetTypeTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetType>>()!;
-            IUrlProvider<DotNetIndex> dotNetIndexUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetIndex>>()!;
-            IUrlProvider<DotNetNamespace> dotNetNamespaceUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetNamespace>>()!;
-            IUrlProvider<DotNetType> dotNetTypeUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetType>>()!;
-            IPublisher publisher = serviceProvider.GetService<IPublisher>()!;
+            IItemTemplateProvider<DotNetIndex> dotNetIndexTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetIndex.");
+            IItemTemplateProvider<DotNetNamespace> dotNetNamespaceTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetNamespace>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetNamespace.");
+            IItemTemplateProvider<DotNetType> dotNetTypeTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetType>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetType.");
+            IUrlProvider<DotNetIndex> dotNetIndexUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetIndex>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetIndex.");
+            IUrlProvider<DotNetNamespace> dotNetNamespaceUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetNamespace>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetNamespace.");
+            IUrlProvider<DotNetType> dotNetTypeUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetType>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetType.");
+            IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
 
             byte[] html = await dotNetIndexTemplate.GetContent(indexData);
             string? urlPrefix = FullUrlPrefix;
