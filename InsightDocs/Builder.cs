@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using InsightDocs.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs;
 
@@ -21,9 +22,12 @@ public class Builder(IServiceCollection services)
         return TocRoot.AddTocItem(title, urlPrefix);
     }
 
-    public Task Execute()
+    public async Task Execute()
     {
         IServiceProvider serviceProvider = Services.BuildServiceProvider();
-        return TocRoot.Execute(serviceProvider);
+        IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
+
+        await publisher.Initialize();
+        await TocRoot.Execute(serviceProvider);
     }
 }
