@@ -5,7 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) : IUrlProvider<DotNetType>, IUrlProvider<DotNetIndex>, IUrlProvider<DotNetNamespace>, IUrlProvider<DotNetMethod>, IUrlProvider<DotNetTypeReference>
+public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) 
+    : IUrlProvider<DotNetType>,
+      IUrlProvider<DotNetIndex>,
+      IUrlProvider<DotNetNamespace>,
+      IUrlProvider<DotNetMethod>,
+      IUrlProvider<DotNetTypeReference>,
+      IUrlProvider<DotNetProperty>,
+      IUrlProvider<DotNetField>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -121,6 +128,70 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) : IUrlPro
     {
         return GetUrl(item.Type);
     }
+
+    public string GetUrl(DotNetProperty item, string? urlPrefix = null)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefix))
+        {
+            url.Append(urlPrefix);
+            url.Append('/');
+        }
+
+        if (item.DeclaringType != null)
+        {
+            if (item.DeclaringType.Namespace != null)
+            {
+                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
+                url.Append('-');
+            }
+
+            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
+            url.Append('-');
+        }
+        
+        url.Append(item.Name.ToLower().Replace(".", "-"));
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
+        return url.ToString();
+    }
+
+    public string GetUrl(DotNetField item, string? urlPrefix = null)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefix))
+        {
+            url.Append(urlPrefix);
+            url.Append('/');
+        }
+
+        if (item.DeclaringType != null)
+        {
+            if (item.DeclaringType.Namespace != null)
+            {
+                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
+                url.Append('-');
+            }
+
+            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
+            url.Append('-');
+        }
+        
+        url.Append(item.Name.ToLower().Replace(".", "-"));
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -146,10 +217,13 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddSingleton<IUrlProvider<DotNetType>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetMethod>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetTypeReference>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {
-            builder.Services.AddSingleton((serviceProvider) => {
+            builder.Services.AddSingleton((serviceProvider) =>
+            {
                 KebabCaseUrlProviderOptions options = new();
                 optionsFactory(options);
 

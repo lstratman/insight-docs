@@ -24,6 +24,10 @@
                                 <!-- TODO: assembly -->
                             </div>
 
+                            <!-- TODO: description -->
+
+                            <!-- TODO: code -->
+
                             @if (Item.TypeParameters != null && Item.TypeParameters.Count > 0)
                             {
                                 <h4 class="propertyInfoTitle stack">Type Parameters</h4>
@@ -52,15 +56,81 @@
 
                             <!-- TODO: implemented interfaces -->
 
+                            <!-- TODO: remarks -->
+
                             <div data-no-chunk>
-                                @if (Item.Methods != null && Item.Methods.Any(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")))
+                                <!-- TODO: constructors-->
+
+                                @if (Item.Fields != null && Item.Fields.Any())
+                                {
+                                    <h2 id="properties">Fields</h2>
+
+                                    <div class="has-inner-focus">
+                                        <table class="table table-sm margin-top-none" aria-label="Fields">
+        	                                <tbody>
+                                                @foreach (Model.DotNet.DotNetField field in Item.Fields.OrderBy(f => f.Name))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="break-text">@RazorTemplate.GetLink(field, field.Name, ServiceProvider!)</span>
+                                                        </td>
+                                                        <td>
+                                                            @if (!String.IsNullOrEmpty(field.Description))
+                                                            {
+                                                                <p>@field.Description</p>
+                                                            }
+
+                                                            @if (field.DeclaringType != null && field.DeclaringType.Type != Item)
+                                                            {
+                                                                <div>(Inherited from @RazorTemplate.GetLink(field.DeclaringType, field.DeclaringType.Name, ServiceProvider!))</div>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
+                                @if (Item.Properties != null && Item.Properties.Any())
+                                {
+                                    <h2 id="properties">Properties</h2>
+
+                                    <div class="has-inner-focus">
+                                        <table class="table table-sm margin-top-none" aria-label="Properties">
+        	                                <tbody>
+                                                @foreach (Model.DotNet.DotNetProperty property in Item.Properties.OrderBy(p => p.Name))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="break-text">@RazorTemplate.GetLink(property, property.Name, ServiceProvider!)</span>
+                                                        </td>
+                                                        <td>
+                                                            @if (!String.IsNullOrEmpty(property.Description))
+                                                            {
+                                                                <p>@property.Description</p>
+                                                            }
+
+                                                            @if (property.DeclaringType != null && property.DeclaringType.Type != Item)
+                                                            {
+                                                                <div>(Inherited from @RazorTemplate.GetLink(property.DeclaringType, property.DeclaringType.Name, ServiceProvider!))</div>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
+                                @if (Item.Methods != null && Item.Methods.Any())
                                 {
                                     <h2 id="methods">Methods</h2>
 
                                     <div class="has-inner-focus">
                                         <table class="table table-sm margin-top-none" aria-label="Methods">
         	                                <tbody>
-                                                @foreach (Model.DotNet.DotNetMethod method in Item.Methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")).OrderBy(m => m.Name).ThenBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.LinkTitle))
+                                                @foreach (Model.DotNet.DotNetMethod method in Item.Methods.OrderBy(m => m.Name).ThenBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.LinkTitle))
                                                 {
                                                     <tr>
                                                         <td>
@@ -83,6 +153,10 @@
                                         </table>
                                     </div>
                                 }
+
+                                <!-- TODO: explicit interface implementations -->
+
+                                <!-- TODO: operators -->
                             </div>
                         </div>
                     </div>

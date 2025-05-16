@@ -79,7 +79,21 @@ public class DotNetType
 
         if (methods != null && methods.Length > 0)
         {
-            Methods = [..methods.Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")).Select(m => new DotNetMethod(m))];
+            Methods = [.. methods.Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")).Select(m => new DotNetMethod(m))];
+        }
+
+        PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        if (properties != null && properties.Length > 0)
+        {
+            Properties = [.. properties.Select(p => new DotNetProperty(p))];
+        }
+
+        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        if (fields != null && fields.Length > 0)
+        {
+            Fields = [.. fields.Select(f => new DotNetField(f))];
         }
     }
 
@@ -134,6 +148,18 @@ public class DotNetType
     }
 
     public List<DotNetMethod>? Methods
+    {
+        get;
+        set;
+    }
+
+    public List<DotNetProperty>? Properties
+    {
+        get;
+        set;
+    }
+
+    public List<DotNetField>? Fields
     {
         get;
         set;
