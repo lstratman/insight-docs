@@ -23,12 +23,12 @@
                             <h2>Definition</h2>
 
                             <div class="metadata">
-                                @if (Item.DeclaringType != null && Item.DeclaringType.Type.Namespace != null)
+                                @if (Item.DeclaringType != null && Item.DeclaringType.Namespace != null)
                                 {
                                     <dl class="attributeList">
                                         <dt>Namespace:</dt>
                                         <dd>
-                                            @RazorTemplate.GetLink(Item.DeclaringType.Type.Namespace, Item.DeclaringType.Type.Namespace.FullName, ServiceProvider!)
+                                            @RazorTemplate.GetLink(Item.DeclaringType.Namespace, Item.DeclaringType.Namespace.FullName, ServiceProvider!)
                                         </dd>
                                     </dl>
                                 }
