@@ -97,9 +97,9 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) : IUrlPro
 
         if (item.DeclaringType != null)
         {
-            if (!String.IsNullOrEmpty(item.DeclaringType.Namespace))
+            if (item.DeclaringType.Namespace != null)
             {
-                url.Append(item.DeclaringType.Namespace.ToLower().Replace(".", "-"));
+                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
                 url.Append('-');
             }
 

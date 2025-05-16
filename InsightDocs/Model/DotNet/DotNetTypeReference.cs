@@ -63,11 +63,11 @@ public class DotNetTypeReference
         }
     }
 
-    public string? Namespace
+    public DotNetNamespace? Namespace
     {
         get
         {
-            return Type.Namespace?.FullName;
+            return Type.Namespace;
         }
     }
 
