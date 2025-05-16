@@ -78,6 +78,12 @@ public partial class DotNetTocItem : TocItem
     [LoggerMessage(LogLevel.Information, "Finished loading {assemblyPath}")]
     public static partial void LogFinishedAssemblyLoad(ILogger logger, string assemblyPath);
 
+    [LoggerMessage(LogLevel.Information, "Publishing topics")]
+    public static partial void LogPublishingTopics(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
+    public static partial void LogFinishedPublishingTopics(ILogger logger);
+
     public async Task DotNetExecutor(IServiceProvider serviceProvider)
     {
         if (RootedAssemblyGlobMatchers != null)
@@ -143,6 +149,8 @@ public partial class DotNetTocItem : TocItem
                 Namespaces = [.. namespaces.Values]
             };
             
+            LogPublishingTopics(logger);
+
             IItemTemplateProvider<DotNetIndex> dotNetIndexTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetIndex.");
             IItemTemplateProvider<DotNetNamespace> dotNetNamespaceTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetNamespace>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetNamespace.");
             IItemTemplateProvider<DotNetType> dotNetTypeTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetType>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetType.");
@@ -178,6 +186,8 @@ public partial class DotNetTocItem : TocItem
                     }
                 }
             }
+
+            LogFinishedPublishingTopics(logger);
         }
 
         await base.Execute(serviceProvider);
