@@ -25,25 +25,37 @@ public class DotNetTypeReference
 
     public DotNetTypeReference(Type type)
     {
-        if (type.GenericTypeArguments != null && type.GenericTypeArguments.Length > 0)
+        if (type.IsArray)
         {
-            GenericArguments = [];
-
-            foreach (Type genericArgument in type.GetGenericArguments())
-            {
-                GenericArguments.Add(new DotNetGenericArgument(genericArgument));
-            }
-
-            if (type.IsGenericType)
-            {
-                type = type.GetGenericTypeDefinition();
-            }
+            IsArray = true;
+            type = type.GetElementType()!;
         }
+
+        if (type.GenericTypeArguments != null && type.GenericTypeArguments.Length > 0)
+            {
+                GenericArguments = [];
+
+                foreach (Type genericArgument in type.GetGenericArguments())
+                {
+                    GenericArguments.Add(new DotNetGenericArgument(genericArgument));
+                }
+
+                if (type.IsGenericType)
+                {
+                    type = type.GetGenericTypeDefinition();
+                }
+            }
 
         Type = DotNetType.Resolve(type);
     }
 
     public DotNetType Type
+    {
+        get;
+        set;
+    }
+
+    public bool IsArray
     {
         get;
         set;
@@ -82,6 +94,11 @@ public class DotNetTypeReference
                 output.Append('<');
                 output.Append(String.Join(", ", GenericArguments.Select(a => a.DisplayName)));
                 output.Append('>');
+            }
+
+            if (IsArray)
+            {
+                output.Append("[]");
             }
 
             return output.ToString();
