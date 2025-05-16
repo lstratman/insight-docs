@@ -12,7 +12,7 @@ public class RazorTemplate
         string url = urlProvider.GetUrl(item);
 
         return (builder) => {
-            builder.AddMarkupContent(0, $@"<a href=""{url}"">{text}</a>");
+            builder.AddMarkupContent(0, $@"<a href=""{url}"">{text.Replace("<", "&lt;").Replace(">", "&gt;")}</a>");
         };
     }
 }

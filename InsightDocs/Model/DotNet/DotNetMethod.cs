@@ -14,11 +14,11 @@ public class DotNetMethod
             Name = Name[(Name.LastIndexOf('.') + 1)..];
         }
 
-        Type[] typeParameters = method.GetGenericArguments();
+        Type[] genericArguments = method.GetGenericArguments();
 
-        if (typeParameters != null && typeParameters.Length > 0)
+        if (genericArguments != null && genericArguments.Length > 0)
         {
-            TypeParameters = [.. typeParameters.Select(a => new DotNetTypeParameter(a))];
+            GenericArguments = [.. genericArguments.Select(a => new DotNetTypeParameter(a))];
         }
 
         ParameterInfo[] parameters = method.GetParameters();
@@ -40,18 +40,7 @@ public class DotNetMethod
     {
         get
         {
-            StringBuilder title = new StringBuilder(Name);
-            
-            title.Append('(');
-
-            if (Parameters != null)
-            {
-                title.Append(String.Join(", ", Parameters.Select(p => p.Type.DisplayName)));
-            }
-
-            title.Append(')');
-            
-            return title.ToString();
+            return DisplayName;
         }
     }
 
@@ -61,7 +50,7 @@ public class DotNetMethod
         set;
     }
 
-    public List<DotNetTypeParameter>? TypeParameters
+    public List<DotNetTypeParameter>? GenericArguments
     {
         get;
         set;
@@ -96,6 +85,14 @@ public class DotNetMethod
         get
         {
             StringBuilder output = new(Name);
+
+            if (GenericArguments != null)
+            {
+                output.Append('<');
+                output.Append(String.Join(", ", GenericArguments.Select(a => a.Name)));
+                output.Append('>');
+            }
+
             output.Append('(');
 
             if (Parameters != null)

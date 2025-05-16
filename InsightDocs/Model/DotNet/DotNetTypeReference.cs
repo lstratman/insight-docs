@@ -32,19 +32,19 @@ public class DotNetTypeReference
         }
 
         if (type.GenericTypeArguments != null && type.GenericTypeArguments.Length > 0)
+        {
+            GenericArguments = [];
+
+            foreach (Type genericArgument in type.GetGenericArguments())
             {
-                GenericArguments = [];
-
-                foreach (Type genericArgument in type.GetGenericArguments())
-                {
-                    GenericArguments.Add(new DotNetGenericArgument(genericArgument));
-                }
-
-                if (type.IsGenericType)
-                {
-                    type = type.GetGenericTypeDefinition();
-                }
+                GenericArguments.Add(new DotNetGenericArgument(genericArgument));
             }
+
+            if (type.IsGenericType)
+            {
+                type = type.GetGenericTypeDefinition();
+            }
+        }
 
         Type = DotNetType.Resolve(type);
     }
