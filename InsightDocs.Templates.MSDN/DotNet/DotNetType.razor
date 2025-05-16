@@ -60,7 +60,7 @@
                                     <div class="has-inner-focus">
                                         <table class="table table-sm margin-top-none" aria-label="Methods">
         	                                <tbody>
-                                                @foreach (Model.DotNet.DotNetMethod method in Item.Methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")))
+                                                @foreach (Model.DotNet.DotNetMethod method in Item.Methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")).OrderBy(m => m.Name).ThenBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.LinkTitle))
                                                 {
                                                     <tr>
                                                         <td>
