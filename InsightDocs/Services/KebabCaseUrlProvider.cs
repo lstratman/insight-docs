@@ -126,6 +126,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
 
     public string GetUrl(DotNetTypeReference item, string? urlPrefix = null)
     {
+        if (item.Type == null)
+        {
+            return "";
+        }
+
         return GetUrl(item.Type);
     }
 

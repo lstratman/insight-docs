@@ -46,16 +46,37 @@ public class DotNetTypeReference
             }
         }
 
-        Type = DotNetType.Resolve(type);
+        if (type.IsGenericParameter)
+        {
+            IsGenericParameter = true;
+            GenericParameterName = type.Name;
+        }
+
+        else
+        {
+            Type = DotNetType.Resolve(type);
+        }
     }
 
-    public DotNetType Type
+    public DotNetType? Type
     {
         get;
         set;
     }
 
     public bool IsArray
+    {
+        get;
+        set;
+    }
+
+    public bool IsGenericParameter
+    {
+        get;
+        set;
+    }
+
+    public string? GenericParameterName
     {
         get;
         set;
@@ -71,7 +92,7 @@ public class DotNetTypeReference
     {
         get
         {
-            return Type.Name;
+            return Type == null ? GenericParameterName! : Type.Name;
         }
     }
 
@@ -79,7 +100,7 @@ public class DotNetTypeReference
     {
         get
         {
-            return Type.Namespace;
+            return Type?.Namespace;
         }
     }
 
@@ -87,7 +108,7 @@ public class DotNetTypeReference
     {
         get
         {
-            StringBuilder output = new(Type.Name);
+            StringBuilder output = new(Name);
 
             if (GenericArguments != null)
             {
