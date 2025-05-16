@@ -1,74 +1,101 @@
 <html>
+    <head>
+        <link rel="stylesheet" href="../../msdn.css"/>
+    </head>
     <body>
-        <h1>@Item!.FullName Namespace</h1>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    <div class="content">
+                        <h1>@Item!.FullName Namespace</h1>
 
-        @if (Item.Types.Any(t => t.TypeName == "Class"))
-        {
-            <h2>Classes</h2>
+                        @if (Item.Types.Any(t => t.TypeName == "Class"))
+                        {
+                            <div class="heading-wrapper" data-heading-level="h2">
+                                <h2 class="heading-anchor">Classes</h2>
+                            </div>
 
-            <table>
-                <tbody>
-                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Class"))
-                    {
-                        <tr>
-                            <td>@type.Name</td>
-                            <td></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+                            <div class="has-inner-focus">
+                                <table class="table table-sm margin-top-none">
+                                    <tbody>
+                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Class"))
+                                        {
+                                            <tr>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td>@type.Description</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
 
-        @if (Item.Types.Any(t => t.TypeName == "Struct"))
-        {
-            <h2>Structs</h2>
+                        @if (Item.Types.Any(t => t.TypeName == "Struct"))
+                        {
+                            <div class="heading-wrapper" data-heading-level="h2">
+                                <h2 class="heading-anchor">Structs</h2>
+                            </div>
 
-            <table>
-                <tbody>
-                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Struct"))
-                    {
-                        <tr>
-                            <td>@type.Name</td>
-                            <td></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+                            <div class="has-inner-focus">
+                                <table class="table table-sm margin-top-none">
+                                    <tbody>
+                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Struct"))
+                                        {
+                                            <tr>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td>@type.Description</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
 
-        @if (Item.Types.Any(t => t.TypeName == "Interface"))
-        {
-            <h2>Interfaces</h2>
+                        @if (Item.Types.Any(t => t.TypeName == "Interface"))
+                        {
+                            <div class="heading-wrapper" data-heading-level="h2">
+                                <h2 class="heading-anchor">Interfaces</h2>
+                            </div>
 
-            <table>
-                <tbody>
-                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Interface"))
-                    {
-                        <tr>
-                            <td>@type.Name</td>
-                            <td></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+                            <div class="has-inner-focus">
+                                <table class="table table-sm margin-top-none">
+                                    <tbody>
+                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Interface"))
+                                        {
+                                            <tr>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td>@type.Description</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
 
-        @if (Item.Types.Any(t => t.TypeName == "Enum"))
-        {
-            <h2>Enums</h2>
+                        @if (Item.Types.Any(t => t.TypeName == "Enum"))
+                        {
+                            <div class="heading-wrapper" data-heading-level="h2">
+                                <h2 class="heading-anchor">Enums</h2>
+                            </div>
 
-            <table>
-                <tbody>
-                    @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Enum"))
-                    {
-                        <tr>
-                            <td>@type.Name</td>
-                            <td></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+                            <div class="has-inner-focus">
+                                <table class="table table-sm margin-top-none">
+                                    <tbody>
+                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Enum"))
+                                        {
+                                            <tr>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td>@type.Description</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </main>
     </body>
 </html>
 

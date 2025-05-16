@@ -1,29 +1,94 @@
 <html>
+    <head>
+        <link rel="stylesheet" href="../../msdn.css"/>
+    </head>
     <body>
-        <h1>@Item!.DisplayTitle</h1>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    <div class="content">
+                        <div data-chunk-ids="0">
+                            <h1>@Item!.DisplayTitle</h1>
 
-        <h2>Definition</h2>
+                            <h2 id="definition">Definition</h2>
 
-        <div class="metadata">
-            @if (Item.Namespace != null)
-            {
-                <dl class="attributeList">
-                    <dt>Namespace:</dt>
-                    <dd>@Item.Namespace.FullName</dd>
-                </dl>
-            }
-        </div>
+                            <div class="metadata">
+                                @if (Item.Namespace != null)
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Namespace:</dt>
+                                        <dd>@Item.Namespace.FullName</dd>
+                                    </dl>
+                                }
 
-        @if (Item.TypeParameters != null && Item.TypeParameters.Count > 0)
-        {
-            <h4>Type Parameters</h4>
+                                <!-- TODO: assembly -->
+                            </div>
 
-            // TODO: type parameters
-        }
+                            @if (Item.TypeParameters != null && Item.TypeParameters.Count > 0)
+                            {
+                                <h4 class="propertyInfoTitle stack">Type Parameters</h4>
 
-        <!-- TODO: base classes -->
+                                @foreach (Model.DotNet.DotNetTypeParameter typeParameter in Item.TypeParameters)
+                                {
+                                    <div class="propertyInfo">
+                                        <dl class="parameterList">
+                                            <dt>
+                                                @typeParameter.Name
+                                            </dt>
+                                            <dd>
+                                                <!-- TODO: typeParameter constraints -->
+                                            </dd>
+                                        </dl>
+                                    </div>
 
-        <!-- TODO: implemented interfaces -->
+                                    @if (!String.IsNullOrEmpty(typeParameter.Description))
+                                    {
+                                        <p>@typeParameter.Description</p>
+                                    }
+                                }
+                            }
+
+                            <!-- TODO: base classes -->
+
+                            <!-- TODO: implemented interfaces -->
+
+                            <div data-no-chunk>
+                                @if (Item.Methods != null && Item.Methods.Any(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")))
+                                {
+                                    <h2 id="methods">Methods</h2>
+
+                                    <div class="has-inner-focus">
+                                        <table class="table table-sm margin-top-none" aria-label="Methods">
+        	                                <tbody>
+                                                @foreach (Model.DotNet.DotNetMethod method in Item.Methods.Where(m => !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="break-text">@RazorTemplate.GetLink(method, method.LinkTitle, ServiceProvider!)</span>
+                                                        </td>
+                                                        <td>
+                                                            @if (!String.IsNullOrEmpty(method.Description))
+                                                            {
+                                                                <p>@method.Description</p>
+                                                            }
+
+                                                            @if (method.DeclaringType != null && method.DeclaringType.Type != Item)
+                                                            {
+                                                                <div>(Inherited from @RazorTemplate.GetLink(method.DeclaringType, method.DeclaringType.Name, ServiceProvider!))</div>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </body>
 </html>
 
