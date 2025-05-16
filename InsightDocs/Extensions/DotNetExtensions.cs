@@ -11,7 +11,7 @@ public partial class DotNetTocItem : TocItem
 {
     protected TocItem _baseTocItem;
     public Dictionary<string, Matcher>? RootedAssemblyGlobMatchers;
-    public Matcher? AssemblyGlobMatcher;
+    public Dictionary<string, Matcher>? RootedRuntimeAssemblyGlobMatchers;
     public Func<Type, bool>? TypeFilter;
 
     public DotNetTocItem(TocItem baseTocItem)
@@ -75,54 +75,48 @@ public partial class DotNetTocItem : TocItem
     [LoggerMessage(LogLevel.Information, "Loading {assemblyPath}")]
     public static partial void LogAssemblyLoad(ILogger logger, string assemblyPath);
 
+    [LoggerMessage(LogLevel.Information, "Finished loading {assemblyPath}")]
+    public static partial void LogFinishedAssemblyLoad(ILogger logger, string assemblyPath);
+
     public async Task DotNetExecutor(IServiceProvider serviceProvider)
     {
-        if (AssemblyGlobMatcher != null || RootedAssemblyGlobMatchers != null)
+        if (RootedAssemblyGlobMatchers != null)
         {
             using ILoggerFactory loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
-            
             ILogger logger = loggerFactory.CreateLogger("DotNet");
             List<string> assemblyPaths = [];
-
-            if (AssemblyGlobMatcher != null)
+            List<string> runtimeAssemblyPaths = [];
+            
+            foreach (KeyValuePair<string, Matcher> matcherAndRoot in RootedAssemblyGlobMatchers)
             {
-                assemblyPaths.AddRange(AssemblyGlobMatcher.GetResultsInFullPath(Directory.GetCurrentDirectory()));
+                assemblyPaths.AddRange(matcherAndRoot.Value.GetResultsInFullPath(matcherAndRoot.Key));
             }
 
-            if (RootedAssemblyGlobMatchers != null)
+            if (RootedRuntimeAssemblyGlobMatchers != null)
             {
-                foreach (KeyValuePair<string, Matcher> matcherAndRoot in RootedAssemblyGlobMatchers)
+                foreach (KeyValuePair<string, Matcher> matcherAndRoot in RootedRuntimeAssemblyGlobMatchers)
                 {
-                    assemblyPaths.AddRange(matcherAndRoot.Value.GetResultsInFullPath(matcherAndRoot.Key));
+                    runtimeAssemblyPaths.AddRange(matcherAndRoot.Value.GetResultsInFullPath(matcherAndRoot.Key));
                 }
             }
 
             List<Assembly> assemblies = [];
             Dictionary<string, DotNetNamespace> namespaces = [];
 
-            PathAssemblyResolver pathAssemblyResolver = 
-                new(
-                    // Directory
-                    //     .GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll")
-                    Directory
-                        .GetFiles(@"C:\Windows\Microsoft.NET\Framework\v4.0.30319", "*.dll")
-                        // .Concat(Directory.GetFiles(@"C:\Windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35", "*.dll"))
-                        // .Concat(Directory.GetFiles(@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PresentationFramework\v4.0_4.0.0.0__31bf3856ad364e35", "*.dll"))
-                        .Concat(assemblyPaths)
-                );
+            PathAssemblyResolver pathAssemblyResolver = new(runtimeAssemblyPaths.Concat(assemblyPaths));
 
             foreach (string assemblyPath in assemblyPaths)
             {
                 LogAssemblyLoad(logger, assemblyPath);
-
                 MetadataLoadContext metadataLoadContext = new(pathAssemblyResolver);
                 Assembly assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
+                LogFinishedAssemblyLoad(logger, assemblyPath);
 
                 assemblies.Add(assembly);
 
                 foreach (Type type in assembly.GetTypes())
                 {
-                    if (type.Name.StartsWith('<') || type.Name.StartsWith("_Closure$"))
+                    if (type.Name.StartsWith('<') || type.Name.StartsWith("_Closure$") || type.Name.StartsWith("VB$StateMachine_"))
                     {
                         continue;
                     }
@@ -192,6 +186,60 @@ public static class DotNetTocItemExtensions
         return dotNetTocItem;
     }
 
+    public static TocItem IncludeDotNetRuntimeAssemblies(this TocItem tocItem, string glob)
+    {
+        if (tocItem is not DotNetTocItem dotNetTocItem)
+        {
+            dotNetTocItem = new DotNetTocItem(tocItem);
+        }
+
+        if (!Path.IsPathRooted(glob))
+        {
+            glob = Path.Combine(AppContext.BaseDirectory, glob);
+        }
+
+        string root = Path.GetPathRoot(glob)!;
+
+        dotNetTocItem.RootedRuntimeAssemblyGlobMatchers ??= [];
+
+        if (!dotNetTocItem.RootedRuntimeAssemblyGlobMatchers.TryGetValue(root, out Matcher? matcher))
+        {
+            matcher = new Matcher();
+            dotNetTocItem.RootedRuntimeAssemblyGlobMatchers[root] = matcher;
+        }
+
+        matcher.AddInclude(glob[root.Length..]);
+
+        return dotNetTocItem;
+    }
+
+    public static TocItem ExcludeDotNetRuntimeAssemblies(this TocItem tocItem, string glob)
+    {
+        if (tocItem is not DotNetTocItem dotNetTocItem)
+        {
+            dotNetTocItem = new DotNetTocItem(tocItem);
+        }
+
+        if (!Path.IsPathRooted(glob))
+        {
+            glob = Path.Combine(AppContext.BaseDirectory, glob);
+        }
+
+        string root = Path.GetPathRoot(glob)!;
+
+        dotNetTocItem.RootedRuntimeAssemblyGlobMatchers ??= [];
+
+        if (!dotNetTocItem.RootedRuntimeAssemblyGlobMatchers.TryGetValue(root, out Matcher? matcher))
+        {
+            matcher = new Matcher();
+            dotNetTocItem.RootedRuntimeAssemblyGlobMatchers[root] = matcher;
+        }
+
+        matcher.AddExclude(glob[root.Length..]);
+
+        return dotNetTocItem;
+    }
+
     public static TocItem IncludeDotNetAssemblies(this TocItem tocItem, string glob)
     {
         if (tocItem is not DotNetTocItem dotNetTocItem)
@@ -199,26 +247,22 @@ public static class DotNetTocItemExtensions
             dotNetTocItem = new DotNetTocItem(tocItem);
         }
 
-        if (Path.IsPathRooted(glob))
+        if (!Path.IsPathRooted(glob))
         {
-            string root = Path.GetPathRoot(glob)!;
-
-            dotNetTocItem.RootedAssemblyGlobMatchers ??= new Dictionary<string, Matcher>();
-
-            if (!dotNetTocItem.RootedAssemblyGlobMatchers.TryGetValue(root, out Matcher? matcher))
-            {
-                matcher = new Matcher();
-                dotNetTocItem.RootedAssemblyGlobMatchers[root] = matcher;
-            }
-
-            matcher.AddInclude(glob.Substring(root.Length));
+            glob = Path.Combine(AppContext.BaseDirectory, glob);
         }
 
-        else 
+        string root = Path.GetPathRoot(glob)!;
+
+        dotNetTocItem.RootedAssemblyGlobMatchers ??= [];
+
+        if (!dotNetTocItem.RootedAssemblyGlobMatchers.TryGetValue(root, out Matcher? matcher))
         {
-            dotNetTocItem.AssemblyGlobMatcher ??= new Matcher();
-            dotNetTocItem.AssemblyGlobMatcher.AddInclude(glob);
+            matcher = new Matcher();
+            dotNetTocItem.RootedAssemblyGlobMatchers[root] = matcher;
         }
+
+        matcher.AddInclude(glob[root.Length..]);
 
         return dotNetTocItem;
     }
@@ -230,26 +274,22 @@ public static class DotNetTocItemExtensions
             dotNetTocItem = new DotNetTocItem(tocItem);
         }
 
-        if (Path.IsPathRooted(glob))
+        if (!Path.IsPathRooted(glob))
         {
-            string root = Path.GetPathRoot(glob)!;
-
-            dotNetTocItem.RootedAssemblyGlobMatchers ??= [];
-
-            if (!dotNetTocItem.RootedAssemblyGlobMatchers.TryGetValue(root, out Matcher? matcher))
-            {
-                matcher = new Matcher();
-                dotNetTocItem.RootedAssemblyGlobMatchers[root] = matcher;
-            }
-
-            matcher.AddExclude(glob.Substring(root.Length));
+            glob = Path.Combine(AppContext.BaseDirectory, glob);
         }
 
-        else 
+        string root = Path.GetPathRoot(glob)!;
+
+        dotNetTocItem.RootedAssemblyGlobMatchers ??= [];
+
+        if (!dotNetTocItem.RootedAssemblyGlobMatchers.TryGetValue(root, out Matcher? matcher))
         {
-            dotNetTocItem.AssemblyGlobMatcher ??= new Matcher();
-            dotNetTocItem.AssemblyGlobMatcher.AddExclude(glob);
+            matcher = new Matcher();
+            dotNetTocItem.RootedAssemblyGlobMatchers[root] = matcher;
         }
+
+        matcher.AddExclude(glob[root.Length..]);
 
         return dotNetTocItem;
     }
