@@ -146,9 +146,11 @@ public partial class DotNetTocItem : TocItem
             IItemTemplateProvider<DotNetIndex> dotNetIndexTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetIndex.");
             IItemTemplateProvider<DotNetNamespace> dotNetNamespaceTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetNamespace>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetNamespace.");
             IItemTemplateProvider<DotNetType> dotNetTypeTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetType>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetType.");
+            IItemTemplateProvider<DotNetMethod> dotNetMethodTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetMethod>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetMethod.");
             IUrlProvider<DotNetIndex> dotNetIndexUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetIndex>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetIndex.");
             IUrlProvider<DotNetNamespace> dotNetNamespaceUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetNamespace>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetNamespace.");
             IUrlProvider<DotNetType> dotNetTypeUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetType>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetType.");
+            IUrlProvider<DotNetMethod> dotNetMethodUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetMethod>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetMethod.");
             IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
 
             byte[] html = await dotNetIndexTemplate.GetContent(indexData);
@@ -165,6 +167,15 @@ public partial class DotNetTocItem : TocItem
                 {
                     html = await dotNetTypeTemplate.GetContent(type);
                     await publisher.Publish(dotNetTypeUrlProvider.GetUrl(type, urlPrefix), html);
+
+                    if (type.Methods != null)
+                    {
+                        foreach (DotNetMethod method in type.Methods.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type))
+                        {
+                            html = await dotNetMethodTemplate.GetContent(method);
+                            await publisher.Publish(dotNetMethodUrlProvider.GetUrl(method, urlPrefix), html);
+                        }
+                    }
                 }
             }
         }

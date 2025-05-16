@@ -7,4 +7,10 @@ public class DotNetTypeParameter(Type type)
         get;
         set;
     } = type.Name;
+
+    public string? Description
+    {
+        get;
+        set;
+    }
 }

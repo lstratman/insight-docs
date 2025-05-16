@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) : IUrlProvider<DotNetType>, IUrlProvider<DotNetIndex>, IUrlProvider<DotNetNamespace>
+public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) : IUrlProvider<DotNetType>, IUrlProvider<DotNetIndex>, IUrlProvider<DotNetNamespace>, IUrlProvider<DotNetMethod>, IUrlProvider<DotNetTypeReference>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -84,6 +84,43 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) : IUrlPro
 
         return url.ToString();
     }
+
+    public string GetUrl(DotNetMethod item, string? urlPrefix = null)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefix))
+        {
+            url.Append(urlPrefix);
+            url.Append('/');
+        }
+
+        if (item.DeclaringType != null)
+        {
+            if (!String.IsNullOrEmpty(item.DeclaringType.Namespace))
+            {
+                url.Append(item.DeclaringType.Namespace.ToLower().Replace(".", "-"));
+                url.Append('-');
+            }
+
+            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
+            url.Append('-');
+        }
+        
+        url.Append(item.Name.ToLower().Replace(".", "-"));
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
+        return url.ToString();
+    }
+
+    public string GetUrl(DotNetTypeReference item, string? urlPrefix = null)
+    {
+        return GetUrl(item.Type);
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -107,6 +144,8 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddSingleton<IUrlProvider<DotNetIndex>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetNamespace>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetType>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<DotNetMethod>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<DotNetTypeReference>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

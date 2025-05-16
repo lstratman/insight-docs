@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="../../msdn.css"/>
+    </head>
+    <body>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    <div class="content">
+                        <div data-chunk-ids="0">
+                            <h1>
+                                @if (Item!.DeclaringType != null)
+                                {
+                                    @(Item.DeclaringType.DisplayName + "." + Item.DisplayName + " Method")
+                                }
+
+                                else
+                                {
+                                    @(Item.DisplayName + " Method")
+                                }
+                            </h1>
+
+                            <h2>Definition</h2>
+
+                            <div class="metadata">
+                                @if (Item.DeclaringType != null && Item.DeclaringType.Type.Namespace != null)
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Namespace:</dt>
+                                        <dd>
+                                            @RazorTemplate.GetLink(Item.DeclaringType.Type.Namespace, Item.DeclaringType.Type.Namespace.FullName, ServiceProvider!)
+                                        </dd>
+                                    </dl>
+                                }
+                                <!-- TODO: assembly -->
+                            </div>
+
+                            <div>
+                                @if (!String.IsNullOrEmpty(Item.Description))
+                                {
+                                    <div class="summaryHolder">@Item.Description</div>
+                                }
+
+                                <!-- TODO: code -->
+
+                                @if (Item.Parameters != null)
+                                {
+                                    <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
+
+                                    @for (int i = 0; i < Item.Parameters.Count; i++)
+                                    {
+                                        <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
+                                            <dl class="parameterList">
+                                                <dt>@Item.Parameters[i].Name</dt>
+                                                <dd>@RazorTemplate.GetLink(Item.Parameters[i].Type, Item.Parameters[i].Type.DisplayName, ServiceProvider!)</dd>
+                                            </dl>
+
+                                            @if (!String.IsNullOrEmpty(Item.Parameters[i].Description))
+                                            {
+                                                <p>@Item.Parameters[i].Description</p>
+                                            }
+                                        </div>
+                                    }
+                                }
+
+                                <h4 class="propertyInfoTitle stack">Returns</h4>
+
+                                <div class="propertyInfo">@RazorTemplate.GetLink(Item.ReturnType, Item.ReturnType.DisplayName, ServiceProvider!)</div>
+
+                                <!-- TODO: return remarks -->
+
+                                <!-- TODO: remarks-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
+
+@code {
+    [Parameter]
+    public Model.DotNet.DotNetMethod? Item 
+    { 
+        get; 
+        set; 
+    }
+
+    [Parameter]
+    public IServiceProvider? ServiceProvider
+    { 
+        get; 
+        set; 
+    }
+}

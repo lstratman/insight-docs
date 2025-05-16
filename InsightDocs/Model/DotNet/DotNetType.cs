@@ -79,7 +79,7 @@ public class DotNetType
 
         if (methods != null && methods.Length > 0)
         {
-            Methods = [..methods.Select(m => new DotNetMethod(m))];
+            Methods = [..methods.Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")).Select(m => new DotNetMethod(m))];
         }
     }
 
