@@ -136,11 +136,11 @@ public partial class DotNetTocItem : TocItem
 
                     if (!namespaces.TryGetValue(ns, out DotNetNamespace? namespaceMetadata))
                     {
-                        namespaceMetadata = new DotNetNamespace(ns);
+                        namespaceMetadata = DotNetNamespace.Resolve(ns);
                         namespaces[ns] = namespaceMetadata;
                     }
 
-                    namespaceMetadata.Types.Add(new DotNetType(type, namespaceMetadata));
+                    namespaceMetadata.Types.Add(DotNetType.Resolve(type));
                 }
             }
 

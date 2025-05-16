@@ -1,9 +1,43 @@
+using System.Reflection;
+
 namespace InsightDocs.Model.DotNet;
 
 public class DotNetType
 {
-    public DotNetType(Type type, DotNetNamespace ns)
+    private readonly static Dictionary<string, DotNetType> TypeCache = [];
+
+    public static DotNetType Resolve(Type type)
     {
+        string key = type.Name;
+
+        if (!String.IsNullOrEmpty(type.Namespace))
+        {
+            key = type.Namespace + "." + type.Name;
+        }
+
+        if (!TypeCache.TryGetValue(key, out DotNetType? typeMetadata))
+        {
+            DotNetNamespace? ns = String.IsNullOrEmpty(type.Namespace) ? null : DotNetNamespace.Resolve(type.Namespace);
+            typeMetadata = new DotNetType(type, ns);
+        }
+
+        return typeMetadata;
+    }
+
+    protected DotNetType(Type type, DotNetNamespace? ns)
+    {
+        string key = type.Name;
+
+        if (!String.IsNullOrEmpty(type.Namespace))
+        {
+            key = type.Namespace + "." + type.Name;
+        }
+
+        if (!TypeCache.ContainsKey(key))
+        {
+            TypeCache[key] = this;
+        }
+
         Namespace = ns;
         Name = type.Name.Contains('`') ? type.Name[..type.Name.IndexOf('`')] : type.Name;
         FullName = String.IsNullOrEmpty(type.Namespace) ? Name : type.Namespace + "." + Name;
@@ -40,6 +74,13 @@ public class DotNetType
         {
             TypeName = "Class";
         }
+
+        MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        if (methods != null && methods.Length > 0)
+        {
+            Methods = [..methods.Select(m => new DotNetMethod(m))];
+        }
     }
 
     public List<DotNetTypeParameter>? TypeParameters
@@ -48,7 +89,7 @@ public class DotNetType
         set;
     }
 
-    public DotNetNamespace Namespace
+    public DotNetNamespace? Namespace
     {
         get;
         set;
@@ -87,6 +128,12 @@ public class DotNetType
     }
 
     public string? Description
+    {
+        get;
+        set;
+    }
+
+    public List<DotNetMethod>? Methods
     {
         get;
         set;
