@@ -62,7 +62,7 @@
 
                                             @if (Item.Parameters[i].Description != null)
                                             {
-                                                <p>@RazorTemplate.Raw(Item.Parameters[i].Description.ToHtml())</p>
+                                                <p>@RazorTemplate.Raw(Item.Parameters[i].Description!.ToHtml())</p>
                                             }
                                         </div>
                                     }
@@ -74,7 +74,14 @@
 
                                 <!-- TODO: return remarks -->
 
-                                <!-- TODO: remarks-->
+                                @if (Item.Remarks != null)
+                                {
+                                    <div class="heading-wrapper" data-heading-level="h2">
+                                        <h2 id="remarks" class="heading-anchor">Remarks</h2>
+                                    </div>
+
+                                    @RazorTemplate.Raw(Item.Remarks.ToHtml(), "p")
+                                }
                             </div>
                         </div>
                     </div>
