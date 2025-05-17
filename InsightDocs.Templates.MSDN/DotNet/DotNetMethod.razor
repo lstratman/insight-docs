@@ -72,7 +72,10 @@
 
                                 <div class="propertyInfo">@RazorTemplate.GetLink(Item.ReturnType, Item.ReturnType.DisplayName, ServiceProvider!)</div>
 
-                                <!-- TODO: return remarks -->
+                                @if (Item.ReturnsDescription != null)
+                                {
+                                    @RazorTemplate.Raw(Item.ReturnsDescription.ToHtml(), "p")
+                                }
 
                                 @if (Item.Remarks != null)
                                 {
