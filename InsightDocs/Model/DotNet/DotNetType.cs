@@ -109,11 +109,11 @@ public class DotNetType : DotNetXmlDocSource
             }
         }
 
-        MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        MethodInfo[] methods = [.. type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))];
 
         if (methods != null && methods.Length > 0)
         {
-            Methods = [.. methods.Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_")).Select(m => new DotNetMethod(m))];
+            Methods = [.. methods.Select(m => new DotNetMethod(m))];
         }
 
         PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -123,7 +123,7 @@ public class DotNetType : DotNetXmlDocSource
             Properties = [.. properties.Select(p => new DotNetProperty(p))];
         }
 
-        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        FieldInfo[] fields = [.. type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(f => !f.Name.StartsWith('<'))];
 
         if (fields != null && fields.Length > 0)
         {
