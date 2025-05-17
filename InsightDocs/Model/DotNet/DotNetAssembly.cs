@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Xml;
 
 namespace InsightDocs.Model.DotNet;
 
@@ -24,6 +25,28 @@ public class DotNetAssembly
 
         Name = assemblyName.Name;
         FullName = assemblyName.FullName;
+
+        string? assemblyDirectory = Path.GetDirectoryName(assembly.Location);
+
+        if (!String.IsNullOrEmpty(assemblyDirectory) && !String.IsNullOrEmpty(assemblyName.Name) && File.Exists(Path.Combine(assemblyDirectory, assemblyName.Name + ".xml")))
+        {
+            XmlDocument xmlDocDocument = new();
+            string xmlDocText = File.ReadAllText(Path.Combine(assemblyDirectory, assemblyName.Name + ".xml")).Replace(">>", ">");
+            
+            xmlDocDocument.LoadXml(xmlDocText);
+
+            XmlNodeList? memberNodes = xmlDocDocument.SelectNodes("/doc/members/member");
+
+            if (memberNodes != null)
+            {
+                XmlDocEntries = [];
+
+                foreach (XmlElement memberNode in memberNodes)
+                {
+                    XmlDocEntries[memberNode.GetAttribute("name")] = new XmlDocEntry(memberNode.GetAttribute("name"), memberNode);
+                }
+            }
+        }
     }
 
     public string? Name
@@ -33,6 +56,12 @@ public class DotNetAssembly
     }
 
     public string FullName
+    {
+        get;
+        set;
+    }
+
+    public Dictionary<string, XmlDocEntry>? XmlDocEntries
     {
         get;
         set;

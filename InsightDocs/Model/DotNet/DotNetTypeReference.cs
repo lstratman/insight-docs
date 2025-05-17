@@ -112,6 +112,31 @@ public class DotNetTypeReference
         }
     }
 
+    public string XmlDocKey
+    {
+        get
+        {
+            if (GenericParameterName != null)
+            {
+                return GenericParameterName;
+            }
+
+            else
+            {
+                StringBuilder key = new(Type!.XmlDocKey);
+
+                if (GenericArguments != null)
+                {
+                    key.Append('{');
+                    key.Append(String.Join(',', GenericArguments.Select(a => a.XmlDocKey)));
+                    key.Append('}');
+                }
+
+                return key.ToString();
+            }
+        }
+    }
+
     public string DisplayName
     {
         get

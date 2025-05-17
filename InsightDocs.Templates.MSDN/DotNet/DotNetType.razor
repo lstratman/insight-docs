@@ -30,7 +30,14 @@
                                 }
                             </div>
 
-                            <!-- TODO: description -->
+                            @if (Item.Description != null)
+                            {
+                                <div class="summaryHolder">
+                                    <div class="summary clearFix has-text-wrap">
+                                        @RazorTemplate.Raw(Item.Description.ToHtml())
+                                    </div>
+                                </div>
+                            }
 
                             <!-- TODO: code -->
 
@@ -51,9 +58,9 @@
                                         </dl>
                                     </div>
 
-                                    @if (!String.IsNullOrEmpty(typeParameter.Description))
+                                    @if (typeParameter.Description != null)
                                     {
-                                        <p>@typeParameter.Description</p>
+                                        <p>@RazorTemplate.Raw(typeParameter.Description.ToHtml())</p>
                                     }
                                 }
                             }
@@ -81,9 +88,9 @@
                                                             <span class="break-text">@RazorTemplate.GetLink(field, field.Name, ServiceProvider!)</span>
                                                         </td>
                                                         <td>
-                                                            @if (!String.IsNullOrEmpty(field.Description))
+                                                            @if (field.Description != null)
                                                             {
-                                                                <p>@field.Description</p>
+                                                                <p>@RazorTemplate.Raw(field.Description.ToHtml())</p>
                                                             }
 
                                                             @if (field.DeclaringType != null && field.DeclaringType.Type != Item)
@@ -112,9 +119,9 @@
                                                             <span class="break-text">@RazorTemplate.GetLink(property, property.Name, ServiceProvider!)</span>
                                                         </td>
                                                         <td>
-                                                            @if (!String.IsNullOrEmpty(property.Description))
+                                                            @if (property.Description != null)
                                                             {
-                                                                <p>@property.Description</p>
+                                                                <p>@RazorTemplate.Raw(property.Description.ToHtml())</p>
                                                             }
 
                                                             @if (property.DeclaringType != null && property.DeclaringType.Type != Item)
@@ -143,9 +150,9 @@
                                                             <span class="break-text">@RazorTemplate.GetLink(method, method.LinkTitle, ServiceProvider!)</span>
                                                         </td>
                                                         <td>
-                                                            @if (!String.IsNullOrEmpty(method.Description))
+                                                            @if (method.Description != null)
                                                             {
-                                                                <p>@method.Description</p>
+                                                                <p>@RazorTemplate.Raw(method.Description.ToHtml())</p>
                                                             }
 
                                                             @if (method.DeclaringType != null && method.DeclaringType.Type != Item)

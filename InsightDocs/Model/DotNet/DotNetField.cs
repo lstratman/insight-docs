@@ -30,6 +30,29 @@ public class DotNetField : DotNetMemberInfo
         if (field.DeclaringType != null)
         {
             DeclaringType = DotNetTypeReference.Resolve(field.DeclaringType);
+
+            if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
+            {
+                DeclaringType.Type.Assembly.XmlDocEntries.TryGetValue("F:" + XmlDocKey, out XmlDocEntry? xmlDocEntry);
+
+                if (xmlDocEntry != null)
+                {
+                    if (xmlDocEntry.Summary != null)
+                    {
+                        Description = new XmlDocHtml(xmlDocEntry.Summary);
+                    }
+
+                    if (xmlDocEntry.Remarks != null)
+                    {
+                        Remarks = new XmlDocHtml(xmlDocEntry.Remarks);
+                    }
+
+                    if (xmlDocEntry.Returns != null)
+                    {
+                        ReturnsDescription = new XmlDocHtml(xmlDocEntry.Returns);
+                    }
+                }
+            }
         }
     }
 
@@ -39,7 +62,7 @@ public class DotNetField : DotNetMemberInfo
         set;
     }
 
-    public string? Description
+    public XmlDocHtml? ReturnsDescription
     {
         get;
         set;
@@ -55,5 +78,14 @@ public class DotNetField : DotNetMemberInfo
     {
         get;
         set;
+    }
+
+    public string? XmlDocKey
+    {
+        get
+        {
+            string? typeDocKey = DeclaringType?.XmlDocKey;
+            return typeDocKey == null ? null : typeDocKey + "." + Name;
+        }
     }
 }

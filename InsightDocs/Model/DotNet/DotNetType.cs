@@ -1,8 +1,9 @@
 using System.Reflection;
+using System.Text;
 
 namespace InsightDocs.Model.DotNet;
 
-public class DotNetType
+public class DotNetType : DotNetXmlDocSource
 {
     private readonly static Dictionary<string, DotNetType> TypeCache = [];
 
@@ -79,6 +80,35 @@ public class DotNetType
             TypeName = "Class";
         }
 
+        if (Assembly.XmlDocEntries != null)
+        {
+            Assembly.XmlDocEntries.TryGetValue("T:" + XmlDocKey, out XmlDocEntry? xmlDocEntry);
+
+            if (xmlDocEntry != null)
+            {
+                if (xmlDocEntry.Summary != null)
+                {
+                    Description = new XmlDocHtml(xmlDocEntry.Summary);
+                }
+
+                if (xmlDocEntry.Remarks != null)
+                {
+                    Remarks = new XmlDocHtml(xmlDocEntry.Remarks);
+                }
+
+                if (TypeParameters != null && xmlDocEntry.TypeParameters != null)
+                {
+                    foreach (DotNetTypeParameter parameter in TypeParameters)
+                    {
+                        if (xmlDocEntry.TypeParameters.TryGetValue(parameter.Name, out List<XmlDocCommentComponent>? components))
+                        {
+                            parameter.Description = new XmlDocHtml(components);
+                        }
+                    }
+                }
+            }
+        }
+
         MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         if (methods != null && methods.Length > 0)
@@ -145,12 +175,6 @@ public class DotNetType
         set;
     }
 
-    public string? Description
-    {
-        get;
-        set;
-    }
-
     public bool IsSealed
     {
         get;
@@ -185,5 +209,23 @@ public class DotNetType
     {
         get;
         set;
+    }
+
+    public string XmlDocKey
+    {
+        get
+        {
+            StringBuilder key = new();
+
+            if (Namespace != null)
+            {
+                key.Append(Namespace.FullName);
+                key.Append('.');
+            }
+
+            key.Append(Name);
+
+            return key.ToString();
+        }
     }
 }

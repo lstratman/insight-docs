@@ -8,7 +8,7 @@ public class DotNetTypeParameter(Type type)
         set;
     } = type.Name;
 
-    public string? Description
+    public XmlDocHtml? Description
     {
         get;
         set;

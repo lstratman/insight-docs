@@ -29,7 +29,7 @@ public class DotNetMethodParameter
         set;
     }
 
-    public string? Description
+    public XmlDocHtml? Description
     {
         get;
         set;

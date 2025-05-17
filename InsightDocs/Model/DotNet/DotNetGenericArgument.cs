@@ -42,4 +42,20 @@ public class DotNetGenericArgument
             }
         }
     }
+
+    public string XmlDocKey
+    {
+        get
+        {
+            if (TypeParameterName != null)
+            {
+                return TypeParameterName;
+            }
+
+            else
+            {
+                return Type!.XmlDocKey;
+            }
+        }
+    }
 }

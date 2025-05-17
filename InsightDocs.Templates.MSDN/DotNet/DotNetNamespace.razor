@@ -22,7 +22,12 @@
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
-                                                <td>@type.Description</td>
+                                                <td>
+                                                    @if (type.Description != null)
+                                                    {
+                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                    }
+                                                </td>
                                             </tr>
                                         }
                                     </tbody>
@@ -43,7 +48,12 @@
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
-                                                <td>@type.Description</td>
+                                                <td>
+                                                    @if (type.Description != null)
+                                                    {
+                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                    }
+                                                </td>
                                             </tr>
                                         }
                                     </tbody>
@@ -64,7 +74,12 @@
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
-                                                <td>@type.Description</td>
+                                                <td>
+                                                    @if (type.Description != null)
+                                                    {
+                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                    }
+                                                </td>
                                             </tr>
                                         }
                                     </tbody>
@@ -85,7 +100,12 @@
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
-                                                <td>@type.Description</td>
+                                                <td>
+                                                    @if (type.Description != null)
+                                                    {
+                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                    }
+                                                </td>
                                             </tr>
                                         }
                                     </tbody>

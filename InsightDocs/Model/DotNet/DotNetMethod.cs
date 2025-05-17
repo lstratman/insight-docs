@@ -51,6 +51,40 @@ public class DotNetMethod : DotNetMemberInfo
         if (method.DeclaringType != null)
         {
             DeclaringType = DotNetTypeReference.Resolve(method.DeclaringType);
+
+            if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
+            {
+                DeclaringType.Type.Assembly.XmlDocEntries.TryGetValue("M:" + XmlDocKey, out XmlDocEntry? xmlDocEntry);
+
+                if (xmlDocEntry != null)
+                {
+                    if (xmlDocEntry.Summary != null)
+                    {
+                        Description = new XmlDocHtml(xmlDocEntry.Summary);
+                    }
+
+                    if (xmlDocEntry.Remarks != null)
+                    {
+                        Remarks = new XmlDocHtml(xmlDocEntry.Remarks);
+                    }
+
+                    if (xmlDocEntry.Returns != null)
+                    {
+                        ReturnsDescription = new XmlDocHtml(xmlDocEntry.Returns);
+                    }
+
+                    if (Parameters != null && xmlDocEntry.Parameters != null)
+                    {
+                        foreach (DotNetMethodParameter parameter in Parameters)
+                        {
+                            if (xmlDocEntry.Parameters.TryGetValue(parameter.Name, out List<XmlDocCommentComponent>? components))
+                            {
+                                parameter.Description = new XmlDocHtml(components);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -86,7 +120,7 @@ public class DotNetMethod : DotNetMemberInfo
         set;
     }
 
-    public string? Description
+    public XmlDocHtml? ReturnsDescription
     {
         get;
         set;
@@ -120,6 +154,34 @@ public class DotNetMethod : DotNetMemberInfo
 
             output.Append(')');
             return output.ToString();
+        }
+    }
+
+    public string? XmlDocKey
+    {
+        get
+        {
+            string? typeDocKey = DeclaringType?.XmlDocKey;
+
+            if (typeDocKey == null)
+            {
+                return null;
+            }
+
+            StringBuilder key = new(typeDocKey);
+
+            key.Append('.');
+            key.Append(Name);
+            key.Append('(');
+
+            if (Parameters != null)
+            {
+                key.Append(String.Join(',', Parameters.Select(p => p.Type.XmlDocKey)));
+            }
+
+            key.Append(')');
+
+            return key.ToString();
         }
     }
 }

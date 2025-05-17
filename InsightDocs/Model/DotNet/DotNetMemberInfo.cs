@@ -1,6 +1,6 @@
 namespace InsightDocs.Model.DotNet;
 
-public abstract class DotNetMemberInfo
+public abstract class DotNetMemberInfo : DotNetXmlDocSource
 {
     public DotNetMemberInfoAccessType AccessType
     {

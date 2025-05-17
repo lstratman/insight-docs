@@ -41,9 +41,9 @@
                             </div>
 
                             <div>
-                                @if (!String.IsNullOrEmpty(Item.Description))
+                                @if (Item.Description != null)
                                 {
-                                    <div class="summaryHolder">@Item.Description</div>
+                                    <div class="summaryHolder">@RazorTemplate.Raw(Item.Description.ToHtml())</div>
                                 }
 
                                 <!-- TODO: code -->
@@ -60,9 +60,9 @@
                                                 <dd>@RazorTemplate.GetLink(Item.Parameters[i].Type, Item.Parameters[i].Type.DisplayName, ServiceProvider!)</dd>
                                             </dl>
 
-                                            @if (!String.IsNullOrEmpty(Item.Parameters[i].Description))
+                                            @if (Item.Parameters[i].Description != null)
                                             {
-                                                <p>@Item.Parameters[i].Description</p>
+                                                <p>@RazorTemplate.Raw(Item.Parameters[i].Description.ToHtml())</p>
                                             }
                                         </div>
                                     }
