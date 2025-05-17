@@ -104,6 +104,14 @@ public class DotNetTypeReference
         }
     }
 
+    public DotNetAssembly? Assembly
+    {
+        get
+        {
+            return Type?.Assembly;
+        }
+    }
+
     public string DisplayName
     {
         get

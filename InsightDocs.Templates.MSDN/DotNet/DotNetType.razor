@@ -17,11 +17,17 @@
                                 {
                                     <dl class="attributeList">
                                         <dt>Namespace:</dt>
-                                        <dd>@Item.Namespace.FullName</dd>
+                                        <dd>@RazorTemplate.GetLink(Item.Namespace, Item.Namespace.FullName, ServiceProvider!)</dd>
                                     </dl>
                                 }
 
-                                <!-- TODO: assembly -->
+                                @if (!String.IsNullOrEmpty(Item.Assembly?.Name))
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Assembly:</dt>
+                                        <dd>@Item.Assembly.Name</dd>
+                                    </dl>
+                                }
                             </div>
 
                             <!-- TODO: description -->

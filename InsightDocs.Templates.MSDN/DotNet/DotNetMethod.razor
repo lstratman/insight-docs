@@ -23,16 +23,21 @@
                             <h2>Definition</h2>
 
                             <div class="metadata">
-                                @if (Item.DeclaringType != null && Item.DeclaringType.Namespace != null)
+                                @if (Item.DeclaringType?.Namespace != null)
                                 {
                                     <dl class="attributeList">
                                         <dt>Namespace:</dt>
-                                        <dd>
-                                            @RazorTemplate.GetLink(Item.DeclaringType.Namespace, Item.DeclaringType.Namespace.FullName, ServiceProvider!)
-                                        </dd>
+                                        <dd>@RazorTemplate.GetLink(Item.DeclaringType.Namespace, Item.DeclaringType.Namespace.FullName, ServiceProvider!)</dd>
                                     </dl>
                                 }
-                                <!-- TODO: assembly -->
+
+                                @if (!String.IsNullOrEmpty(Item.DeclaringType?.Assembly?.Name))
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Assembly:</dt>
+                                        <dd>@Item.DeclaringType.Assembly.Name</dd>
+                                    </dl>
+                                }
                             </div>
 
                             <div>

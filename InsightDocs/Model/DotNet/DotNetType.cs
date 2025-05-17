@@ -17,14 +17,15 @@ public class DotNetType
 
         if (!TypeCache.TryGetValue(key, out DotNetType? typeMetadata))
         {
+            DotNetAssembly assembly = DotNetAssembly.Resolve(type.Assembly);
             DotNetNamespace? ns = String.IsNullOrEmpty(type.Namespace) ? null : DotNetNamespace.Resolve(type.Namespace);
-            typeMetadata = new DotNetType(type, ns);
+            typeMetadata = new DotNetType(type, assembly, ns);
         }
 
         return typeMetadata;
     }
 
-    protected DotNetType(Type type, DotNetNamespace? ns)
+    protected DotNetType(Type type, DotNetAssembly assembly, DotNetNamespace? ns)
     {
         string key = type.Name;
 
@@ -38,9 +39,12 @@ public class DotNetType
             TypeCache[key] = this;
         }
 
+        Assembly = assembly;
         Namespace = ns;
         Name = type.Name.Contains('`') ? type.Name[..type.Name.IndexOf('`')] : type.Name;
         FullName = String.IsNullOrEmpty(type.Namespace) ? Name : type.Namespace + "." + Name;
+        IsSealed = type.IsSealed;
+        IsAbstract = type.IsAbstract;
 
         Type[] typeParameters = type.GetGenericArguments();
 
@@ -142,6 +146,24 @@ public class DotNetType
     }
 
     public string? Description
+    {
+        get;
+        set;
+    }
+
+    public bool IsSealed
+    {
+        get;
+        set;
+    }
+
+    public bool IsAbstract
+    {
+        get;
+        set;
+    }
+
+    public DotNetAssembly Assembly
     {
         get;
         set;

@@ -3,11 +3,29 @@ using System.Text;
 
 namespace InsightDocs.Model.DotNet;
 
-public class DotNetMethod
+public class DotNetMethod : DotNetMemberInfo
 {
     public DotNetMethod(MethodInfo method)
     {
         Name = method.Name;
+        IsStatic = method.IsStatic;
+        IsInternal = method.IsAssembly;
+        IsAbstract = method.IsAbstract;
+
+        if (method.IsPublic)
+        {
+            AccessType = DotNetMemberInfoAccessType.Public;
+        }
+
+        else if (method.IsPrivate)
+        {
+            AccessType = DotNetMemberInfoAccessType.Private;
+        }
+
+        else if (method.IsFamily)
+        {
+            AccessType = DotNetMemberInfoAccessType.Protected;
+        }
 
         if (Name.Contains('.'))
         {
