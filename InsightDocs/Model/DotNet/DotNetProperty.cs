@@ -4,6 +4,18 @@ namespace InsightDocs.Model.DotNet;
 
 public class DotNetProperty : DotNetXmlDocSource
 {
+    public DotNetProperty(DotNetProperty property)
+    {
+        Name = property.Name;
+        PropertyType = property.PropertyType;
+        DeclaringType = property.DeclaringType;
+        GetMethod = property.GetMethod == null ? null : new DotNetMethod(property.GetMethod);
+        SetMethod = property.SetMethod == null ? null : new DotNetMethod(property.SetMethod);
+        Description = property.Description;
+        Remarks = property.Remarks;
+        DeclaringType = property.DeclaringType;
+    }
+
     public DotNetProperty(PropertyInfo property)
     {
         Name = property.Name;

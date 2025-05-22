@@ -5,6 +5,22 @@ namespace InsightDocs.Model.DotNet;
 
 public class DotNetMethod : DotNetMemberInfo
 {
+    public DotNetMethod(DotNetMethod method)
+    {
+        Name = method.Name;
+        IsStatic = method.IsStatic;
+        IsInternal = method.IsInternal;
+        IsAbstract = method.IsAbstract;
+        AccessType = method.AccessType;
+        ReturnType = method.ReturnType;
+        GenericArguments = method.GenericArguments == null ? null : [.. method.GenericArguments];
+        Parameters = method.Parameters == null ? null : [.. method.Parameters];
+        Description = method.Description;
+        Remarks = method.Remarks;
+        ReturnsDescription = method.ReturnsDescription;
+        DeclaringType = method.DeclaringType;
+    }
+
     public DotNetMethod(MethodInfo method)
     {
         Name = method.Name;
@@ -43,7 +59,7 @@ public class DotNetMethod : DotNetMemberInfo
 
         if (parameters != null && parameters.Length > 0)
         {
-            Parameters = [..parameters.Select(p => new DotNetMethodParameter(p))];
+            Parameters = [.. parameters.Select(p => new DotNetMethodParameter(p))];
         }
 
         ReturnType = DotNetTypeReference.Resolve(method.ReturnType);

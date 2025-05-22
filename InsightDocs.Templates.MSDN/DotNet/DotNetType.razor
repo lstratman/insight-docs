@@ -60,16 +60,63 @@
 
                                     @if (typeParameter.Description != null)
                                     {
-                                        <p>@RazorTemplate.Raw(typeParameter.Description.ToHtml())</p>
+                                        @RazorTemplate.Raw(typeParameter.Description.ToHtml(), "p")
                                     }
                                 }
                             }
 
-                            <!-- TODO: base classes -->
+                            @if (Item.BaseType != null)
+                            {
+                                List<Model.DotNet.DotNetTypeReference> baseTypes = [];
+                                Model.DotNet.DotNetTypeReference? currentBaseType = Item.BaseType;
 
-                            <!-- TODO: implemented interfaces -->
+                                while (currentBaseType != null)
+                                {
+                                    baseTypes.Add(currentBaseType);
+                                    currentBaseType = currentBaseType.Type?.BaseType;
+                                }
+                                
+                                baseTypes.Reverse();
 
-                            <!-- TODO: remarks -->
+                                <dl class="attributeList stack">
+                                    <dt>Inheritance</dt>
+                                    <dd>
+                                        <div class="pdlHolder">
+                                            @foreach (Model.DotNet.DotNetTypeReference baseType in baseTypes)
+                                            {
+                                                <div class="pdl">@RazorTemplate.GetLink(baseType, baseType.DisplayName, ServiceProvider!)</div> 
+                                            }
+                                            <span>@Item.DisplayName</span> 
+                                        </div>
+                                    </dd>
+                                </dl>
+                            }
+
+                            @if (Item.ImplementedInterfaces != null)
+                            {
+                                <dl class="attributeList stack">
+                                    <dt>Implements</dt>
+                                    <dd>
+                                        <div class="cdlHolder">
+                                            @for (int i = 0; i < Item.ImplementedInterfaces.Count; i++)
+                                            {
+                                                <span class="@(i == Item.ImplementedInterfaces.Count - 1 ? "cdl cdlLastVisible" : "cdl")">
+                                                    <span class="break-text">@RazorTemplate.GetLink(Item.ImplementedInterfaces[i], Item.ImplementedInterfaces[i].DisplayName, ServiceProvider!)</span>
+                                                </span>
+                                            }
+                                        </div>
+                                    </dd>
+                                </dl>
+                            }
+
+                            @if (Item.Remarks != null)
+                            {
+                                <div class="heading-wrapper" data-heading-level="h2">
+                                    <h2 id="remarks" class="heading-anchor">Remarks</h2>
+                                </div>
+
+                                @RazorTemplate.Raw(Item.Remarks.ToHtml(), "p")
+                            }
 
                             <div data-no-chunk>
                                 <!-- TODO: constructors-->

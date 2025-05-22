@@ -109,6 +109,26 @@ public class DotNetType : DotNetXmlDocSource
             }
         }
 
+        Type? baseType = type.BaseType;
+
+        if (type.IsInterface)
+        {
+            baseType = type.GetInterfaces().FirstOrDefault();
+        }
+
+        if (baseType != null)
+        {
+            BaseType = DotNetTypeReference.Resolve(baseType);
+        }
+
+        Type[] baseTypeInterfaces = baseType == null ? [] : baseType.GetInterfaces();
+        Type[] implementedInterfaces = [.. type.GetInterfaces().Except(baseTypeInterfaces).Where(i => i != baseType)];
+
+        if (implementedInterfaces != null && implementedInterfaces.Length > 0)
+        {
+            ImplementedInterfaces = [.. implementedInterfaces.Select(i => new DotNetTypeReference(i))];
+        }
+
         MethodInfo[] methods = [.. type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))];
 
         if (methods != null && methods.Length > 0)
@@ -128,6 +148,48 @@ public class DotNetType : DotNetXmlDocSource
         if (fields != null && fields.Length > 0)
         {
             Fields = [.. fields.Select(f => new DotNetField(f))];
+        }
+
+        if (type.IsInterface && BaseType?.Type != null)
+        {
+            if (BaseType.Type.Properties != null)
+            {
+                Properties ??= [];
+
+                Properties.AddRange(BaseType.Type.Properties.Select(p =>
+                {
+                    DotNetProperty clonedProperty = new(p);
+                    clonedProperty.DeclaringType ??= BaseType;
+
+                    return clonedProperty;
+                }));
+            }
+
+            if (BaseType.Type.Methods != null)
+            {
+                Methods ??= [];
+
+                Methods.AddRange(BaseType.Type.Methods.Select(m =>
+                {
+                    DotNetMethod clonedMethod = new(m);
+                    clonedMethod.DeclaringType ??= BaseType;
+
+                    return clonedMethod;
+                }));
+            }
+
+            if (BaseType.Type.Fields != null)
+            {
+                Fields ??= [];
+
+                Fields.AddRange(BaseType.Type.Fields.Select(f =>
+                {
+                    DotNetField clonedField = new(f);
+                    clonedField.DeclaringType ??= BaseType;
+
+                    return clonedField;
+                }));
+            }
         }
     }
 
@@ -182,6 +244,18 @@ public class DotNetType : DotNetXmlDocSource
     }
 
     public bool IsAbstract
+    {
+        get;
+        set;
+    }
+
+    public DotNetTypeReference? BaseType
+    {
+        get;
+        set;
+    }
+
+    public List<DotNetTypeReference>? ImplementedInterfaces
     {
         get;
         set;

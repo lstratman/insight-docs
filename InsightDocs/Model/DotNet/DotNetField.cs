@@ -4,6 +4,21 @@ namespace InsightDocs.Model.DotNet;
 
 public class DotNetField : DotNetMemberInfo
 {
+    public DotNetField(DotNetField field)
+    {
+        Name = field.Name;
+        IsStatic = field.IsStatic;
+        IsInternal = field.IsInternal;
+        IsAbstract = field.IsAbstract;
+        AccessType = field.AccessType;
+        FieldType = field.FieldType;
+        DeclaringType = field.DeclaringType;
+        Description = field.Description;
+        Remarks = field.Remarks;
+        ReturnsDescription = field.ReturnsDescription;
+        DeclaringType = field.DeclaringType;
+    }
+
     public DotNetField(FieldInfo field)
     {
         Name = field.Name;
