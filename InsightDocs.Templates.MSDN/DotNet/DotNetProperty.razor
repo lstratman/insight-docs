@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="../../msdn.css"/>
+    </head>
+    <body>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    <div class="content">
+                        <div data-chunk-ids="0">
+                            <h1>
+                                @if (Item!.DeclaringType != null)
+                                {
+                                    @(Item.DeclaringType.DisplayName + "." + Item.Name + " Property")
+                                }
+
+                                else
+                                {
+                                    @(Item.Name + " Property")
+                                }
+                            </h1>
+
+                            <h2>Definition</h2>
+
+                            <div class="metadata">
+                                @if (Item.DeclaringType?.Namespace != null)
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Namespace:</dt>
+                                        <dd>@RazorTemplate.GetLink(Item.DeclaringType.Namespace, Item.DeclaringType.Namespace.FullName, ServiceProvider!)</dd>
+                                    </dl>
+                                }
+
+                                @if (!String.IsNullOrEmpty(Item.DeclaringType?.Assembly?.Name))
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Assembly:</dt>
+                                        <dd>@Item.DeclaringType.Assembly.Name</dd>
+                                    </dl>
+                                }
+                            </div>
+
+                            <div>
+                                @if (Item.Description != null)
+                                {
+                                    <div class="summaryHolder">@RazorTemplate.Raw(Item.Description.ToHtml())</div>
+                                }
+
+                                <!-- TODO: code -->
+
+                                <div class="heading-wrapper" data-heading-level="h4">
+                                    <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>
+                                </div>
+
+                                <div class="propertyInfo">@RazorTemplate.GetLink(Item.PropertyType, Item.PropertyType.DisplayName, ServiceProvider!)</div>
+
+                                @if (Item.ValueDescription != null)
+                                {
+                                    @RazorTemplate.Raw(Item.ValueDescription.ToHtml(), "p")
+                                }
+
+                                @if (Item.Remarks != null)
+                                {
+                                    <div class="heading-wrapper" data-heading-level="h2">
+                                        <h2 id="remarks" class="heading-anchor">Remarks</h2>
+                                    </div>
+
+                                    @RazorTemplate.Raw(Item.Remarks.ToHtml(), "p")
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
+
+@code {
+    [Parameter]
+    public Model.DotNet.DotNetProperty? Item 
+    { 
+        get; 
+        set; 
+    }
+
+    [Parameter]
+    public IServiceProvider? ServiceProvider
+    { 
+        get; 
+        set; 
+    }
+}
