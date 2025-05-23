@@ -14,6 +14,7 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<DotNetType, DotNet.DotNetType>();
         builder.RegisterRazorItemTemplate<DotNetMethod, DotNet.DotNetMethod>();
         builder.RegisterRazorItemTemplate<DotNetProperty, DotNet.DotNetProperty>();
+        builder.RegisterRazorItemTemplate<DotNetField, DotNet.DotNetField>();
         
         builder.Services.AddSingleton<ITemplateAssetProvider, TemplateAssetProvider>();
 

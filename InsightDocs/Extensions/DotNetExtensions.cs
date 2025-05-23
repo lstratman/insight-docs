@@ -156,11 +156,13 @@ public partial class DotNetTocItem : TocItem
             IItemTemplateProvider<DotNetType> dotNetTypeTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetType>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetType.");
             IItemTemplateProvider<DotNetMethod> dotNetMethodTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetMethod>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetMethod.");
             IItemTemplateProvider<DotNetProperty> dotNetPropertyTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetProperty>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetProperty.");
+            IItemTemplateProvider<DotNetField> dotNetFieldTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetField>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetField.");
             IUrlProvider<DotNetIndex> dotNetIndexUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetIndex>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetIndex.");
             IUrlProvider<DotNetNamespace> dotNetNamespaceUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetNamespace>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetNamespace.");
             IUrlProvider<DotNetType> dotNetTypeUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetType>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetType.");
             IUrlProvider<DotNetMethod> dotNetMethodUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetMethod>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetMethod.");
             IUrlProvider<DotNetProperty> dotNetPropertyUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetProperty>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetProperty.");
+            IUrlProvider<DotNetField> dotNetFieldUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetField>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetField.");
             IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
 
             byte[] html = await dotNetIndexTemplate.GetContent(indexData);
@@ -193,6 +195,15 @@ public partial class DotNetTocItem : TocItem
                         {
                             html = await dotNetPropertyTemplate.GetContent(property);
                             await publisher.Publish(dotNetPropertyUrlProvider.GetUrl(property, urlPrefix), html);
+                        }
+                    }
+
+                    if (type.Fields != null)
+                    {
+                        foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type))
+                        {
+                            html = await dotNetFieldTemplate.GetContent(field);
+                            await publisher.Publish(dotNetFieldUrlProvider.GetUrl(field, urlPrefix), html);
                         }
                     }
                 }
