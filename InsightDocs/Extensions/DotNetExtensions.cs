@@ -180,7 +180,7 @@ public partial class DotNetTocItem : TocItem
 
                     if (type.Methods != null)
                     {
-                        foreach (DotNetMethod method in type.Methods.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type))
+                        foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)))
                         {
                             html = await dotNetMethodTemplate.GetContent(method);
                             await publisher.Publish(dotNetMethodUrlProvider.GetUrl(method, urlPrefix), html);

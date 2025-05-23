@@ -9,8 +9,8 @@ public class DotNetProperty : DotNetXmlDocSource
         Name = property.Name;
         PropertyType = property.PropertyType;
         DeclaringType = property.DeclaringType;
-        GetMethod = property.GetMethod == null ? null : new DotNetMethod(property.GetMethod);
-        SetMethod = property.SetMethod == null ? null : new DotNetMethod(property.SetMethod);
+        GetMethod = property.GetMethod == null ? null : new DotNetMethodOverload(property.GetMethod);
+        SetMethod = property.SetMethod == null ? null : new DotNetMethodOverload(property.SetMethod);
         Description = property.Description;
         Remarks = property.Remarks;
         DeclaringType = property.DeclaringType;
@@ -51,22 +51,22 @@ public class DotNetProperty : DotNetXmlDocSource
 
         if (property.GetMethod != null)
         {
-            GetMethod = new DotNetMethod(property.GetMethod);
+            GetMethod = new DotNetMethodOverload(property.GetMethod);
         }
 
         if (property.SetMethod != null)
         {
-            SetMethod = new DotNetMethod(property.SetMethod);
+            SetMethod = new DotNetMethodOverload(property.SetMethod);
         }
     }
 
-    public DotNetMethod? GetMethod
+    public DotNetMethodOverload? GetMethod
     {
         get;
         set;
     }
 
-    public DotNetMethod? SetMethod
+    public DotNetMethodOverload? SetMethod
     {
         get;
         set;

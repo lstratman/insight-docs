@@ -190,24 +190,27 @@
                                     <div class="has-inner-focus">
                                         <table class="table table-sm margin-top-none" aria-label="Methods">
         	                                <tbody>
-                                                @foreach (Model.DotNet.DotNetMethod method in Item.Methods.OrderBy(m => m.Name).ThenBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.LinkTitle))
+                                                @foreach (Model.DotNet.DotNetMethod method in Item.Methods.OrderBy(m => m.Name))
                                                 {
-                                                    <tr>
-                                                        <td>
-                                                            <span class="break-text">@RazorTemplate.GetLink(method, method.LinkTitle, ServiceProvider!)</span>
-                                                        </td>
-                                                        <td>
-                                                            @if (method.Description != null)
-                                                            {
-                                                                <p>@RazorTemplate.Raw(method.Description.ToHtml())</p>
-                                                            }
+                                                    @foreach (Model.DotNet.DotNetMethodOverload methodOverload in method.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.DisplayName))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <span class="break-text">@RazorTemplate.GetLink(methodOverload, methodOverload.DisplayName, ServiceProvider!)</span>
+                                                            </td>
+                                                            <td>
+                                                                @if (methodOverload.Description != null)
+                                                                {
+                                                                    <p>@RazorTemplate.Raw(methodOverload.Description.ToHtml())</p>
+                                                                }
 
-                                                            @if (method.DeclaringType != null && method.DeclaringType.Type != Item)
-                                                            {
-                                                                <div>(Inherited from @RazorTemplate.GetLink(method.DeclaringType, method.DeclaringType.Name, ServiceProvider!))</div>
-                                                            }
-                                                        </td>
-                                                    </tr>
+                                                                @if (methodOverload.DeclaringType != null && methodOverload.DeclaringType.Type != Item)
+                                                                {
+                                                                    <div>(Inherited from @RazorTemplate.GetLink(methodOverload.DeclaringType, methodOverload.DeclaringType.Name, ServiceProvider!))</div>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
                                                 }
                                             </tbody>
                                         </table>

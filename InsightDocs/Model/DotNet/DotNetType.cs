@@ -133,7 +133,20 @@ public class DotNetType : DotNetXmlDocSource
 
         if (methods != null && methods.Length > 0)
         {
-            Methods = [.. methods.Select(m => new DotNetMethod(m))];
+            Methods = [];
+
+            foreach (MethodInfo method in methods)
+            {
+                DotNetMethod? methodCollection = Methods.FirstOrDefault(m => m.Name == method.Name);
+
+                if (methodCollection == null)
+                {
+                    methodCollection = new DotNetMethod(method.Name, DotNetTypeReference.Resolve(type));
+                    Methods.Add(methodCollection);
+                }
+
+                methodCollection.Overloads.Add(new DotNetMethodOverload(method, methodCollection));
+            }
         }
 
         PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);

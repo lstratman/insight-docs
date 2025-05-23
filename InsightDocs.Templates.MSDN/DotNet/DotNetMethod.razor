@@ -11,12 +11,12 @@
                             <h1>
                                 @if (Item!.DeclaringType != null)
                                 {
-                                    @(Item.DeclaringType.DisplayName + "." + Item.DisplayName + " Method")
+                                    @(Item.DeclaringType.DisplayName + "." + (Item.Overloads.Count == 1 ? Item.Overloads[0].DisplayName : Item.Name) + " Method")
                                 }
 
                                 else
                                 {
-                                    @(Item.DisplayName + " Method")
+                                    @((Item.Overloads.Count == 1 ? Item.Overloads[0].DisplayName : Item.Name) + " Method")
                                 }
                             </h1>
 
@@ -40,52 +40,74 @@
                                 }
                             </div>
 
-                            <div>
-                                @if (Item.Description != null)
-                                {
-                                    <div class="summaryHolder">@RazorTemplate.Raw(Item.Description.ToHtml())</div>
-                                }
+                            @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
+                            {
+                                <h2 id="overloads">Overloads</h2>
+                            }
 
-                                <!-- TODO: code -->
-
-                                @if (Item.Parameters != null)
-                                {
-                                    <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
-
-                                    @for (int i = 0; i < Item.Parameters.Count; i++)
+                            @foreach (Model.DotNet.DotNetMethodOverload overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
+                            {
+                                <div>
+                                    @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
                                     {
-                                        <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
-                                            <dl class="parameterList">
-                                                <dt>@Item.Parameters[i].Name</dt>
-                                                <dd>@RazorTemplate.GetLink(Item.Parameters[i].Type, Item.Parameters[i].Type.DisplayName, ServiceProvider!)</dd>
-                                            </dl>
-
-                                            @if (Item.Parameters[i].Description != null)
-                                            {
-                                                <p>@RazorTemplate.Raw(Item.Parameters[i].Description!.ToHtml())</p>
-                                            }
+                                        <div class="heading-wrapper" data-heading-level="h2">
+                                            <h2 class="memberNameHolder heading-anchor">@overload.DisplayName</h2>
                                         </div>
+
+                                        @RazorTemplate.Raw("<div class=\"memberInfo\">")
                                     }
-                                }
 
-                                <h4 class="propertyInfoTitle stack">Returns</h4>
+                                    @if (overload.Description != null)
+                                    {
+                                        <div class="summaryHolder">@RazorTemplate.Raw(overload.Description.ToHtml())</div>
+                                    }
 
-                                <div class="propertyInfo">@RazorTemplate.GetLink(Item.ReturnType, Item.ReturnType.DisplayName, ServiceProvider!)</div>
+                                    <!-- TODO: code -->
 
-                                @if (Item.ReturnsDescription != null)
-                                {
-                                    @RazorTemplate.Raw(Item.ReturnsDescription.ToHtml(), "p")
-                                }
+                                    @if (overload.Parameters != null)
+                                    {
+                                        <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
 
-                                @if (Item.Remarks != null)
-                                {
-                                    <div class="heading-wrapper" data-heading-level="h2">
-                                        <h2 id="remarks" class="heading-anchor">Remarks</h2>
-                                    </div>
+                                        @for (int i = 0; i < overload.Parameters.Count; i++)
+                                        {
+                                            <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
+                                                <dl class="parameterList">
+                                                    <dt>@overload.Parameters[i].Name</dt>
+                                                    <dd>@RazorTemplate.GetLink(overload.Parameters[i].Type, overload.Parameters[i].Type.DisplayName, ServiceProvider!)</dd>
+                                                </dl>
 
-                                    @RazorTemplate.Raw(Item.Remarks.ToHtml(), "p")
-                                }
-                            </div>
+                                                @if (overload.Parameters[i].Description != null)
+                                                {
+                                                    <p>@RazorTemplate.Raw(overload.Parameters[i].Description!.ToHtml())</p>
+                                                }
+                                            </div>
+                                        }
+                                    }
+
+                                    <h4 class="propertyInfoTitle stack">Returns</h4>
+
+                                    <div class="propertyInfo">@RazorTemplate.GetLink(overload.ReturnType, overload.ReturnType.DisplayName, ServiceProvider!)</div>
+
+                                    @if (overload.ReturnsDescription != null)
+                                    {
+                                        @RazorTemplate.Raw(overload.ReturnsDescription.ToHtml(), "p")
+                                    }
+
+                                    @if (overload.Remarks != null)
+                                    {
+                                        <div class="heading-wrapper" data-heading-level="h2">
+                                            <h2 id="remarks" class="heading-anchor">Remarks</h2>
+                                        </div>
+
+                                        @RazorTemplate.Raw(overload.Remarks.ToHtml(), "p")
+                                    }
+
+                                    @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
+                                    {
+                                        @RazorTemplate.Raw("</div>")
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

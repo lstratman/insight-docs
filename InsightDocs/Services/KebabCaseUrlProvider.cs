@@ -10,6 +10,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
       IUrlProvider<DotNetIndex>,
       IUrlProvider<DotNetNamespace>,
       IUrlProvider<DotNetMethod>,
+      IUrlProvider<DotNetMethodOverload>,
       IUrlProvider<DotNetTypeReference>,
       IUrlProvider<DotNetProperty>,
       IUrlProvider<DotNetField>
@@ -197,6 +198,63 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
 
         return url.ToString();
     }
+
+    public string GetUrl(DotNetMethodOverload item, string? urlPrefix = null)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefix))
+        {
+            url.Append(urlPrefix);
+            url.Append('/');
+        }
+
+        if (item.DeclaringType != null)
+        {
+            if (item.DeclaringType.Namespace != null)
+            {
+                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
+                url.Append('-');
+            }
+
+            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
+            url.Append('-');
+        }
+        
+        url.Append(item.Name.ToLower().Replace(".", "-"));
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
+        if (item.MethodCollection != null && item.MethodCollection.Overloads.Count > 1)
+        {
+            url.Append('#');
+
+            if (item.DeclaringType != null)
+            {
+                if (item.DeclaringType.Namespace != null)
+                {
+                    url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
+                    url.Append('-');
+                }
+
+                url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
+                url.Append('-');
+            }
+
+            url.Append(item.Name.ToLower().Replace(".", "-"));
+
+            url.Append('(');
+
+            // TODO: parameters
+
+            url.Append(')');
+        }
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -221,6 +279,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddSingleton<IUrlProvider<DotNetNamespace>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetType>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetMethod>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<DotNetMethodOverload>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetTypeReference>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
