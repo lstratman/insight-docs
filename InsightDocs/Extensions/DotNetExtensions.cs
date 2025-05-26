@@ -90,6 +90,9 @@ public partial class DotNetTocItem : TocItem
         {
             using ILoggerFactory loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
             ILogger logger = loggerFactory.CreateLogger("DotNet");
+
+            XmlDocUrlResolver.SetServiceProvider(serviceProvider);
+
             List<string> assemblyPaths = [];
             List<string> runtimeAssemblyPaths = [];
             

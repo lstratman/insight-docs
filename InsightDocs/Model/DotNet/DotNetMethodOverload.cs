@@ -195,14 +195,20 @@ public class DotNetMethodOverload : DotNetMemberInfo
 
             key.Append('.');
             key.Append(Name);
-            key.Append('(');
+
+            if (GenericArguments != null && GenericArguments.Count > 0)
+            {
+                key.Append('{');
+                key.Append(String.Join(',', GenericArguments.Select(a => a.Name)));
+                key.Append('}');
+            }
 
             if (Parameters != null)
             {
-                key.Append(String.Join(',', Parameters.Select(p => p.Type.XmlDocKey)));
+                key.Append('(');
+                key.Append(String.Join(',', Parameters.Select(p => p.Type.XmlDocKey + (p.IsByRef ? "@" : ""))));
+                key.Append(')');
             }
-
-            key.Append(')');
 
             return key.ToString();
         }

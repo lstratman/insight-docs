@@ -16,6 +16,12 @@ public class DotNetMethodParameter(ParameterInfo parameterInfo)
         set;
     } = parameterInfo.IsOut;
 
+    public bool IsByRef
+    {
+        get;
+        set;
+    } = parameterInfo.ParameterType.IsByRef;
+
     public string Name
     {
         get;

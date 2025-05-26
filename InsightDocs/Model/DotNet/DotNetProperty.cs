@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text;
 using InsightDocs.Abstractions;
 
 namespace InsightDocs.Model.DotNet;
@@ -20,6 +21,12 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
     public DotNetProperty(PropertyInfo property)
     {
         Name = property.Name;
+
+        if (Name.Contains('.'))
+        {
+            Name = Name[(Name.LastIndexOf('.') + 1)..];
+        }
+
         PropertyType = DotNetTypeReference.Resolve(property.PropertyType);
 
         if (property.DeclaringType != null)
@@ -58,6 +65,13 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         if (property.SetMethod != null)
         {
             SetMethod = new DotNetMethodOverload(property.SetMethod);
+        }
+
+        ParameterInfo[] indexParameters = property.GetIndexParameters();
+
+        if (indexParameters != null && indexParameters.Length > 0)
+        {
+            IndexParameters = [.. indexParameters.Select(p => new DotNetMethodParameter(p))];
         }
     }
 
@@ -102,7 +116,22 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         get
         {
             string? typeDocKey = DeclaringType?.XmlDocKey;
-            return typeDocKey == null ? null : typeDocKey + "." + Name;
+
+            if (typeDocKey == null)
+            {
+                return null;
+            }
+
+            StringBuilder key = new(typeDocKey + "." + Name);
+
+            if (IndexParameters != null && IndexParameters.Count > 0)
+            {
+                key.Append('[');
+                key.Append(String.Join(',', IndexParameters.Select(p => p.Type.XmlDocKey)));
+                key.Append(']');
+            }
+
+            return key.ToString();
         }
     }
 
@@ -120,7 +149,7 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
                 return Name;
             }
         }
-    } 
+    }
 
     public string Title
     {
@@ -134,7 +163,13 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
     {
         get
         {
-            return MemberDisplayName;
+            return Name;
         }
+    }
+
+    public List<DotNetMethodParameter>? IndexParameters
+    {
+        get;
+        set;
     }
 }

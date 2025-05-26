@@ -10,6 +10,11 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
     public static DotNetType Resolve(Type type)
     {
+        if (type.IsByRef)
+        {
+            return Resolve(type.GetElementType()!);
+        }
+
         string key = type.Name;
 
         if (!String.IsNullOrEmpty(type.Namespace))
@@ -36,6 +41,11 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
             key = type.Namespace + "." + type.Name;
         }
 
+        if (key.EndsWith('&'))
+        {
+            key = key[..(key.Length - 1)];
+        }
+
         if (!TypeCache.ContainsKey(key))
         {
             TypeCache[key] = this;
@@ -44,9 +54,23 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         Assembly = assembly;
         Namespace = ns;
         Name = type.Name.Contains('`') ? type.Name[..type.Name.IndexOf('`')] : type.Name;
+
+        if (Name.EndsWith('&'))
+        {
+            Name = Name[.. (Name.Length - 1)];
+        }
+
         FullName = String.IsNullOrEmpty(type.Namespace) ? Name : type.Namespace + "." + Name;
         IsSealed = type.IsSealed;
         IsAbstract = type.IsAbstract;
+
+        Type? currentDeclaringType = type.DeclaringType;
+
+        while (currentDeclaringType != null)
+        {
+            Name = (currentDeclaringType.Name.Contains('`') ? currentDeclaringType.Name[..currentDeclaringType.Name.IndexOf('`')] : currentDeclaringType.Name) + "." + Name;
+            currentDeclaringType = currentDeclaringType.DeclaringType;
+        }
 
         Type[] typeParameters = type.GetGenericArguments();
 
@@ -130,7 +154,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
             ImplementedInterfaces = [.. implementedInterfaces.Select(i => new DotNetTypeReference(i))];
         }
 
-        MethodInfo[] methods = [.. type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))];
+        MethodInfo[] methods = [.. type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("op_") && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_") && !m.Name.Contains(".op_") && !m.Name.Contains(".get_") && !m.Name.Contains(".set_"))];
 
         if (methods != null && methods.Length > 0)
         {
@@ -146,22 +170,39 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
                     Methods.Add(methodCollection);
                 }
 
-                methodCollection.Overloads.Add(new DotNetMethodOverload(method, methodCollection));
+                DotNetMethodOverload overload = new(method, methodCollection);
+                methodCollection.Overloads.Add(overload);
+
+                if (!method.Name.Contains('.') && overload.DeclaringType != null && overload.DeclaringType.Type == this && overload.XmlDocKey != null)
+                {
+                    XmlDocUrlResolver.RegisterLookup(overload, "M:" + overload.XmlDocKey);
+                }
             }
         }
 
-        PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        // TODO: explicitly implemented interface properties
+        PropertyInfo[] properties = [.. type.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(p => !p.Name.Contains('.'))];
 
         if (properties != null && properties.Length > 0)
         {
             Properties = [.. properties.Select(p => new DotNetProperty(p))];
+
+            foreach (DotNetProperty property in Properties.Where(p => p.DeclaringType?.Type == this && p.XmlDocKey != null))
+            {
+                XmlDocUrlResolver.RegisterLookup(property, "P:" + property.XmlDocKey!);
+            }
         }
 
-        FieldInfo[] fields = [.. type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(f => !f.Name.StartsWith('<'))];
+        FieldInfo[] fields = [.. type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(f => !f.Name.StartsWith('<'))];
 
         if (fields != null && fields.Length > 0)
         {
             Fields = [.. fields.Select(f => new DotNetField(f))];
+
+            foreach (DotNetField field in Fields.Where(f => f.DeclaringType?.Type == this && f.XmlDocKey != null))
+            {
+                XmlDocUrlResolver.RegisterLookup(field, "F:" + field.XmlDocKey!);
+            }
         }
 
         if (type.IsInterface && BaseType?.Type != null)
@@ -204,6 +245,11 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
                     return clonedField;
                 }));
             }
+        }
+
+        if (XmlDocKey != null)
+        {
+            XmlDocUrlResolver.RegisterLookup(this, "T:" + XmlDocKey);
         }
     }
 
@@ -312,6 +358,13 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
             }
 
             key.Append(Name);
+
+            if (TypeParameters != null && TypeParameters.Count > 0)
+            {
+                key.Append('{');
+                key.Append(String.Join(',', TypeParameters.Select(p => p.Name)));
+                key.Append('}');
+            }
 
             return key.ToString();
         }

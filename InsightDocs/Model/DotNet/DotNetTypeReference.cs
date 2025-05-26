@@ -8,11 +8,21 @@ public class DotNetTypeReference
 
     public static DotNetTypeReference Resolve(Type type)
     {
-        string key = type.Name;
-
-        if (!String.IsNullOrEmpty(type.Namespace))
+        if (type.IsByRef)
         {
-            key = type.Namespace + "." + type.Name;
+            return Resolve(type.GetElementType()!);
+        }
+
+        string? key = type.FullName;
+
+        if (key == null)
+        {
+            key = type.Name;
+
+            if (type.Namespace != null)
+            {
+                key = type.Namespace + "." + key;
+            }
         }
 
         if (!TypeReferenceCache.TryGetValue(key, out DotNetTypeReference? typeReference))
@@ -123,13 +133,31 @@ public class DotNetTypeReference
 
             else
             {
-                StringBuilder key = new(Type!.XmlDocKey);
+                StringBuilder key = new();
 
                 if (GenericArguments != null)
                 {
+                    if (Namespace != null)
+                    {
+                        key.Append(Namespace.FullName);
+                        key.Append('.');
+                    }
+
+                    key.Append(Name);
+
                     key.Append('{');
                     key.Append(String.Join(',', GenericArguments.Select(a => a.XmlDocKey)));
                     key.Append('}');
+                }
+
+                else
+                {
+                    key.Append(Type!.XmlDocKey);
+                }
+
+                if (IsArray)
+                {
+                    key.Append("[]");
                 }
 
                 return key.ToString();

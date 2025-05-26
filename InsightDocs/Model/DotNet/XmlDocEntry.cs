@@ -147,6 +147,7 @@ public abstract class XmlDocCommentComponent
                     components.Add(new XmlDocCommentHtmlTagComponent("p", xmlElement));
                 }
 
+                // TODO: move to custom
                 else if (xmlElement.Name == "b" || xmlElement.Name == "i" || xmlElement.Name == "u" || xmlElement.Name == "strike" || xmlElement.Name == "p" || xmlElement.Name == "br")
                 {
                     components.Add(new XmlDocCommentHtmlTagComponent(xmlElement.Name, xmlElement));
@@ -162,14 +163,9 @@ public abstract class XmlDocCommentComponent
                     components.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement));
                 }
 
-                else if (xmlElement.Name == "see")
+                else if (xmlElement.Name == "see" || xmlElement.Name == "seealso")
                 {
-                    // TODO
-                }
-
-                else if (xmlElement.Name == "seealso")
-                {
-                    // TODO
+                    components.Add(new XmlDocSeeTagComponent(xmlElement));
                 }
 
                 else if (xmlElement.Name == "example")
@@ -179,7 +175,7 @@ public abstract class XmlDocCommentComponent
 
                 else if (xmlElement.Name == "paramref" || xmlElement.Name == "typeparamref")
                 {
-                    XmlDocCommentHtmlTagComponent codeTag = new XmlDocCommentHtmlTagComponent("code", null);
+                    XmlDocCommentHtmlTagComponent codeTag = new("code", null);
                     codeTag.ChildComponents.Add(new XmlDocCommentTextComponent(xmlElement.GetAttribute("name")));
 
                     components.Add(codeTag);
@@ -235,6 +231,69 @@ public class XmlDocCommentHtmlTagComponent : XmlDocCommentComponent
     public override string ToHtml()
     {
         return $"<{TagName}>{String.Join(" ", ChildComponents.Select(c => c.ToHtml()))}</{TagName}>";
+    }
+}
+
+public class XmlDocSeeTagComponent(XmlElement xmlElement) : XmlDocCommentComponent
+{
+    public string CRef
+    {
+        get;
+        set;
+    } = xmlElement.GetAttribute("cref");
+
+    public string Url
+    {
+        get;
+        set;
+    } = xmlElement.GetAttribute("url");
+
+    public string Href
+    {
+        get;
+        set;
+    } = xmlElement.GetAttribute("href");
+
+    public string LangWord
+    {
+        get;
+        set;
+    } = xmlElement.GetAttribute("langword");
+
+    public string LinkText
+    {
+        get;
+        set;
+    } = xmlElement.InnerText;
+
+    public override string ToHtml()
+    {
+        if (!String.IsNullOrEmpty(LangWord))
+        {
+            return $@"<code>{LangWord}</code>";
+        }
+
+        else if (!String.IsNullOrEmpty(CRef))
+        {
+            string url = CRef.StartsWith('!') ? "about:blank" : XmlDocUrlResolver.GetUrl(CRef);
+            string linkText = String.IsNullOrEmpty(LinkText) ? XmlDocUrlResolver.GetLinkText(CRef) : LinkText;
+
+            return $@"<a href=""{url}"">{linkText}</a>";
+        }
+
+        else if (!String.IsNullOrEmpty(Url))
+        {
+            string linkText = String.IsNullOrEmpty(LinkText) ? Url : LinkText;
+            return $@"<a href=""{Url}"">{linkText}</a>";
+        }
+
+        else if (!String.IsNullOrEmpty(Href))
+        {
+            string linkText = String.IsNullOrEmpty(LinkText) ? Href : LinkText;
+            return $@"<a href=""{Href}"">{linkText}</a>";
+        }
+
+        return "";
     }
 }
 
