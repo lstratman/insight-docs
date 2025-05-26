@@ -1,8 +1,9 @@
 using System.Reflection;
+using InsightDocs.Abstractions;
 
 namespace InsightDocs.Model.DotNet;
 
-public class DotNetProperty : DotNetXmlDocSource
+public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
 {
     public DotNetProperty(DotNetProperty property)
     {
@@ -102,6 +103,38 @@ public class DotNetProperty : DotNetXmlDocSource
         {
             string? typeDocKey = DeclaringType?.XmlDocKey;
             return typeDocKey == null ? null : typeDocKey + "." + Name;
+        }
+    }
+
+    public string MemberDisplayName
+    {
+        get
+        {
+            if (DeclaringType != null)
+            {
+                return DeclaringType.DisplayName + "." + Name;
+            }
+
+            else
+            {
+                return Name;
+            }
+        }
+    } 
+
+    public string Title
+    {
+        get
+        {
+            return MemberDisplayName + " Property";
+        }
+    }
+
+    public string LinkText
+    {
+        get
+        {
+            return MemberDisplayName;
         }
     }
 }

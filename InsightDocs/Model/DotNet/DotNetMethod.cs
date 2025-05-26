@@ -1,6 +1,8 @@
+using InsightDocs.Abstractions;
+
 namespace InsightDocs.Model.DotNet;
 
-public class DotNetMethod
+public class DotNetMethod : ILinkTarget
 {
     public DotNetMethod(DotNetMethod method)
     {
@@ -38,4 +40,36 @@ public class DotNetMethod
         get;
         set;
     } = [];
+
+    public string Title
+    {
+        get
+        {
+            return MemberDisplayName + " Method";
+        }
+    }
+
+    public string MemberDisplayName
+    {
+        get
+        {
+            if (DeclaringType != null)
+            {
+                return DeclaringType.DisplayName + "." + (Overloads.Count == 1 ? Overloads[0].MemberDisplayName : Name);
+            }
+
+            else
+            {
+                return Overloads.Count == 1 ? Overloads[0].MemberDisplayName : Name;
+            }
+        }
+    }
+
+    public string LinkText
+    {
+        get
+        {
+            return MemberDisplayName;
+        }
+    }
 }

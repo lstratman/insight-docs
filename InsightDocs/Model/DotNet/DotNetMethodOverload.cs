@@ -147,7 +147,7 @@ public class DotNetMethodOverload : DotNetMemberInfo
         set;
     }
 
-    public string DisplayName
+    public override string MemberDisplayName
     {
         get
         {
@@ -169,6 +169,14 @@ public class DotNetMethodOverload : DotNetMemberInfo
 
             output.Append(')');
             return output.ToString();
+        }
+    }
+
+    public override string LinkText
+    {
+        get
+        {
+            return MemberDisplayName;
         }
     }
 

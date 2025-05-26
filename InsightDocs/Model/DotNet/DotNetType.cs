@@ -1,9 +1,10 @@
 using System.Reflection;
 using System.Text;
+using InsightDocs.Abstractions;
 
 namespace InsightDocs.Model.DotNet;
 
-public class DotNetType : DotNetXmlDocSource
+public class DotNetType : DotNetXmlDocSource, ILinkTarget
 {
     private readonly static Dictionary<string, DotNetType> TypeCache = [];
 
@@ -224,7 +225,7 @@ public class DotNetType : DotNetXmlDocSource
         set;
     }
 
-    public string DisplayTitle
+    public string Title
     {
         get
         {
@@ -313,6 +314,14 @@ public class DotNetType : DotNetXmlDocSource
             key.Append(Name);
 
             return key.ToString();
+        }
+    }
+
+    public string LinkText
+    {
+        get
+        {
+            return DisplayName;
         }
     }
 }

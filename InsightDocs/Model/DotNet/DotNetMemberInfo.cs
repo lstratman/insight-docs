@@ -1,6 +1,8 @@
+using InsightDocs.Abstractions;
+
 namespace InsightDocs.Model.DotNet;
 
-public abstract class DotNetMemberInfo : DotNetXmlDocSource
+public abstract class DotNetMemberInfo : DotNetXmlDocSource, ILinkTarget
 {
     public DotNetMemberInfoAccessType AccessType
     {
@@ -24,6 +26,16 @@ public abstract class DotNetMemberInfo : DotNetXmlDocSource
     {
         get;
         set;
+    }
+
+    public abstract string LinkText
+    {
+        get;
+    }
+
+    public abstract string MemberDisplayName
+    {
+        get;
     }
 }
 

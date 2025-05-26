@@ -21,7 +21,7 @@
                                         @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Class").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {
@@ -47,7 +47,7 @@
                                         @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Struct").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {
@@ -73,7 +73,7 @@
                                         @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Interface").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {
@@ -99,7 +99,7 @@
                                         @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Enum").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, type.Name, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {

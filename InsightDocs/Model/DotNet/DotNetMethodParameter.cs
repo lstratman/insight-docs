@@ -2,32 +2,31 @@ using System.Reflection;
 
 namespace InsightDocs.Model.DotNet;
 
-public class DotNetMethodParameter
+public class DotNetMethodParameter(ParameterInfo parameterInfo)
 {
-    public DotNetMethodParameter(ParameterInfo parameterInfo)
-    {
-        Name = parameterInfo.Name!;
-        IsOptional = parameterInfo.IsOptional;
-        Type = DotNetTypeReference.Resolve(parameterInfo.ParameterType);
-    }
-
     public bool IsOptional
     {
         get;
         set;
-    }
+    } = parameterInfo.IsOptional;
+
+    public bool IsOut
+    {
+        get;
+        set;
+    } = parameterInfo.IsOut;
 
     public string Name
     {
         get;
         set;
-    }
+    } = parameterInfo.Name!;
 
     public DotNetTypeReference Type
     {
         get;
         set;
-    }
+    } = DotNetTypeReference.Resolve(parameterInfo.ParameterType);
 
     public XmlDocHtml? Description
     {

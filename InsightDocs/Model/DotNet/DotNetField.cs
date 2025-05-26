@@ -71,6 +71,38 @@ public class DotNetField : DotNetMemberInfo
         }
     }
 
+    public override string MemberDisplayName
+    {
+        get
+        {
+            return Name;
+        }
+    }
+
+    public string Title
+    {
+        get
+        {
+            if (DeclaringType != null)
+            {
+                return DeclaringType.DisplayName + "." + Name + " Field";
+            }
+
+            else
+            {
+                return Name + " Field";
+            }
+        }
+    }
+
+    public override string LinkText
+    {
+        get
+        {
+            return MemberDisplayName;
+        }
+    }
+
     public string Name
     {
         get;

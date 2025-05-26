@@ -11,7 +11,6 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
       IUrlProvider<DotNetNamespace>,
       IUrlProvider<DotNetMethod>,
       IUrlProvider<DotNetMethodOverload>,
-      IUrlProvider<DotNetTypeReference>,
       IUrlProvider<DotNetProperty>,
       IUrlProvider<DotNetField>
 {
@@ -123,16 +122,6 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         }
 
         return url.ToString();
-    }
-
-    public string GetUrl(DotNetTypeReference item, string? urlPrefix = null)
-    {
-        if (item.Type == null)
-        {
-            return "";
-        }
-
-        return GetUrl(item.Type);
     }
 
     public string GetUrl(DotNetProperty item, string? urlPrefix = null)
@@ -280,7 +269,6 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddSingleton<IUrlProvider<DotNetType>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetMethod>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetMethodOverload>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<DotNetTypeReference>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
 

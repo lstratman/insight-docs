@@ -1,6 +1,8 @@
+using InsightDocs.Abstractions;
+
 namespace InsightDocs.Model.DotNet;
 
-public class DotNetNamespace
+public class DotNetNamespace : ILinkTarget
 {
     private static readonly Dictionary<string, DotNetNamespace> NamespaceCache = [];
 
@@ -38,4 +40,12 @@ public class DotNetNamespace
         get;
         private set;
     } = [];
+
+    public string LinkText
+    {
+        get
+        {
+            return FullName;
+        }
+    }
 }

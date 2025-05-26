@@ -8,17 +8,7 @@
 				<div>
                     <div class="content">
                         <div data-chunk-ids="0">
-                            <h1>
-                                @if (Item!.DeclaringType != null)
-                                {
-                                    @(Item.DeclaringType.DisplayName + "." + Item.Name + " Property")
-                                }
-
-                                else
-                                {
-                                    @(Item.Name + " Property")
-                                }
-                            </h1>
+                            <h1>@Item!.Title</h1>
 
                             <h2>Definition</h2>
 
@@ -27,7 +17,7 @@
                                 {
                                     <dl class="attributeList">
                                         <dt>Namespace:</dt>
-                                        <dd>@RazorTemplate.GetLink(Item.DeclaringType.Namespace, Item.DeclaringType.Namespace.FullName, ServiceProvider!)</dd>
+                                        <dd>@RazorTemplate.GetLink(Item.DeclaringType.Namespace, ServiceProvider!)</dd>
                                     </dl>
                                 }
 
@@ -52,7 +42,7 @@
                                     <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>
                                 </div>
 
-                                <div class="propertyInfo">@RazorTemplate.GetLink(Item.PropertyType, Item.PropertyType.DisplayName, ServiceProvider!)</div>
+                                <div class="propertyInfo">@RazorTemplate.GetLink(Item.PropertyType, ServiceProvider!)</div>
 
                                 @if (Item.ValueDescription != null)
                                 {
