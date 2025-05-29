@@ -31,6 +31,7 @@ public class DotNetAssembly
         if (!String.IsNullOrEmpty(assemblyDirectory) && !String.IsNullOrEmpty(assemblyName.Name) && File.Exists(Path.Combine(assemblyDirectory, assemblyName.Name + ".xml")))
         {
             XmlDocument xmlDocDocument = new();
+            // TODO: move >> replacement to custom
             string xmlDocText = File.ReadAllText(Path.Combine(assemblyDirectory, assemblyName.Name + ".xml")).Replace(">>", ">");
             
             xmlDocDocument.LoadXml(xmlDocText);

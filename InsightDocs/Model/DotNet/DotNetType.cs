@@ -16,10 +16,17 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         }
 
         string key = type.Name;
+        Type? currentDeclaringType = type.DeclaringType;
+
+        while (currentDeclaringType != null)
+        {
+            key = (currentDeclaringType.Name.Contains('`') ? currentDeclaringType.Name[..currentDeclaringType.Name.IndexOf('`')] : currentDeclaringType.Name) + "." + key;
+            currentDeclaringType = currentDeclaringType.DeclaringType;
+        }
 
         if (!String.IsNullOrEmpty(type.Namespace))
         {
-            key = type.Namespace + "." + type.Name;
+            key = type.Namespace + "." + key;
         }
 
         if (!TypeCache.TryGetValue(key, out DotNetType? typeMetadata))
@@ -35,15 +42,17 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
     protected DotNetType(Type type, DotNetAssembly assembly, DotNetNamespace? ns)
     {
         string key = type.Name;
+        Type? currentDeclaringType = type.DeclaringType;
+
+        while (currentDeclaringType != null)
+        {
+            key = (currentDeclaringType.Name.Contains('`') ? currentDeclaringType.Name[..currentDeclaringType.Name.IndexOf('`')] : currentDeclaringType.Name) + "." + key;
+            currentDeclaringType = currentDeclaringType.DeclaringType;
+        }
 
         if (!String.IsNullOrEmpty(type.Namespace))
         {
-            key = type.Namespace + "." + type.Name;
-        }
-
-        if (key.EndsWith('&'))
-        {
-            key = key[..(key.Length - 1)];
+            key = type.Namespace + "." + key;
         }
 
         if (!TypeCache.ContainsKey(key))
@@ -54,23 +63,18 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         Assembly = assembly;
         Namespace = ns;
         Name = type.Name.Contains('`') ? type.Name[..type.Name.IndexOf('`')] : type.Name;
-
-        if (Name.EndsWith('&'))
-        {
-            Name = Name[.. (Name.Length - 1)];
-        }
-
-        FullName = String.IsNullOrEmpty(type.Namespace) ? Name : type.Namespace + "." + Name;
         IsSealed = type.IsSealed;
         IsAbstract = type.IsAbstract;
 
-        Type? currentDeclaringType = type.DeclaringType;
+        currentDeclaringType = type.DeclaringType;
 
         while (currentDeclaringType != null)
         {
             Name = (currentDeclaringType.Name.Contains('`') ? currentDeclaringType.Name[..currentDeclaringType.Name.IndexOf('`')] : currentDeclaringType.Name) + "." + Name;
             currentDeclaringType = currentDeclaringType.DeclaringType;
         }
+
+        FullName = String.IsNullOrEmpty(type.Namespace) ? Name : type.Namespace + "." + Name;
 
         Type[] typeParameters = type.GetGenericArguments();
 

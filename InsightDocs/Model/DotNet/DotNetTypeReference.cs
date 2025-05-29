@@ -18,6 +18,14 @@ public class DotNetTypeReference
         if (key == null)
         {
             key = type.Name;
+            
+            Type? currentDeclaringType = type.DeclaringType;
+
+            while (currentDeclaringType != null)
+            {
+                key = (currentDeclaringType.Name.Contains('`') ? currentDeclaringType.Name[..currentDeclaringType.Name.IndexOf('`')] : currentDeclaringType.Name) + "." + key;
+                currentDeclaringType = currentDeclaringType.DeclaringType;
+            }
 
             if (type.Namespace != null)
             {

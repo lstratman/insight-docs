@@ -36,7 +36,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
             url.Append('-');
         }
 
-        url.Append(item.Name.ToLower());
+        url.Append(item.Name.ToLower().Replace(".", "-"));
 
         if (item.TypeParameters != null)
         {
