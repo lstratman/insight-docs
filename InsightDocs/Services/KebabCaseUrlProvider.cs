@@ -1,6 +1,7 @@
 using System.Text;
 using InsightDocs.Abstractions;
 using InsightDocs.Model.DotNet;
+using InsightDocs.Model.Site;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
@@ -12,7 +13,8 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
       IUrlProvider<DotNetMethod>,
       IUrlProvider<DotNetMethodOverload>,
       IUrlProvider<DotNetProperty>,
-      IUrlProvider<DotNetField>
+      IUrlProvider<DotNetField>,
+      IUrlProvider<SiteTableOfContents>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -244,6 +246,26 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
 
         return url.ToString();
     }
+
+    public string GetUrl(SiteTableOfContents item, string? urlPrefix = null)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefix))
+        {
+            url.Append(urlPrefix);
+            url.Append('/');
+        }
+
+        url.Append("table-of-contents");
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".json");
+        }
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -271,6 +293,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddSingleton<IUrlProvider<DotNetMethodOverload>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<SiteTableOfContents>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

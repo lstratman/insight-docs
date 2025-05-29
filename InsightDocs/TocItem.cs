@@ -6,18 +6,25 @@ public class TocItem
     {
     }
 
-    public TocItem(string title, TocItem? parent, string? urlPrefix = null)
+    public TocItem(string title, TocItem? parent, string? url = null, string? urlPrefix = null)
     {
         Title = title;
         Parent = parent;
         UrlPrefix = urlPrefix;
+        Url = url;
     }
 
-    public virtual string? Title
+    public virtual string? Url
     {
         get;
         set;
     }
+
+    public virtual string Title
+    {
+        get;
+        set;
+    } = "";
 
     public virtual string? UrlPrefix
     {
@@ -60,28 +67,31 @@ public class TocItem
         private set;
     } = [];
 
-    protected virtual List<Func<IServiceProvider, Task>> Executors
+    protected virtual List<Func<IServiceProvider, Task>>? Executors
     {
         get;
         private set;
-    } = [];
+    }
 
     public virtual async Task Execute(IServiceProvider serviceProvider)
     {
-        foreach (Func<IServiceProvider, Task> executor in Executors)
+        if (Executors != null)
         {
-            await executor(serviceProvider);
+            foreach (Func<IServiceProvider, Task> executor in Executors)
+            {
+                await executor(serviceProvider);
+            }
         }
 
         foreach (TocItem child in Children)
-        {
-            await child.Execute(serviceProvider);
-        }
+            {
+                await child.Execute(serviceProvider);
+            }
     }
 
-    public TocItem AddTocItem(string title, string? urlPrefix = null)
+    public TocItem AddTocItem(string title, string? url = null, string? urlPrefix = null)
     {
-        TocItem newTocItem = new(title, this, urlPrefix);
+        TocItem newTocItem = new(title, this, url, urlPrefix);
         Children.Add(newTocItem);
 
         return newTocItem;
@@ -89,6 +99,7 @@ public class TocItem
 
     public virtual void RegisterExecutor(Func<IServiceProvider, Task> executor)
     {
+        Executors ??= [];
         Executors.Add(executor);
     }
 }

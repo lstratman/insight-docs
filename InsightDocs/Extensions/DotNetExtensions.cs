@@ -41,7 +41,7 @@ public partial class DotNetTocItem : TocItem
         }
     }
 
-    public override string? Title
+    public override string Title
     {
         get
         {
@@ -173,40 +173,67 @@ public partial class DotNetTocItem : TocItem
 
             await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData, urlPrefix), html);
 
-            foreach (DotNetNamespace ns in indexData.Namespaces)
+            foreach (DotNetNamespace ns in indexData.Namespaces.OrderBy(n => n.FullName))
             {
-                html = await dotNetNamespaceTemplate.GetContent(ns);
-                await publisher.Publish(dotNetNamespaceUrlProvider.GetUrl(ns, urlPrefix), html);
+                string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns, urlPrefix);
+                TocItem namespaceTocItem = AddTocItem(ns.FullName, namespaceUrl);
 
-                foreach (DotNetType type in ns.Types)
+                html = await dotNetNamespaceTemplate.GetContent(ns);
+                await publisher.Publish(namespaceUrl, html);
+
+                foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
                 {
+                    string typeUrl = dotNetTypeUrlProvider.GetUrl(type, urlPrefix);
+                    TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
+
                     html = await dotNetTypeTemplate.GetContent(type);
-                    await publisher.Publish(dotNetTypeUrlProvider.GetUrl(type, urlPrefix), html);
+                    await publisher.Publish(typeUrl, html);
 
                     if (type.Methods != null)
                     {
+                        TocItem? methodsTocItem = null;
+
                         foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)))
                         {
+                            methodsTocItem ??= typeTocItem.AddTocItem("Methods");
+
+                            string methodUrl = dotNetMethodUrlProvider.GetUrl(method, urlPrefix);
+                            methodsTocItem.AddTocItem(method.Name, methodUrl);
+
                             html = await dotNetMethodTemplate.GetContent(method);
-                            await publisher.Publish(dotNetMethodUrlProvider.GetUrl(method, urlPrefix), html);
+                            await publisher.Publish(methodUrl, html);
                         }
                     }
 
                     if (type.Properties != null)
                     {
+                        TocItem? propertiesTocItem = null;
+
                         foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type))
                         {
+                            propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
+
+                            string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property, urlPrefix);
+                            propertiesTocItem.AddTocItem(property.Name, propertyUrl);
+
                             html = await dotNetPropertyTemplate.GetContent(property);
-                            await publisher.Publish(dotNetPropertyUrlProvider.GetUrl(property, urlPrefix), html);
+                            await publisher.Publish(propertyUrl, html);
                         }
                     }
 
                     if (type.Fields != null)
                     {
+                        TocItem? fieldsTocItem = null;
+
                         foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type))
                         {
+                            fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
+
+                            string fieldUrl = dotNetFieldUrlProvider.GetUrl(field, urlPrefix);
+                            fieldsTocItem.AddTocItem(field.Name, fieldUrl);
+
                             html = await dotNetFieldTemplate.GetContent(field);
-                            await publisher.Publish(dotNetFieldUrlProvider.GetUrl(field, urlPrefix), html);
+                            await publisher.Publish(fieldUrl, html);
                         }
                     }
                 }
