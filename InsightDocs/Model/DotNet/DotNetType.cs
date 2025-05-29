@@ -8,13 +8,8 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 {
     private readonly static Dictionary<string, DotNetType> TypeCache = [];
 
-    public static DotNetType Resolve(Type type)
+    private static string GetCacheKey(Type type)
     {
-        if (type.IsByRef)
-        {
-            return Resolve(type.GetElementType()!);
-        }
-
         string key = type.Name;
         Type? currentDeclaringType = type.DeclaringType;
 
@@ -28,6 +23,18 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         {
             key = type.Namespace + "." + key;
         }
+
+        return key;
+    }
+
+    public static DotNetType Resolve(Type type)
+    {
+        if (type.IsByRef)
+        {
+            return Resolve(type.GetElementType()!);
+        }
+
+        string key = GetCacheKey(type);
 
         if (!TypeCache.TryGetValue(key, out DotNetType? typeMetadata))
         {
@@ -41,19 +48,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
     protected DotNetType(Type type, DotNetAssembly assembly, DotNetNamespace? ns)
     {
-        string key = type.Name;
-        Type? currentDeclaringType = type.DeclaringType;
-
-        while (currentDeclaringType != null)
-        {
-            key = (currentDeclaringType.Name.Contains('`') ? currentDeclaringType.Name[..currentDeclaringType.Name.IndexOf('`')] : currentDeclaringType.Name) + "." + key;
-            currentDeclaringType = currentDeclaringType.DeclaringType;
-        }
-
-        if (!String.IsNullOrEmpty(type.Namespace))
-        {
-            key = type.Namespace + "." + key;
-        }
+        string key = GetCacheKey(type);
 
         if (!TypeCache.ContainsKey(key))
         {
@@ -66,7 +61,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         IsSealed = type.IsSealed;
         IsAbstract = type.IsAbstract;
 
-        currentDeclaringType = type.DeclaringType;
+        Type? currentDeclaringType = type.DeclaringType;
 
         while (currentDeclaringType != null)
         {

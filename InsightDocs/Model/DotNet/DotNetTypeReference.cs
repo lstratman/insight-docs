@@ -6,19 +6,14 @@ public class DotNetTypeReference
 {
     private readonly static Dictionary<string, DotNetTypeReference> TypeReferenceCache = [];
 
-    public static DotNetTypeReference Resolve(Type type)
+    private static string GetCacheKey(Type type)
     {
-        if (type.IsByRef)
-        {
-            return Resolve(type.GetElementType()!);
-        }
-
         string? key = type.FullName;
 
         if (key == null)
         {
             key = type.Name;
-            
+
             Type? currentDeclaringType = type.DeclaringType;
 
             while (currentDeclaringType != null)
@@ -32,6 +27,18 @@ public class DotNetTypeReference
                 key = type.Namespace + "." + key;
             }
         }
+
+        return key;
+    }
+
+    public static DotNetTypeReference Resolve(Type type)
+    {
+        if (type.IsByRef)
+        {
+            return Resolve(type.GetElementType()!);
+        }
+
+        string key = GetCacheKey(type);
 
         if (!TypeReferenceCache.TryGetValue(key, out DotNetTypeReference? typeReference))
         {
