@@ -100,6 +100,26 @@ public class DotNetMethodOverload : DotNetMemberInfo
                             }
                         }
                     }
+
+                    if (xmlDocEntry.Exceptions != null)
+                    {
+                        Exceptions = [];
+
+                        foreach (XmlDocException exception in xmlDocEntry.Exceptions)
+                        {
+                            Exceptions.Add(new(new XmlDocHtml([exception.Exception]), exception.Text == null || exception.Text.Count == 0 ? null : new XmlDocHtml(exception.Text)));
+                        }
+                    }
+
+                    if (xmlDocEntry.SeeAlso != null)
+                    {
+                        SeeAlso = [];
+
+                        foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
+                        {
+                            SeeAlso.Add(new XmlDocHtml([seeAlso]));
+                        }
+                    }
                 }
             }
         }
@@ -136,6 +156,18 @@ public class DotNetMethodOverload : DotNetMemberInfo
     }
 
     public XmlDocHtml? ReturnsDescription
+    {
+        get;
+        set;
+    }
+
+    public List<Tuple<XmlDocHtml, XmlDocHtml?>>? Exceptions
+    {
+        get;
+        set;
+    }
+
+    public List<XmlDocHtml>? SeeAlso
     {
         get;
         set;

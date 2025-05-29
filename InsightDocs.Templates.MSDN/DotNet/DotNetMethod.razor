@@ -56,7 +56,7 @@
 
                                     @if (overload.Parameters != null)
                                     {
-                                        <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
+                                        <h3 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h3>
 
                                         @for (int i = 0; i < overload.Parameters.Count; i++)
                                         {
@@ -74,7 +74,7 @@
                                         }
                                     }
 
-                                    <h4 class="propertyInfoTitle stack">Returns</h4>
+                                    <h3 class="propertyInfoTitle stack">Returns</h3>
 
                                     <div class="propertyInfo">@RazorTemplate.GetLink(overload.ReturnType, ServiceProvider!)</div>
 
@@ -83,13 +83,42 @@
                                         @RazorTemplate.Raw(overload.ReturnsDescription.ToHtml(), "p")
                                     }
 
+                                    @if (overload.Exceptions != null)
+                                    {
+                                        <h3 class="propertyInfoTitle stack heading-anchor" id="exceptions">Exceptions</h3>
+
+                                        foreach (Tuple<Model.DotNet.XmlDocHtml, Model.DotNet.XmlDocHtml?> exception in overload.Exceptions)
+                                        {
+                                            <div class="propertyInfo">
+                                                <div class="subtle">
+                                                    @RazorTemplate.Raw(exception.Item1.ToHtml())
+                                                </div>
+                                                
+                                                @if (exception.Item2 != null)
+                                                {
+                                                    @RazorTemplate.Raw(exception.Item2.ToHtml(), "p")
+                                                }
+                                            </div>
+                                        }
+                                    }
+
                                     @if (overload.Remarks != null)
                                     {
-                                        <div class="heading-wrapper" data-heading-level="h2">
-                                            <h2 id="remarks" class="heading-anchor">Remarks</h2>
-                                        </div>
+                                        <h3 id="remarks" class="heading-anchor">Remarks</h3>
 
                                         @RazorTemplate.Raw(overload.Remarks.ToHtml(), "p")
+                                    }
+
+                                    @if (overload.SeeAlso != null)
+                                    {
+                                        <h3 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h3>
+
+                                        <ul>
+                                            @foreach (Model.DotNet.XmlDocHtml seeAlso in overload.SeeAlso)
+                                            {
+                                                <li>@RazorTemplate.Raw(seeAlso.ToHtml())</li>
+                                            }
+                                        </ul>
                                     }
 
                                     @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)

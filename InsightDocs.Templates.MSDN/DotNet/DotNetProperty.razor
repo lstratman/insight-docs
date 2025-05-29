@@ -57,6 +57,20 @@
 
                                     @RazorTemplate.Raw(Item.Remarks.ToHtml(), "p")
                                 }
+
+                                @if (Item.SeeAlso != null)
+                                {
+                                    <div class="heading-wrapper" data-heading-level="h2">
+                                        <h2 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h2>
+                                    </div>
+
+                                    <ul>
+                                        @foreach (Model.DotNet.XmlDocHtml seeAlso in Item.SeeAlso)
+                                        {
+                                            <li>@RazorTemplate.Raw(seeAlso.ToHtml())</li>
+                                        }
+                                    </ul>
+                                }
                             </div>
                         </div>
                     </div>

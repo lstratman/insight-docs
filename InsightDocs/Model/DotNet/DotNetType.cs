@@ -130,6 +130,16 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
                         }
                     }
                 }
+
+                if (xmlDocEntry.SeeAlso != null)
+                {
+                    SeeAlso = [];
+
+                    foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
+                    {
+                        SeeAlso.Add(new XmlDocHtml([seeAlso]));
+                    }
+                }
             }
         }
 
@@ -375,5 +385,11 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         {
             return DisplayName;
         }
+    }
+
+    public List<XmlDocHtml>? SeeAlso
+    {
+        get;
+        set;
     }
 }

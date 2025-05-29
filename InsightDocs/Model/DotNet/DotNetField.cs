@@ -66,6 +66,16 @@ public class DotNetField : DotNetMemberInfo
                     {
                         ReturnsDescription = new XmlDocHtml(xmlDocEntry.Returns);
                     }
+
+                    if (xmlDocEntry.SeeAlso != null)
+                    {
+                        SeeAlso = [];
+
+                        foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
+                        {
+                            SeeAlso.Add(new XmlDocHtml([seeAlso]));
+                        }
+                    }
                 }
             }
         }
@@ -134,5 +144,11 @@ public class DotNetField : DotNetMemberInfo
             string? typeDocKey = DeclaringType?.XmlDocKey;
             return typeDocKey == null ? null : typeDocKey + "." + Name;
         }
+    }
+
+    public List<XmlDocHtml>? SeeAlso
+    {
+        get;
+        set;
     }
 }

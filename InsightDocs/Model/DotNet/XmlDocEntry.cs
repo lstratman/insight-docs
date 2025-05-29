@@ -44,7 +44,8 @@ public class XmlDocEntry
 
             else if (childNode.Name == "seealso")
             {
-                // TODO
+                SeeAlso ??= [];
+                SeeAlso.Add(new XmlDocSeeTagComponent(childNode));
             }
 
             else if (childNode.Name == "example")
@@ -69,7 +70,8 @@ public class XmlDocEntry
 
             else if (childNode.Name == "exception")
             {
-                // TODO
+                Exceptions ??= [];
+                Exceptions.Add(new(childNode));
             }
 
             else if (childNode.Name == "inheritdoc")
@@ -121,6 +123,18 @@ public class XmlDocEntry
     }
 
     public Dictionary<string, List<XmlDocCommentComponent>>? TypeParameters
+    {
+        get;
+        set;
+    }
+
+    public List<XmlDocSeeTagComponent>? SeeAlso
+    {
+        get;
+        set;
+    }
+
+    public List<XmlDocException>? Exceptions
     {
         get;
         set;
@@ -309,4 +323,19 @@ public class XmlDocCommentTextComponent(string text) : XmlDocCommentComponent
     {
         return Text;
     }
+}
+
+public class XmlDocException(XmlElement childNode)
+{
+    public XmlDocSeeTagComponent Exception
+    {
+        get;
+        set;
+    } = new XmlDocSeeTagComponent(childNode) { LinkText = "" };
+
+    public List<XmlDocCommentComponent> Text
+    {
+        get;
+        set;
+    } = XmlDocCommentComponent.Process(childNode);
 }

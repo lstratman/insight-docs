@@ -53,6 +53,16 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
                     {
                         ValueDescription = new XmlDocHtml(xmlDocEntry.Value);
                     }
+
+                    if (xmlDocEntry.SeeAlso != null)
+                    {
+                        SeeAlso = [];
+
+                        foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
+                        {
+                            SeeAlso.Add(new XmlDocHtml([seeAlso]));
+                        }
+                    }
                 }
             }
         }
@@ -168,6 +178,12 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
     }
 
     public List<DotNetMethodParameter>? IndexParameters
+    {
+        get;
+        set;
+    }
+
+    public List<XmlDocHtml>? SeeAlso
     {
         get;
         set;
