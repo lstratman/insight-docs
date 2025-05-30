@@ -33,22 +33,29 @@ public class Builder(IServiceCollection services)
 
     public async Task Execute()
     {
-        IServiceProvider serviceProvider = Services.BuildServiceProvider();
-        IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
-        IUrlProvider<SiteTableOfContents> tableOfContentsUrlProvider = serviceProvider.GetService<IUrlProvider<SiteTableOfContents>>() ?? throw new Exception("No IUrlProvider service was registered for SiteTableOfContents.");
-        ITemplateAssetProvider? templateAssetProvider = serviceProvider.GetService<ITemplateAssetProvider>();
-
-        await publisher.Initialize();
-        await TocRoot.Execute(serviceProvider);
-
-        SiteTableOfContents siteTableOfContents = new(TocRoot);
-        string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
-
-        await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteTableOfContents), SerializerOptions)));
-
-        if (templateAssetProvider != null)
+        using (ServiceProvider serviceProvider = Services.BuildServiceProvider())
         {
-            await templateAssetProvider.PublishAssets();
+            IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
+            IUrlProvider<SiteTableOfContents> tableOfContentsUrlProvider = serviceProvider.GetService<IUrlProvider<SiteTableOfContents>>() ?? throw new Exception("No IUrlProvider service was registered for SiteTableOfContents.");
+            IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetService<IUrlProvider<SiteIndex>>() ?? throw new Exception("No IUrlProvider service was registered for SiteIndex.");
+            IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<SiteIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for SiteIndex.");
+            ITemplateAssetProvider? templateAssetProvider = serviceProvider.GetService<ITemplateAssetProvider>();
+            SiteIndex siteIndex = new();
+
+            await publisher.Initialize();
+            await TocRoot.Execute(serviceProvider);
+
+            string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
+            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex));
+
+            SiteTableOfContents siteTableOfContents = new(TocRoot);
+            string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
+            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteTableOfContents), SerializerOptions)));
+
+            if (templateAssetProvider != null)
+            {
+                await templateAssetProvider.PublishAssets();
+            }
         }
     }
 }

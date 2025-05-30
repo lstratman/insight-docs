@@ -14,7 +14,8 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
       IUrlProvider<DotNetMethodOverload>,
       IUrlProvider<DotNetProperty>,
       IUrlProvider<DotNetField>,
-      IUrlProvider<SiteTableOfContents>
+      IUrlProvider<SiteTableOfContents>,
+      IUrlProvider<SiteIndex>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -266,6 +267,26 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
 
         return url.ToString();
     }
+
+    public string GetUrl(SiteIndex item, string? urlPrefix = null)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefix))
+        {
+            url.Append(urlPrefix);
+            url.Append('/');
+        }
+
+        url.Append("index");
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -294,6 +315,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddSingleton<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<SiteTableOfContents>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<SiteIndex>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

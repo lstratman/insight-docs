@@ -11,13 +11,12 @@ namespace InsightDocs.Extensions;
 public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvider) : IItemTemplateProvider<T> where TTemplate: IComponent
 {
     protected IServiceProvider _serviceProvider = serviceProvider;
+    protected ILoggerFactory _loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
     public async Task<byte[]> GetContent(T item)
     {
-        ILoggerFactory loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
+        using HtmlRenderer htmlRenderer = new(_serviceProvider, _loggerFactory);
 
-        using HtmlRenderer htmlRenderer = new(_serviceProvider, loggerFactory);
-        
         return await htmlRenderer.Dispatcher.InvokeAsync(async () =>
         {
             var dictionary = new Dictionary<string, object?>

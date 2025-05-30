@@ -44,7 +44,7 @@ public class HtmlFilePublisher(HtmlFilePublisherOptions options) : IPublisher
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         }
 
-        await File.WriteAllBytesAsync(Path.Combine(Options.OutputDirectory, url), contents);
+        await File.WriteAllBytesAsync(outputPath, contents);
     }
 }
 

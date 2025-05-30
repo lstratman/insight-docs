@@ -14,12 +14,36 @@ public class TemplateAssetProvider(IPublisher publisher) : ITemplateAssetProvide
     public async Task PublishAssets()
     {
         Assembly executingAssembly = Assembly.GetExecutingAssembly();
-        Stream stylesheetResourceStream = executingAssembly.GetManifestResourceStream("InsightDocs.Templates.MSDN.Assets.msdn.css") ?? throw new Exception("Unable to load the resource stream for the MSDN template stylesheet.");
+        Stream resourceStream = executingAssembly.GetManifestResourceStream("InsightDocs.Templates.MSDN.Assets.msdn.css") ?? throw new Exception("Unable to load the resource stream for the MSDN template stylesheet.");
 
         using (MemoryStream memoryStream = new())
         {
-            await stylesheetResourceStream.CopyToAsync(memoryStream);
+            await resourceStream.CopyToAsync(memoryStream);
             await Publisher.Publish("msdn.css", memoryStream.ToArray());
+        }
+
+        resourceStream = executingAssembly.GetManifestResourceStream("InsightDocs.Templates.MSDN.Assets.docons.woff2") ?? throw new Exception("Unable to load the resource stream for docons font.");
+
+        using (MemoryStream memoryStream = new())
+        {
+            await resourceStream.CopyToAsync(memoryStream);
+            await Publisher.Publish("docons.woff2", memoryStream.ToArray());
+        }
+
+        resourceStream = executingAssembly.GetManifestResourceStream("InsightDocs.Templates.MSDN.Assets.segoe-ui.woff2") ?? throw new Exception("Unable to load the resource stream for Segoe UI font.");
+
+        using (MemoryStream memoryStream = new())
+        {
+            await resourceStream.CopyToAsync(memoryStream);
+            await Publisher.Publish("segoe-ui.woff2", memoryStream.ToArray());
+        }
+
+        resourceStream = executingAssembly.GetManifestResourceStream("InsightDocs.Templates.MSDN.Assets.segoe-ui-roman-vf.woff2") ?? throw new Exception("Unable to load the resource stream for Segoe UI Roman VF font.");
+
+        using (MemoryStream memoryStream = new())
+        {
+            await resourceStream.CopyToAsync(memoryStream);
+            await Publisher.Publish("segoe-ui-roman-vf.woff2", memoryStream.ToArray());
         }
     }
 }

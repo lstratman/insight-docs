@@ -12415,8 +12415,7 @@ h1, h2.likeAnH1, h2, h3, h4, h5, h6 {
 @font-face {
   font-family: docons;
   font-display: block;
-  src: url("docons.3850ca0.989437f2.eot");
-  src: url("docons.3850ca0.989437f2.eot") format("embedded-opentype"), url("docons.3850ca0.2b3535fe.woff2") format("woff2"), url("docons.3850ca0.2a4aee50.woff") format("woff"), url("docons.3850ca0.726ae44e.ttf") format("truetype");
+  src: url("docons.woff2");
   font-weight: normal;
   font-style: normal;
 }
@@ -12424,15 +12423,14 @@ h1, h2.likeAnH1, h2, h3, h4, h5, h6 {
 @font-face {
   font-family: SegoeUI;
   font-display: block;
-  src: url("/static/third-party/SegoeUIWeb/1.01.206/SegoeUI-Roman-VF_web.woff2") format("woff2"), url("/static/third-party/SegoeUIWeb/1.01.206/SegoeUI-Roman-VF_web.woff") format("woff"), url("/static/third-party/SegoeUIWeb/1.01.206/SegoeUI-Roman-VF_web.ttf") format("ttf");
+  src: url("segoe-ui-roman-vf.woff2");
   font-weight: 100 700;
 }
 
 @font-face {
   font-family: SegoeUI;
   font-display: block;
-  src: url("/static/third-party/SegoeUI/5.32/west-european/italic/latest.eot");
-  src: url("/static/third-party/SegoeUI/5.32/west-european/italic/latest.woff2") format("woff2"), url("/static/third-party/SegoeUI/5.32/west-european/italic/latest.woff") format("woff"), url("/static/third-party/SegoeUI/5.32/west-european/italic/latest.ttf") format("ttf");
+  src: url("segoe-ui.woff2");
   font-style: italic;
   font-weight: 400;
 }

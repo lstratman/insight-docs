@@ -88,7 +88,7 @@ public partial class DotNetTocItem : TocItem
     {
         if (RootedAssemblyGlobMatchers != null)
         {
-            using ILoggerFactory loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
+            ILoggerFactory loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
             ILogger logger = loggerFactory.CreateLogger("DotNet");
 
             XmlDocUrlResolver.SetServiceProvider(serviceProvider);
