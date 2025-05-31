@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Xml;
+using InsightDocs.DotNet.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.DotNet.Model;
 
@@ -42,9 +44,12 @@ public class DotNetAssembly
             {
                 XmlDocEntries = [];
 
+                IXmlDocProcessor xmlDocProcessor = serviceProvider.GetRequiredService<IXmlDocProcessor>();
+
                 foreach (XmlElement memberNode in memberNodes)
                 {
-                    XmlDocEntries[memberNode.GetAttribute("name")] = new XmlDocEntry(memberNode.GetAttribute("name"), memberNode, serviceProvider);
+                    XmlDocEntry xmlDocEntry = xmlDocProcessor.ProcessMemberNode(memberNode);
+                    XmlDocEntries[xmlDocEntry.Key] = xmlDocEntry;
                 }
             }
         }

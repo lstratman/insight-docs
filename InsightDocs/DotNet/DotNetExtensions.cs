@@ -9,7 +9,9 @@ public static class DotNetExtensions
 {
     public static Builder UseDotNet(this Builder builder)
     {
+        builder.Services.AddSingleton<IXmlDocProcessor, XmlDocProcessor>();
         builder.Services.AddScoped<IXmlDocUrlResolver, XmlDocUrlResolver>();
+        
         return builder;
     }
 }
