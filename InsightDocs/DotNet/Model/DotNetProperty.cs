@@ -18,7 +18,7 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         DeclaringType = property.DeclaringType;
     }
 
-    public DotNetProperty(PropertyInfo property)
+    public DotNetProperty(PropertyInfo property, IServiceProvider serviceProvider)
     {
         Name = property.Name;
 
@@ -27,11 +27,11 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
             Name = Name[(Name.LastIndexOf('.') + 1)..];
         }
         
-        PropertyType = DotNetTypeReference.Resolve(property.PropertyType);
+        PropertyType = DotNetTypeReference.Resolve(property.PropertyType, serviceProvider);
 
         if (property.DeclaringType != null)
         {
-            DeclaringType = DotNetTypeReference.Resolve(property.DeclaringType);
+            DeclaringType = DotNetTypeReference.Resolve(property.DeclaringType, serviceProvider);
 
             if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
             {
@@ -69,19 +69,19 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
 
         if (property.GetMethod != null)
         {
-            GetMethod = new DotNetMethodOverload(property.GetMethod);
+            GetMethod = new DotNetMethodOverload(property.GetMethod, serviceProvider);
         }
 
         if (property.SetMethod != null)
         {
-            SetMethod = new DotNetMethodOverload(property.SetMethod);
+            SetMethod = new DotNetMethodOverload(property.SetMethod, serviceProvider);
         }
 
         ParameterInfo[] indexParameters = property.GetIndexParameters();
 
         if (indexParameters != null && indexParameters.Length > 0)
         {
-            IndexParameters = [.. indexParameters.Select(p => new DotNetMethodParameter(p))];
+            IndexParameters = [.. indexParameters.Select(p => new DotNetMethodParameter(p, serviceProvider))];
         }
     }
 

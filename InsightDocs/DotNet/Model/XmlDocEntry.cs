@@ -1,10 +1,13 @@
 using System.Xml;
+using InsightDocs.DotNet.Abstractions;
+using InsightDocs.DotNet.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.DotNet.Model;
 
 public class XmlDocEntry
 {
-    public XmlDocEntry(string key, XmlElement xmlNode)
+    public XmlDocEntry(string key, XmlElement xmlNode, IServiceProvider serviceProvider)
     {
         Key = key;
 
@@ -12,40 +15,40 @@ public class XmlDocEntry
         {
             if (childNode.Name == "summary")
             {
-                Summary = XmlDocCommentComponent.Process(childNode);
+                Summary = XmlDocCommentComponent.Process(childNode, serviceProvider);
             }
 
             else if (childNode.Name == "remarks")
             {
-                Remarks = XmlDocCommentComponent.Process(childNode);
+                Remarks = XmlDocCommentComponent.Process(childNode, serviceProvider);
             }
 
             else if (childNode.Name == "returns")
             {
-                Returns = XmlDocCommentComponent.Process(childNode);
+                Returns = XmlDocCommentComponent.Process(childNode, serviceProvider);
             }
 
             else if (childNode.Name == "value")
             {
-                Value = XmlDocCommentComponent.Process(childNode);
+                Value = XmlDocCommentComponent.Process(childNode, serviceProvider);
             }
 
             else if (childNode.Name == "param")
             {
                 Parameters ??= [];
-                Parameters[childNode.GetAttribute("name")] = XmlDocCommentComponent.Process(childNode);
+                Parameters[childNode.GetAttribute("name")] = XmlDocCommentComponent.Process(childNode, serviceProvider);
             }
 
             else if (childNode.Name == "typeparam")
             {
                 TypeParameters ??= [];
-                TypeParameters[childNode.GetAttribute("name")] = XmlDocCommentComponent.Process(childNode);
+                TypeParameters[childNode.GetAttribute("name")] = XmlDocCommentComponent.Process(childNode, serviceProvider);
             }
 
             else if (childNode.Name == "seealso")
             {
                 SeeAlso ??= [];
-                SeeAlso.Add(new XmlDocSeeTagComponent(childNode));
+                SeeAlso.Add(new XmlDocSeeTagComponent(childNode, serviceProvider));
             }
 
             else if (childNode.Name == "example")
@@ -71,7 +74,7 @@ public class XmlDocEntry
             else if (childNode.Name == "exception")
             {
                 Exceptions ??= [];
-                Exceptions.Add(new(childNode));
+                Exceptions.Add(new(childNode, serviceProvider));
             }
 
             else if (childNode.Name == "inheritdoc")
@@ -143,7 +146,7 @@ public class XmlDocEntry
 
 public abstract class XmlDocCommentComponent
 {
-    public static List<XmlDocCommentComponent> Process(XmlElement xmlNode)
+    public static List<XmlDocCommentComponent> Process(XmlElement xmlNode, IServiceProvider serviceProvider)
     {
         List<XmlDocCommentComponent> components = [];
 
@@ -158,13 +161,13 @@ public abstract class XmlDocCommentComponent
             {
                 if (xmlElement.Name == "para")
                 {
-                    components.Add(new XmlDocCommentHtmlTagComponent("p", xmlElement));
+                    components.Add(new XmlDocCommentHtmlTagComponent("p", xmlElement, serviceProvider));
                 }
 
                 // TODO: move to custom
                 else if (xmlElement.Name == "b" || xmlElement.Name == "i" || xmlElement.Name == "u" || xmlElement.Name == "strike" || xmlElement.Name == "p" || xmlElement.Name == "br")
                 {
-                    components.Add(new XmlDocCommentHtmlTagComponent(xmlElement.Name, xmlElement));
+                    components.Add(new XmlDocCommentHtmlTagComponent(xmlElement.Name, xmlElement, serviceProvider));
                 }
 
                 else if (xmlElement.Name == "list")
@@ -174,12 +177,12 @@ public abstract class XmlDocCommentComponent
 
                 else if (xmlElement.Name == "code" || xmlElement.Name == "c")
                 {
-                    components.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement));
+                    components.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement, serviceProvider));
                 }
 
                 else if (xmlElement.Name == "see" || xmlElement.Name == "seealso")
                 {
-                    components.Add(new XmlDocSeeTagComponent(xmlElement));
+                    components.Add(new XmlDocSeeTagComponent(xmlElement, serviceProvider));
                 }
 
                 else if (xmlElement.Name == "example")
@@ -189,7 +192,7 @@ public abstract class XmlDocCommentComponent
 
                 else if (xmlElement.Name == "paramref" || xmlElement.Name == "typeparamref")
                 {
-                    XmlDocCommentHtmlTagComponent codeTag = new("code", null);
+                    XmlDocCommentHtmlTagComponent codeTag = new("code", null, serviceProvider);
                     codeTag.ChildComponents.Add(new XmlDocCommentTextComponent(xmlElement.GetAttribute("name")));
 
                     components.Add(codeTag);
@@ -215,13 +218,13 @@ public abstract class XmlDocCommentComponent
 
 public class XmlDocCommentHtmlTagComponent : XmlDocCommentComponent
 {
-    public XmlDocCommentHtmlTagComponent(string tagName, XmlElement? xmlNode)
+    public XmlDocCommentHtmlTagComponent(string tagName, XmlElement? xmlNode, IServiceProvider serviceProvider)
     {
         TagName = tagName;
 
         if (xmlNode != null)
         {
-            ChildComponents = Process(xmlNode);
+            ChildComponents = Process(xmlNode, serviceProvider);
         }
 
         else
@@ -248,8 +251,10 @@ public class XmlDocCommentHtmlTagComponent : XmlDocCommentComponent
     }
 }
 
-public class XmlDocSeeTagComponent(XmlElement xmlElement) : XmlDocCommentComponent
+public class XmlDocSeeTagComponent(XmlElement xmlElement, IServiceProvider serviceProvider) : XmlDocCommentComponent
 {
+    protected IServiceProvider _serviceProvider = serviceProvider;
+
     public string CRef
     {
         get;
@@ -289,8 +294,10 @@ public class XmlDocSeeTagComponent(XmlElement xmlElement) : XmlDocCommentCompone
 
         else if (!String.IsNullOrEmpty(CRef))
         {
-            string url = CRef.StartsWith('!') ? "about:blank" : XmlDocUrlResolver.GetUrl(CRef);
-            string linkText = String.IsNullOrEmpty(LinkText) ? XmlDocUrlResolver.GetLinkText(CRef) : LinkText;
+            IXmlDocUrlResolver xmlDocUrlResolver = _serviceProvider.GetRequiredService<IXmlDocUrlResolver>();
+
+            string url = CRef.StartsWith('!') ? "about:blank" : xmlDocUrlResolver.GetUrl(CRef);
+            string linkText = String.IsNullOrEmpty(LinkText) ? xmlDocUrlResolver.GetLinkText(CRef) : LinkText;
 
             return $@"<a href=""{url}"">{linkText}</a>";
         }
@@ -325,17 +332,17 @@ public class XmlDocCommentTextComponent(string text) : XmlDocCommentComponent
     }
 }
 
-public class XmlDocException(XmlElement childNode)
+public class XmlDocException(XmlElement childNode, IServiceProvider serviceProvider)
 {
     public XmlDocSeeTagComponent Exception
     {
         get;
         set;
-    } = new XmlDocSeeTagComponent(childNode) { LinkText = "" };
+    } = new XmlDocSeeTagComponent(childNode, serviceProvider) { LinkText = "" };
 
     public List<XmlDocCommentComponent> Text
     {
         get;
         set;
-    } = XmlDocCommentComponent.Process(childNode);
+    } = XmlDocCommentComponent.Process(childNode, serviceProvider);
 }

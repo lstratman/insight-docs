@@ -1,6 +1,9 @@
 using System.Reflection;
 using System.Text;
 using InsightDocs.Abstractions;
+using InsightDocs.DotNet.Abstractions;
+using InsightDocs.DotNet.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.DotNet.Model;
 
@@ -27,26 +30,26 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         return key;
     }
 
-    public static DotNetType Resolve(Type type)
+    public static DotNetType Resolve(Type type, IServiceProvider serviceProvider)
     {
         if (type.IsByRef)
         {
-            return Resolve(type.GetElementType()!);
+            return Resolve(type.GetElementType()!, serviceProvider);
         }
 
         string key = GetCacheKey(type);
 
         if (!TypeCache.TryGetValue(key, out DotNetType? typeMetadata))
         {
-            DotNetAssembly assembly = DotNetAssembly.Resolve(type.Assembly);
+            DotNetAssembly assembly = DotNetAssembly.Resolve(type.Assembly, serviceProvider);
             DotNetNamespace? ns = String.IsNullOrEmpty(type.Namespace) ? null : DotNetNamespace.Resolve(type.Namespace);
-            typeMetadata = new DotNetType(type, assembly, ns);
+            typeMetadata = new DotNetType(type, assembly, ns, serviceProvider);
         }
 
         return typeMetadata;
     }
 
-    protected DotNetType(Type type, DotNetAssembly assembly, DotNetNamespace? ns)
+    protected DotNetType(Type type, DotNetAssembly assembly, DotNetNamespace? ns, IServiceProvider serviceProvider)
     {
         string key = GetCacheKey(type);
 
@@ -54,6 +57,8 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         {
             TypeCache[key] = this;
         }
+
+        IXmlDocUrlResolver xmlDocUrlResolver = serviceProvider.GetRequiredService<IXmlDocUrlResolver>();
 
         Assembly = assembly;
         Namespace = ns;
@@ -152,7 +157,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
         if (baseType != null)
         {
-            BaseType = DotNetTypeReference.Resolve(baseType);
+            BaseType = DotNetTypeReference.Resolve(baseType, serviceProvider);
         }
 
         Type[] baseTypeInterfaces = baseType == null ? [] : baseType.GetInterfaces();
@@ -160,7 +165,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
         if (implementedInterfaces != null && implementedInterfaces.Length > 0)
         {
-            ImplementedInterfaces = [.. implementedInterfaces.Select(i => new DotNetTypeReference(i))];
+            ImplementedInterfaces = [.. implementedInterfaces.Select(i => DotNetTypeReference.Resolve(i, serviceProvider))];
         }
 
         MethodInfo[] methods = [.. type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("op_") && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_") && !m.Name.Contains(".op_") && !m.Name.Contains(".get_") && !m.Name.Contains(".set_"))];
@@ -175,16 +180,16 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
                 if (methodCollection == null)
                 {
-                    methodCollection = new DotNetMethod(method.Name, DotNetTypeReference.Resolve(type));
+                    methodCollection = new DotNetMethod(method.Name, DotNetTypeReference.Resolve(type, serviceProvider));
                     Methods.Add(methodCollection);
                 }
 
-                DotNetMethodOverload overload = new(method, methodCollection);
+                DotNetMethodOverload overload = new(method, serviceProvider, methodCollection);
                 methodCollection.Overloads.Add(overload);
 
                 if (!method.Name.Contains('.') && overload.DeclaringType != null && overload.DeclaringType.Type == this && overload.XmlDocKey != null)
                 {
-                    XmlDocUrlResolver.RegisterLookup(overload, "M:" + overload.XmlDocKey);
+                    xmlDocUrlResolver.RegisterLookup(overload, "M:" + overload.XmlDocKey);
                 }
             }
         }
@@ -194,11 +199,11 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
         if (properties != null && properties.Length > 0)
         {
-            Properties = [.. properties.Select(p => new DotNetProperty(p))];
+            Properties = [.. properties.Select(p => new DotNetProperty(p, serviceProvider))];
 
             foreach (DotNetProperty property in Properties.Where(p => p.DeclaringType?.Type == this && p.XmlDocKey != null))
             {
-                XmlDocUrlResolver.RegisterLookup(property, "P:" + property.XmlDocKey!);
+                xmlDocUrlResolver.RegisterLookup(property, "P:" + property.XmlDocKey!);
             }
         }
 
@@ -206,11 +211,11 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
         if (fields != null && fields.Length > 0)
         {
-            Fields = [.. fields.Select(f => new DotNetField(f))];
+            Fields = [.. fields.Select(f => new DotNetField(f, serviceProvider))];
 
             foreach (DotNetField field in Fields.Where(f => f.DeclaringType?.Type == this && f.XmlDocKey != null))
             {
-                XmlDocUrlResolver.RegisterLookup(field, "F:" + field.XmlDocKey!);
+                xmlDocUrlResolver.RegisterLookup(field, "F:" + field.XmlDocKey!);
             }
         }
 
@@ -258,7 +263,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
         if (XmlDocKey != null)
         {
-            XmlDocUrlResolver.RegisterLookup(this, "T:" + XmlDocKey);
+            xmlDocUrlResolver.RegisterLookup(this, "T:" + XmlDocKey);
         }
     }
 

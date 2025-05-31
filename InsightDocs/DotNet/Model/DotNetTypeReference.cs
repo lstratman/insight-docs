@@ -31,24 +31,24 @@ public class DotNetTypeReference
         return key;
     }
 
-    public static DotNetTypeReference Resolve(Type type)
+    public static DotNetTypeReference Resolve(Type type, IServiceProvider serviceProvider)
     {
         if (type.IsByRef)
         {
-            return Resolve(type.GetElementType()!);
+            return Resolve(type.GetElementType()!, serviceProvider);
         }
 
         string key = GetCacheKey(type);
 
         if (!TypeReferenceCache.TryGetValue(key, out DotNetTypeReference? typeReference))
         {
-            typeReference = new DotNetTypeReference(type);
+            typeReference = new DotNetTypeReference(type, serviceProvider);
         }
 
         return typeReference;
     }
 
-    public DotNetTypeReference(Type type)
+    private DotNetTypeReference(Type type, IServiceProvider serviceProvider)
     {
         if (type.IsArray)
         {
@@ -62,7 +62,7 @@ public class DotNetTypeReference
 
             foreach (Type genericArgument in type.GetGenericArguments())
             {
-                GenericArguments.Add(new DotNetGenericArgument(genericArgument));
+                GenericArguments.Add(new DotNetGenericArgument(genericArgument, serviceProvider));
             }
 
             if (type.IsGenericType)
@@ -79,7 +79,7 @@ public class DotNetTypeReference
 
         else
         {
-            Type = DotNetType.Resolve(type);
+            Type = DotNetType.Resolve(type, serviceProvider);
         }
     }
 

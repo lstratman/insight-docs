@@ -7,19 +7,19 @@ public class DotNetAssembly
 {
     private readonly static Dictionary<string, DotNetAssembly> AssemblyCache = [];
 
-    public static DotNetAssembly Resolve(Assembly assembly)
+    public static DotNetAssembly Resolve(Assembly assembly, IServiceProvider serviceProvider)
     {
         string key = assembly.Location;
 
         if (!AssemblyCache.TryGetValue(key, out DotNetAssembly? assemblyMetadata))
         {
-            assemblyMetadata = new DotNetAssembly(assembly);
+            assemblyMetadata = new DotNetAssembly(assembly, serviceProvider);
         }
 
         return assemblyMetadata;
     }
 
-    protected DotNetAssembly(Assembly assembly)
+    protected DotNetAssembly(Assembly assembly, IServiceProvider serviceProvider)
     {
         AssemblyName assemblyName = assembly.GetName();
 
@@ -44,7 +44,7 @@ public class DotNetAssembly
 
                 foreach (XmlElement memberNode in memberNodes)
                 {
-                    XmlDocEntries[memberNode.GetAttribute("name")] = new XmlDocEntry(memberNode.GetAttribute("name"), memberNode);
+                    XmlDocEntries[memberNode.GetAttribute("name")] = new XmlDocEntry(memberNode.GetAttribute("name"), memberNode, serviceProvider);
                 }
             }
         }

@@ -2,7 +2,7 @@ namespace InsightDocs.DotNet.Model;
 
 public class DotNetGenericArgument
 {
-    public DotNetGenericArgument(Type type)
+    public DotNetGenericArgument(Type type, IServiceProvider serviceProvider)
     {
         if (type.IsGenericParameter)
         {
@@ -11,7 +11,7 @@ public class DotNetGenericArgument
 
         else
         {
-            Type = DotNetTypeReference.Resolve(type);
+            Type = DotNetTypeReference.Resolve(type, serviceProvider);
         }
     }
 

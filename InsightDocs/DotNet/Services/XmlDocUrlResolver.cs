@@ -1,15 +1,17 @@
 using InsightDocs.Abstractions;
+using InsightDocs.DotNet.Abstractions;
+using InsightDocs.DotNet.Model;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace InsightDocs.DotNet.Model;
+namespace InsightDocs.DotNet.Services;
 
-public class XmlDocUrlResolver
+public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlResolver
 {
-    private static readonly Dictionary<string, string> Urls = [];
-    private static readonly Dictionary<string, string> LinkTexts = [];
-    private static IServiceProvider? ServiceProvider = null;
+    protected readonly Dictionary<string, string> Urls = [];
+    protected readonly Dictionary<string, string> LinkTexts = [];
+    protected IServiceProvider _serviceProvider = serviceProvider;
 
-    public static string GetUrl(string key)
+    public string GetUrl(string key)
     {
         if (!Urls.TryGetValue(key, out string? value))
         {
@@ -21,7 +23,7 @@ public class XmlDocUrlResolver
 
                     if (type != null)
                     {
-                        DotNetType.Resolve(type);
+                        DotNetType.Resolve(type, _serviceProvider);
                         Urls.TryGetValue(key, out string? value2);
                         value = value2;
                     }
@@ -44,7 +46,7 @@ public class XmlDocUrlResolver
         return value;
     }
 
-    public static string GetLinkText(string key)
+    public string GetLinkText(string key)
     {
         if (!LinkTexts.TryGetValue(key, out string? value))
         {
@@ -57,24 +59,14 @@ public class XmlDocUrlResolver
         return value;
     }
 
-    public static void SetServiceProvider(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
-
-    public static void RegisterLookup<T>(T target, string key) where T : ILinkTarget
+    public void RegisterLookup<T>(T target, string key) where T : ILinkTarget
     {
         if (Urls.ContainsKey(key))
         {
             throw new Exception("XmlDoc target already registered for key: " + key + ".");
         }
 
-        if (ServiceProvider == null)
-        {
-            throw new Exception("ServiceProvider has not been set");
-        }
-
-        IUrlProvider<T> urlProvider = ServiceProvider.GetService<IUrlProvider<T>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(T) + ".");
+        IUrlProvider<T> urlProvider = _serviceProvider.GetService<IUrlProvider<T>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(T) + ".");
         Urls[key] = urlProvider.GetUrl(target);
         LinkTexts[key] = target.LinkText;
     }

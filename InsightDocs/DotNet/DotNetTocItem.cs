@@ -1,6 +1,7 @@
 using System.Reflection;
 using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Model;
+using InsightDocs.DotNet.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Logging;
@@ -91,8 +92,6 @@ public partial class DotNetTocItem : TocItem
             ILoggerFactory loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
             ILogger logger = loggerFactory.CreateLogger("DotNet");
 
-            XmlDocUrlResolver.SetServiceProvider(serviceProvider);
-
             List<string> assemblyPaths = [];
             List<string> runtimeAssemblyPaths = [];
 
@@ -143,7 +142,7 @@ public partial class DotNetTocItem : TocItem
                         namespaces[ns] = namespaceMetadata;
                     }
 
-                    namespaceMetadata.Types.Add(DotNetType.Resolve(type));
+                    namespaceMetadata.Types.Add(DotNetType.Resolve(type, serviceProvider));
                 }
             }
 

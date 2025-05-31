@@ -1,6 +1,18 @@
+using InsightDocs.DotNet.Abstractions;
+using InsightDocs.DotNet.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace InsightDocs.DotNet;
+
+public static class DotNetExtensions
+{
+    public static Builder UseDotNet(this Builder builder)
+    {
+        builder.Services.AddScoped<IXmlDocUrlResolver, XmlDocUrlResolver>();
+        return builder;
+    }
+}
 
 public static class DotNetTocItemExtensions
 {

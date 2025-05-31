@@ -21,7 +21,7 @@ public class DotNetMethodOverload : DotNetMemberInfo
         DeclaringType = method.DeclaringType;
     }
 
-    public DotNetMethodOverload(MethodInfo method, DotNetMethod? methodCollection = null)
+    public DotNetMethodOverload(MethodInfo method, IServiceProvider serviceProvider, DotNetMethod? methodCollection = null)
     {
         Name = method.Name;
         IsStatic = method.IsStatic;
@@ -60,14 +60,14 @@ public class DotNetMethodOverload : DotNetMemberInfo
 
         if (parameters != null && parameters.Length > 0)
         {
-            Parameters = [.. parameters.Select(p => new DotNetMethodParameter(p))];
+            Parameters = [.. parameters.Select(p => new DotNetMethodParameter(p, serviceProvider))];
         }
 
-        ReturnType = DotNetTypeReference.Resolve(method.ReturnType);
+        ReturnType = DotNetTypeReference.Resolve(method.ReturnType, serviceProvider);
 
         if (method.DeclaringType != null)
         {
-            DeclaringType = DotNetTypeReference.Resolve(method.DeclaringType);
+            DeclaringType = DotNetTypeReference.Resolve(method.DeclaringType, serviceProvider);
 
             if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
             {

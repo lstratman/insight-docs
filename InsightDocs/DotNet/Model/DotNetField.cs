@@ -19,10 +19,10 @@ public class DotNetField : DotNetMemberInfo
         DeclaringType = field.DeclaringType;
     }
 
-    public DotNetField(FieldInfo field)
+    public DotNetField(FieldInfo field, IServiceProvider serviceProvider)
     {
         Name = field.Name;
-        FieldType = DotNetTypeReference.Resolve(field.FieldType);
+        FieldType = DotNetTypeReference.Resolve(field.FieldType, serviceProvider);
         IsStatic = field.IsStatic;
         IsInternal = field.IsAssembly;
         IsAbstract = false;
@@ -44,7 +44,7 @@ public class DotNetField : DotNetMemberInfo
 
         if (field.DeclaringType != null)
         {
-            DeclaringType = DotNetTypeReference.Resolve(field.DeclaringType);
+            DeclaringType = DotNetTypeReference.Resolve(field.DeclaringType, serviceProvider);
 
             if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
             {

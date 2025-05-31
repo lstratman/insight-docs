@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace InsightDocs.DotNet.Model;
 
-public class DotNetMethodParameter(ParameterInfo parameterInfo)
+public class DotNetMethodParameter(ParameterInfo parameterInfo, IServiceProvider serviceProvider)
 {
     public bool IsOptional
     {
@@ -32,7 +32,7 @@ public class DotNetMethodParameter(ParameterInfo parameterInfo)
     {
         get;
         set;
-    } = DotNetTypeReference.Resolve(parameterInfo.ParameterType);
+    } = DotNetTypeReference.Resolve(parameterInfo.ParameterType, serviceProvider);
 
     public XmlDocHtml? Description
     {
