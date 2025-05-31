@@ -1,6 +1,6 @@
 using InsightDocs.Abstractions;
+using InsightDocs.DotNet.Model;
 using InsightDocs.Extensions;
-using InsightDocs.Model.DotNet;
 using InsightDocs.Model.Site;
 using Microsoft.Extensions.DependencyInjection;
 

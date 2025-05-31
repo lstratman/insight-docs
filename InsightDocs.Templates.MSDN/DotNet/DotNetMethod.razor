@@ -35,7 +35,7 @@
                                 <h2 id="overloads">Overloads</h2>
                             }
 
-                            @foreach (Model.DotNet.DotNetMethodOverload overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
+                            @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
                             {
                                 <div>
                                     @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
@@ -87,7 +87,7 @@
                                     {
                                         <h3 class="propertyInfoTitle stack heading-anchor" id="exceptions">Exceptions</h3>
 
-                                        foreach (Tuple<Model.DotNet.XmlDocHtml, Model.DotNet.XmlDocHtml?> exception in overload.Exceptions)
+                                        foreach (Tuple<InsightDocs.DotNet.Model.XmlDocHtml, InsightDocs.DotNet.Model.XmlDocHtml?> exception in overload.Exceptions)
                                         {
                                             <div class="propertyInfo">
                                                 <div class="subtle">
@@ -114,7 +114,7 @@
                                         <h3 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h3>
 
                                         <ul>
-                                            @foreach (Model.DotNet.XmlDocHtml seeAlso in overload.SeeAlso)
+                                            @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in overload.SeeAlso)
                                             {
                                                 <li>@RazorTemplate.Raw(seeAlso.ToHtml())</li>
                                             }
@@ -137,7 +137,7 @@
 
 @code {
     [Parameter]
-    public Model.DotNet.DotNetMethod? Item 
+    public InsightDocs.DotNet.Model.DotNetMethod? Item 
     { 
         get; 
         set; 

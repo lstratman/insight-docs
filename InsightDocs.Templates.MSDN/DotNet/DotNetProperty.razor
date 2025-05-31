@@ -65,7 +65,7 @@
                                     </div>
 
                                     <ul>
-                                        @foreach (Model.DotNet.XmlDocHtml seeAlso in Item.SeeAlso)
+                                        @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in Item.SeeAlso)
                                         {
                                             <li>@RazorTemplate.Raw(seeAlso.ToHtml())</li>
                                         }
@@ -82,7 +82,7 @@
 
 @code {
     [Parameter]
-    public Model.DotNet.DotNetProperty? Item 
+    public InsightDocs.DotNet.Model.DotNetProperty? Item 
     { 
         get; 
         set; 

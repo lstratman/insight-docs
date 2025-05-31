@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace InsightDocs.Model.DotNet;
+namespace InsightDocs.DotNet.Model;
 
 public class DotNetField : DotNetMemberInfo
 {

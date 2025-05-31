@@ -18,7 +18,7 @@
                             <div class="has-inner-focus">
                                 <table class="table table-sm margin-top-none">
                                     <tbody>
-                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Class").OrderBy(t => t.Name))
+                                        @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Class").OrderBy(t => t.Name))
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
@@ -44,7 +44,7 @@
                             <div class="has-inner-focus">
                                 <table class="table table-sm margin-top-none">
                                     <tbody>
-                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Struct").OrderBy(t => t.Name))
+                                        @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Struct").OrderBy(t => t.Name))
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
@@ -70,7 +70,7 @@
                             <div class="has-inner-focus">
                                 <table class="table table-sm margin-top-none">
                                     <tbody>
-                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Interface").OrderBy(t => t.Name))
+                                        @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Interface").OrderBy(t => t.Name))
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
@@ -96,7 +96,7 @@
                             <div class="has-inner-focus">
                                 <table class="table table-sm margin-top-none">
                                     <tbody>
-                                        @foreach (Model.DotNet.DotNetType type in Item.Types.Where(t => t.TypeName == "Enum").OrderBy(t => t.Name))
+                                        @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Enum").OrderBy(t => t.Name))
                                         {
                                             <tr>
                                                 <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
@@ -121,7 +121,7 @@
 
 @code {
     [Parameter]
-    public Model.DotNet.DotNetNamespace? Item 
+    public InsightDocs.DotNet.Model.DotNetNamespace? Item 
     { 
         get; 
         set; 

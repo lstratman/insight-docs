@@ -1,6 +1,6 @@
 using System.Text;
 using InsightDocs.Abstractions;
-using InsightDocs.Model.DotNet;
+using InsightDocs.DotNet.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 

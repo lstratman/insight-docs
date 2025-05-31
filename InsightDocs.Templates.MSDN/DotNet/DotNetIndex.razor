@@ -20,7 +20,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (Model.DotNet.DotNetNamespace ns in Item!.Namespaces)
+                                @foreach (InsightDocs.DotNet.Model.DotNetNamespace ns in Item!.Namespaces)
                                 {
                                     <tr>
                                         <td>@RazorTemplate.GetLink(ns, ServiceProvider!) Namespace</td>
@@ -38,7 +38,7 @@
 
 @code {
     [Parameter]
-    public Model.DotNet.DotNetIndex? Item
+    public InsightDocs.DotNet.Model.DotNetIndex? Item
     { 
         get; 
         set; 

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace InsightDocs.Model.DotNet;
+namespace InsightDocs.DotNet.Model;
 
 public class DotNetTypeReference
 {

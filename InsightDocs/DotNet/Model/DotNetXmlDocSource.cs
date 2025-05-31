@@ -1,4 +1,4 @@
-namespace InsightDocs.Model.DotNet;
+namespace InsightDocs.DotNet.Model;
 
 public abstract class DotNetXmlDocSource
 {

@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text;
 using InsightDocs.Abstractions;
 
-namespace InsightDocs.Model.DotNet;
+namespace InsightDocs.DotNet.Model;
 
 public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
 {
@@ -26,7 +26,7 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         {
             Name = Name[(Name.LastIndexOf('.') + 1)..];
         }
-
+        
         PropertyType = DotNetTypeReference.Resolve(property.PropertyType);
 
         if (property.DeclaringType != null)

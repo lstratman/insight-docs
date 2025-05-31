@@ -1,12 +1,12 @@
 using InsightDocs.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace InsightDocs.Model.DotNet;
+namespace InsightDocs.DotNet.Model;
 
 public class XmlDocUrlResolver
 {
-    private static Dictionary<string, string> Urls = [];
-    private static Dictionary<string, string> LinkTexts = [];
+    private static readonly Dictionary<string, string> Urls = [];
+    private static readonly Dictionary<string, string> LinkTexts = [];
     private static IServiceProvider? ServiceProvider = null;
 
     public static string GetUrl(string key)

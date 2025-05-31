@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Xml;
 
-namespace InsightDocs.Model.DotNet;
+namespace InsightDocs.DotNet.Model;
 
 public class DotNetAssembly
 {

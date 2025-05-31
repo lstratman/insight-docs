@@ -1,6 +1,6 @@
 using InsightDocs.Abstractions;
 
-namespace InsightDocs.Model.DotNet;
+namespace InsightDocs.DotNet.Model;
 
 public class DotNetIndex : ILinkTarget
 {
