@@ -6,6 +6,7 @@
             let tocResponse = await fetch('./table-of-contents.json');
             let tocData = await tocResponse.json();
             let navbar = document.getElementById('navbar');
+            let topicContent = document.getElementById('topicContentIFrame');
 
             function addTocItemChildren(indices, container) {
                 if (!indices) {
@@ -24,7 +25,7 @@
                         tocElementLabel.classList.add('tree-expander');
 
                         if (tocItem.u) {
-                             tocElementLabel.innerHTML = `<span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span><a class="tree-item" target="topicContentIFrame" href="${tocItem.u}">${tocItem.t.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')}</a>`;
+                             tocElementLabel.innerHTML = `<span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span><a class="tree-item" href="${tocItem.u}" target="topicContentIFrame">${tocItem.t.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')}</a>`;
                         }
 
                         else {
@@ -67,11 +68,15 @@
                     target = evt.target;
                 }
 
-                if (evt.target.classList.contains('tree-item') || evt.target.classList.contains('tree-expander')) {
+                else if (evt.target.tagName === 'A' && evt.target.classList.contains('tree-item')) {
+                    target = evt.target.parentElement.parentElement;
+                }
+
+                else if (evt.target.classList.contains('tree-expander') || evt.target.classList.contains('tree-item')) {
                     target = evt.target.parentElement;
                 }
 
-                if (evt.target.classList.contains('tree-expander-indicator')) {
+                else if (evt.target.classList.contains('tree-expander-indicator')) {
                     target = evt.target.parentElement.parentElement;
                 }
 
@@ -100,6 +105,12 @@
                 }
             });
 
+            topicContent.addEventListener('load', () => {
+                if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname) {
+                    document.location.replace('#' + topicContent.contentDocument.location.pathname);
+                }
+            });
+
             let navbarRootList = document.createElement('ul');
             navbarRootList.classList.add('tree', 'table-of-contents', 'flex-grow-1', 'flex-shrink-1');
 
@@ -107,6 +118,10 @@
 
             for (let index of tocData.RootItems) {
                 addTocItemChildren(tocData.RootItems, navbarRootList);
+            }
+
+            if (document.location.hash) {
+                topicContent.src = document.location.hash.substr(1);
             }
         }
     </script>
