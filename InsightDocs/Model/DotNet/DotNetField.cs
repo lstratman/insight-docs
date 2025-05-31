@@ -131,12 +131,6 @@ public class DotNetField : DotNetMemberInfo
         set;
     }
 
-    public DotNetTypeReference? DeclaringType
-    {
-        get;
-        set;
-    }
-
     public string? XmlDocKey
     {
         get
@@ -144,11 +138,5 @@ public class DotNetField : DotNetMemberInfo
             string? typeDocKey = DeclaringType?.XmlDocKey;
             return typeDocKey == null ? null : typeDocKey + "." + Name;
         }
-    }
-
-    public List<XmlDocHtml>? SeeAlso
-    {
-        get;
-        set;
     }
 }

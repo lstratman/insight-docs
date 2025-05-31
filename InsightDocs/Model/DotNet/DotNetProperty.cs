@@ -182,10 +182,4 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         get;
         set;
     }
-
-    public List<XmlDocHtml>? SeeAlso
-    {
-        get;
-        set;
-    }
 }

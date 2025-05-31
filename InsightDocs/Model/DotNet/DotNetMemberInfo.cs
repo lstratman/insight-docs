@@ -37,6 +37,12 @@ public abstract class DotNetMemberInfo : DotNetXmlDocSource, ILinkTarget
     {
         get;
     }
+
+    public DotNetTypeReference? DeclaringType
+    {
+        get;
+        set;
+    }
 }
 
 public enum DotNetMemberInfoAccessType

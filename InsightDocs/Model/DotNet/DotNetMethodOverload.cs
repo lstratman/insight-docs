@@ -167,18 +167,6 @@ public class DotNetMethodOverload : DotNetMemberInfo
         set;
     }
 
-    public List<XmlDocHtml>? SeeAlso
-    {
-        get;
-        set;
-    }
-
-    public DotNetTypeReference? DeclaringType
-    {
-        get;
-        set;
-    }
-
     public override string MemberDisplayName
     {
         get

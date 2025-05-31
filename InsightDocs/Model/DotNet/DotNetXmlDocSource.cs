@@ -13,4 +13,10 @@ public abstract class DotNetXmlDocSource
         get;
         set;
     }
+
+    public List<XmlDocHtml>? SeeAlso
+    {
+        get;
+        set;
+    }
 }

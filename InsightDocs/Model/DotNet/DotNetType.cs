@@ -386,10 +386,4 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
             return DisplayName;
         }
     }
-
-    public List<XmlDocHtml>? SeeAlso
-    {
-        get;
-        set;
-    }
 }
