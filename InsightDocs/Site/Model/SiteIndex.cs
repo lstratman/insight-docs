@@ -1,6 +1,6 @@
 using InsightDocs.Abstractions;
 
-namespace InsightDocs.Model.Site;
+namespace InsightDocs.Site.Model;
 
 public class SiteIndex : ILinkTarget
 {

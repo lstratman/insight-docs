@@ -1,7 +1,7 @@
 using System.Text;
 using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Model;
-using InsightDocs.Model.Site;
+using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
@@ -14,7 +14,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
       IUrlProvider<DotNetMethodOverload>,
       IUrlProvider<DotNetProperty>,
       IUrlProvider<DotNetField>,
-      IUrlProvider<SiteTableOfContents>,
+      IUrlProvider<SiteToc>,
       IUrlProvider<SiteIndex>
 {
     protected KebabCaseUrlProviderOptions Options
@@ -248,7 +248,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(SiteTableOfContents item, string? urlPrefix = null)
+    public string GetUrl(SiteToc item, string? urlPrefix = null)
     {
         StringBuilder url = new();
 
@@ -314,7 +314,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddSingleton<IUrlProvider<DotNetMethodOverload>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<SiteTableOfContents>, KebabCaseUrlProvider>();
+        builder.Services.AddSingleton<IUrlProvider<SiteToc>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<SiteIndex>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)

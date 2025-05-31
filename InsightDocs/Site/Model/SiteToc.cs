@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
 using InsightDocs.Abstractions;
 
-namespace InsightDocs.Model.Site;
+namespace InsightDocs.Site.Model;
 
-public class SiteTableOfContents : ILinkTarget
+public class SiteToc : ILinkTarget
 {
-    public SiteTableOfContents(TocItem root)
+    public SiteToc(TocItem root)
     {
         foreach (TocItem rootChild in root.Children)
         {

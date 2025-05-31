@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using InsightDocs.Abstractions;
-using InsightDocs.Model.Site;
+using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs;
@@ -36,7 +36,7 @@ public class Builder(IServiceCollection services)
         using (ServiceProvider serviceProvider = Services.BuildServiceProvider())
         {
             IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
-            IUrlProvider<SiteTableOfContents> tableOfContentsUrlProvider = serviceProvider.GetService<IUrlProvider<SiteTableOfContents>>() ?? throw new Exception("No IUrlProvider service was registered for SiteTableOfContents.");
+            IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetService<IUrlProvider<SiteToc>>() ?? throw new Exception("No IUrlProvider service was registered for SiteToc.");
             IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetService<IUrlProvider<SiteIndex>>() ?? throw new Exception("No IUrlProvider service was registered for SiteIndex.");
             IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<SiteIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for SiteIndex.");
             ITemplateAssetProvider? templateAssetProvider = serviceProvider.GetService<ITemplateAssetProvider>();
@@ -48,9 +48,9 @@ public class Builder(IServiceCollection services)
             string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
             await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex));
 
-            SiteTableOfContents siteTableOfContents = new(TocRoot);
+            SiteToc siteTableOfContents = new(TocRoot);
             string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
-            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteTableOfContents), SerializerOptions)));
+            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)));
 
             if (templateAssetProvider != null)
             {

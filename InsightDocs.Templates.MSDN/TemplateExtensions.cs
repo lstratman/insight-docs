@@ -1,7 +1,7 @@
 using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Model;
 using InsightDocs.Extensions;
-using InsightDocs.Model.Site;
+using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Templates.MSDN;

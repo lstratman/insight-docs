@@ -1,3 +1,5 @@
+@inherits InsightDocs.RazorTemplate<InsightDocs.Site.Model.SiteIndex>
+
 <html>
 <head>
     <script type="text/javascript">
@@ -167,19 +169,3 @@
     </div>
 </body>
 </html>
-
-@code {
-    [Parameter]
-    public Model.Site.SiteIndex? Item 
-    { 
-        get; 
-        set; 
-    }
-
-    [Parameter]
-    public IServiceProvider? ServiceProvider
-    { 
-        get; 
-        set; 
-    }
-}
