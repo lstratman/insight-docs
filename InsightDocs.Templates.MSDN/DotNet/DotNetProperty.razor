@@ -1,3 +1,5 @@
+@inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetProperty>
+
 <html>
     <head>
         <link rel="stylesheet" href="../../msdn.css"/>
@@ -17,7 +19,7 @@
                                 {
                                     <dl class="attributeList">
                                         <dt>Namespace:</dt>
-                                        <dd>@RazorTemplate.GetLink(Item.DeclaringType.Namespace, ServiceProvider!)</dd>
+                                        <dd>@GetLink(Item.DeclaringType.Namespace)</dd>
                                     </dl>
                                 }
 
@@ -33,7 +35,7 @@
                             <div>
                                 @if (Item.Description != null)
                                 {
-                                    <div class="summaryHolder">@RazorTemplate.Raw(Item.Description.ToHtml())</div>
+                                    <div class="summaryHolder">@Raw(Item.Description.ToHtml())</div>
                                 }
 
                                 <!-- TODO: code -->
@@ -42,11 +44,11 @@
                                     <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>
                                 </div>
 
-                                <div class="propertyInfo">@RazorTemplate.GetLink(Item.PropertyType, ServiceProvider!)</div>
+                                <div class="propertyInfo">@GetLink(Item.PropertyType)</div>
 
                                 @if (Item.ValueDescription != null)
                                 {
-                                    @RazorTemplate.Raw(Item.ValueDescription.ToHtml(), "p")
+                                    @Raw(Item.ValueDescription.ToHtml(), "p")
                                 }
 
                                 @if (Item.Remarks != null)
@@ -55,7 +57,7 @@
                                         <h2 id="remarks" class="heading-anchor">Remarks</h2>
                                     </div>
 
-                                    @RazorTemplate.Raw(Item.Remarks.ToHtml(), "p")
+                                    @Raw(Item.Remarks.ToHtml(), "p")
                                 }
 
                                 @if (Item.SeeAlso != null)
@@ -67,7 +69,7 @@
                                     <ul>
                                         @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in Item.SeeAlso)
                                         {
-                                            <li>@RazorTemplate.Raw(seeAlso.ToHtml())</li>
+                                            <li>@Raw(seeAlso.ToHtml())</li>
                                         }
                                     </ul>
                                 }
@@ -79,19 +81,3 @@
         </main>
     </body>
 </html>
-
-@code {
-    [Parameter]
-    public InsightDocs.DotNet.Model.DotNetProperty? Item 
-    { 
-        get; 
-        set; 
-    }
-
-    [Parameter]
-    public IServiceProvider? ServiceProvider
-    { 
-        get; 
-        set; 
-    }
-}

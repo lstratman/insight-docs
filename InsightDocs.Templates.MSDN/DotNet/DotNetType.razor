@@ -1,3 +1,5 @@
+@inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetType>
+
 <html>
     <head>
         <link rel="stylesheet" href="../../msdn.css"/>
@@ -17,7 +19,7 @@
                                 {
                                     <dl class="attributeList">
                                         <dt>Namespace:</dt>
-                                        <dd>@RazorTemplate.GetLink(Item.Namespace, ServiceProvider!)</dd>
+                                        <dd>@GetLink(Item.Namespace)</dd>
                                     </dl>
                                 }
 
@@ -34,7 +36,7 @@
                             {
                                 <div class="summaryHolder">
                                     <div class="summary clearFix has-text-wrap">
-                                        @RazorTemplate.Raw(Item.Description.ToHtml())
+                                        @Raw(Item.Description.ToHtml())
                                     </div>
                                 </div>
                             }
@@ -60,7 +62,7 @@
 
                                     @if (typeParameter.Description != null)
                                     {
-                                        @RazorTemplate.Raw(typeParameter.Description.ToHtml(), "p")
+                                        @Raw(typeParameter.Description.ToHtml(), "p")
                                     }
                                 }
                             }
@@ -84,7 +86,7 @@
                                         <div class="pdlHolder">
                                             @foreach (InsightDocs.DotNet.Model.DotNetTypeReference baseType in baseTypes)
                                             {
-                                                <div class="pdl">@RazorTemplate.GetLink(baseType, ServiceProvider!)</div> 
+                                                <div class="pdl">@GetLink(baseType)</div> 
                                             }
                                             <span>@Item.DisplayName</span> 
                                         </div>
@@ -101,7 +103,7 @@
                                             @for (int i = 0; i < Item.ImplementedInterfaces.Count; i++)
                                             {
                                                 <span class="@(i == Item.ImplementedInterfaces.Count - 1 ? "cdl cdlLastVisible" : "cdl")">
-                                                    <span class="break-text">@RazorTemplate.GetLink(Item.ImplementedInterfaces[i], ServiceProvider!)</span>
+                                                    <span class="break-text">@GetLink(Item.ImplementedInterfaces[i])</span>
                                                 </span>
                                             }
                                         </div>
@@ -115,7 +117,7 @@
                                     <h2 id="remarks" class="heading-anchor">Remarks</h2>
                                 </div>
 
-                                @RazorTemplate.Raw(Item.Remarks.ToHtml(), "p")
+                                @Raw(Item.Remarks.ToHtml(), "p")
                             }
 
                             @if (Item.SeeAlso != null)
@@ -127,7 +129,7 @@
                                 <ul>
                                     @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in Item.SeeAlso)
                                     {
-                                        <li>@RazorTemplate.Raw(seeAlso.ToHtml())</li>
+                                        <li>@Raw(seeAlso.ToHtml())</li>
                                     }
                                 </ul>
                             }
@@ -146,17 +148,17 @@
                                                 {
                                                     <tr>
                                                         <td>
-                                                            <span class="break-text">@RazorTemplate.GetLink(field, ServiceProvider!)</span>
+                                                            <span class="break-text">@GetLink(field)</span>
                                                         </td>
                                                         <td>
                                                             @if (field.Description != null)
                                                             {
-                                                                <p>@RazorTemplate.Raw(field.Description.ToHtml())</p>
+                                                                <p>@Raw(field.Description.ToHtml())</p>
                                                             }
 
                                                             @if (field.DeclaringType != null && field.DeclaringType.Type != Item)
                                                             {
-                                                                <div>(Inherited from @RazorTemplate.GetLink(field.DeclaringType, ServiceProvider!))</div>
+                                                                <div>(Inherited from @GetLink(field.DeclaringType))</div>
                                                             }
                                                         </td>
                                                     </tr>
@@ -177,17 +179,17 @@
                                                 {
                                                     <tr>
                                                         <td>
-                                                            <span class="break-text">@RazorTemplate.GetLink(property, ServiceProvider!)</span>
+                                                            <span class="break-text">@GetLink(property)</span>
                                                         </td>
                                                         <td>
                                                             @if (property.Description != null)
                                                             {
-                                                                <p>@RazorTemplate.Raw(property.Description.ToHtml())</p>
+                                                                <p>@Raw(property.Description.ToHtml())</p>
                                                             }
 
                                                             @if (property.DeclaringType != null && property.DeclaringType.Type != Item)
                                                             {
-                                                                <div>(Inherited from @RazorTemplate.GetLink(property.DeclaringType, ServiceProvider!))</div>
+                                                                <div>(Inherited from @GetLink(property.DeclaringType))</div>
                                                             }
                                                         </td>
                                                     </tr>
@@ -210,17 +212,17 @@
                                                     {
                                                         <tr>
                                                             <td>
-                                                                <span class="break-text">@RazorTemplate.GetLink(methodOverload, ServiceProvider!)</span>
+                                                                <span class="break-text">@GetLink(methodOverload)</span>
                                                             </td>
                                                             <td>
                                                                 @if (methodOverload.Description != null)
                                                                 {
-                                                                    <p>@RazorTemplate.Raw(methodOverload.Description.ToHtml())</p>
+                                                                    <p>@Raw(methodOverload.Description.ToHtml())</p>
                                                                 }
 
                                                                 @if (methodOverload.DeclaringType != null && methodOverload.DeclaringType.Type != Item)
                                                                 {
-                                                                    <div>(Inherited from @RazorTemplate.GetLink(methodOverload.DeclaringType, ServiceProvider!))</div>
+                                                                    <div>(Inherited from @GetLink(methodOverload.DeclaringType))</div>
                                                                 }
                                                             </td>
                                                         </tr>
@@ -242,19 +244,3 @@
         </main>
     </body>
 </html>
-
-@code {
-    [Parameter]
-    public InsightDocs.DotNet.Model.DotNetType? Item 
-    { 
-        get; 
-        set; 
-    }
-
-    [Parameter]
-    public IServiceProvider? ServiceProvider
-    { 
-        get; 
-        set; 
-    }
-}

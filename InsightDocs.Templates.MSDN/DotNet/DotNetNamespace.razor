@@ -1,3 +1,5 @@
+@inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetNamespace>
+
 <html>
     <head>
         <link rel="stylesheet" href="../../msdn.css"/>
@@ -21,11 +23,11 @@
                                         @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Class").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@GetLink(type)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {
-                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                        @Raw(type.Description.ToHtml())
                                                     }
                                                 </td>
                                             </tr>
@@ -47,11 +49,11 @@
                                         @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Struct").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@GetLink(type)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {
-                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                        @Raw(type.Description.ToHtml())
                                                     }
                                                 </td>
                                             </tr>
@@ -73,11 +75,11 @@
                                         @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Interface").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@GetLink(type)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {
-                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                        @Raw(type.Description.ToHtml())
                                                     }
                                                 </td>
                                             </tr>
@@ -99,11 +101,11 @@
                                         @foreach (InsightDocs.DotNet.Model.DotNetType type in Item.Types.Where(t => t.TypeName == "Enum").OrderBy(t => t.Name))
                                         {
                                             <tr>
-                                                <td><span class="break-text">@RazorTemplate.GetLink(type, ServiceProvider!)</span></td>
+                                                <td><span class="break-text">@GetLink(type)</span></td>
                                                 <td>
                                                     @if (type.Description != null)
                                                     {
-                                                        @RazorTemplate.Raw(type.Description.ToHtml())
+                                                        @Raw(type.Description.ToHtml())
                                                     }
                                                 </td>
                                             </tr>
@@ -118,19 +120,3 @@
         </main>
     </body>
 </html>
-
-@code {
-    [Parameter]
-    public InsightDocs.DotNet.Model.DotNetNamespace? Item 
-    { 
-        get; 
-        set; 
-    }
-
-    [Parameter]
-    public IServiceProvider? ServiceProvider
-    { 
-        get; 
-        set; 
-    }
-}

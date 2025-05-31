@@ -1,5 +1,4 @@
-@using InsightDocs.Abstractions
-@using Microsoft.Extensions.DependencyInjection
+@inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetIndex>
 
 <html>
     <head>
@@ -23,7 +22,7 @@
                                 @foreach (InsightDocs.DotNet.Model.DotNetNamespace ns in Item!.Namespaces)
                                 {
                                     <tr>
-                                        <td>@RazorTemplate.GetLink(ns, ServiceProvider!) Namespace</td>
+                                        <td>@GetLink(ns) Namespace</td>
                                         <td></td>
                                     </tr>
                                 }
@@ -35,19 +34,3 @@
         </main>
     </body>
 </html>
-
-@code {
-    [Parameter]
-    public InsightDocs.DotNet.Model.DotNetIndex? Item
-    { 
-        get; 
-        set; 
-    }
-
-    [Parameter]
-    public IServiceProvider? ServiceProvider
-    { 
-        get; 
-        set; 
-    }
-}
