@@ -85,6 +85,21 @@ public partial class DotNetTocItem : TocItem
     [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
     public static partial void LogFinishedPublishingTopics(ILogger logger);
 
+    [LoggerMessage(LogLevel.Information, "Publishing topics for namespace {ns}")]
+    public static partial void LogPublishingNamespace(ILogger logger, string ns);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics for namespace {ns}")]
+    public static partial void LogFinishedPublishingNamespace(ILogger logger, string ns);
+
+    [LoggerMessage(LogLevel.Debug, "Publishing topic for type {type}")]
+    public static partial void LogPublishingType(ILogger logger, string type);
+
+    [LoggerMessage(LogLevel.Debug, "Skipping type {type}")]
+    public static partial void LogSkippingLoadingType(ILogger logger, string type);
+
+    [LoggerMessage(LogLevel.Debug, "Loading type {type}")]
+    public static partial void LogLoadingType(ILogger logger, string type);
+
     protected async Task DotNetExecutor(IServiceProvider serviceProvider)
     {
         if (RootedAssemblyGlobMatchers != null)
@@ -126,13 +141,17 @@ public partial class DotNetTocItem : TocItem
                 {
                     if (type.Name.StartsWith('<') || type.Name.StartsWith("_Closure$") || type.Name.StartsWith("VB$StateMachine_"))
                     {
+                        LogSkippingLoadingType(logger, type.FullName!);
                         continue;
                     }
 
                     if (TypeFilter != null && !TypeFilter(type))
                     {
+                        LogSkippingLoadingType(logger, type.FullName!);
                         continue;
                     }
+
+                    LogLoadingType(logger, type.FullName!);
 
                     string ns = type.Namespace ?? "";
 
@@ -174,6 +193,8 @@ public partial class DotNetTocItem : TocItem
 
             foreach (DotNetNamespace ns in indexData.Namespaces.OrderBy(n => n.FullName))
             {
+                LogPublishingNamespace(logger, ns.FullName);
+
                 string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns, urlPrefix);
                 TocItem namespaceTocItem = AddTocItem(ns.FullName, namespaceUrl);
 
@@ -182,6 +203,8 @@ public partial class DotNetTocItem : TocItem
 
                 foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
                 {
+                    LogPublishingType(logger, type.FullName);
+
                     string typeUrl = dotNetTypeUrlProvider.GetUrl(type, urlPrefix);
                     TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
 
@@ -236,6 +259,8 @@ public partial class DotNetTocItem : TocItem
                         }
                     }
                 }
+
+                LogFinishedPublishingNamespace(logger, ns.FullName);
             }
 
             LogFinishedPublishingTopics(logger);
