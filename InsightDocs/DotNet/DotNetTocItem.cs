@@ -123,9 +123,7 @@ public partial class DotNetTocItem : TocItem
                 }
             }
 
-            List<Assembly> assemblies = [];
             Dictionary<string, DotNetNamespace> namespaces = [];
-
             PathAssemblyResolver pathAssemblyResolver = new(runtimeAssemblyPaths.Concat(assemblyPaths));
 
             foreach (string assemblyPath in assemblyPaths)
@@ -134,8 +132,6 @@ public partial class DotNetTocItem : TocItem
                 MetadataLoadContext metadataLoadContext = new(pathAssemblyResolver);
                 Assembly assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
                 LogFinishedAssemblyLoad(logger, assemblyPath);
-
-                assemblies.Add(assembly);
 
                 foreach (Type type in assembly.GetTypes())
                 {

@@ -16,6 +16,7 @@ public class DotNetAssembly
         if (!AssemblyCache.TryGetValue(key, out DotNetAssembly? assemblyMetadata))
         {
             assemblyMetadata = new DotNetAssembly(assembly, serviceProvider);
+            AssemblyCache[key] = assemblyMetadata;
         }
 
         return assemblyMetadata;
@@ -35,7 +36,7 @@ public class DotNetAssembly
             XmlDocument xmlDocDocument = new();
             // TODO: move >> replacement to custom
             string xmlDocText = File.ReadAllText(Path.Combine(assemblyDirectory, assemblyName.Name + ".xml")).Replace(">>", ">");
-            
+
             xmlDocDocument.LoadXml(xmlDocText);
 
             XmlNodeList? memberNodes = xmlDocDocument.SelectNodes("/doc/members/member");
