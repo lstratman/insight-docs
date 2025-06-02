@@ -2,13 +2,26 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using InsightDocs.Abstractions;
+using InsightDocs.Services;
 using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs;
 
-public class Builder(IServiceCollection services)
+public class InsightDocsBuilder
 {
+    public static InsightDocsBuilder Create(IServiceCollection services)
+    {
+        return new InsightDocsBuilder(services);
+    }
+
+    private InsightDocsBuilder(IServiceCollection services)
+    {
+        Services = services;
+
+        Services.AddScoped<IUrlPrefixProvider, UrlPrefixProvider>();
+    }
+
     public TocItem TocRoot
     {
         get;
@@ -19,7 +32,7 @@ public class Builder(IServiceCollection services)
     {
         get;
         private set;
-    } = services;
+    }
 
     public TocItem AddTocItem(string title, string? urlPrefix = null)
     {

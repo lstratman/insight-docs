@@ -65,7 +65,7 @@ public class HtmlFilePublisherOptions(string outputDirectory)
 
 public static class HtmlFilePublisherExtensions
 {
-    public static Builder PublishToHtmlFiles(this Builder builder, HtmlFilePublisherOptions options)
+    public static InsightDocsBuilder PublishToHtmlFiles(this InsightDocsBuilder builder, HtmlFilePublisherOptions options)
     {
         builder.Services.AddSingleton<IPublisher, HtmlFilePublisher>((provider) => {
             return new HtmlFilePublisher(options);

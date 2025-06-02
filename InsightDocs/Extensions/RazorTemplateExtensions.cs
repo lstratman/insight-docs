@@ -35,7 +35,7 @@ public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvide
 
 public static class RazorTemplateExtensions
 {
-    public static void RegisterRazorItemTemplate<T, TTemplate>(this Builder builder) where TTemplate : IComponent
+    public static void RegisterRazorItemTemplate<T, TTemplate>(this InsightDocsBuilder builder) where TTemplate : IComponent
     {
         builder.Services.AddSingleton<IItemTemplateProvider<T>>((serviceProvider) => {
             return new RazorTemplateRenderer<T, TTemplate>(serviceProvider);

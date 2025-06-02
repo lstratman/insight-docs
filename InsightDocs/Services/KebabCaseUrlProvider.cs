@@ -300,12 +300,12 @@ public class KebabCaseUrlProviderOptions
 
 public static class KebabCaseUrlProviderExtensions
 {
-    public static Builder UseKebabCaseUrls(this Builder builder)
+    public static InsightDocsBuilder UseKebabCaseUrls(this InsightDocsBuilder builder)
     {
         return UseKebabCaseUrls(builder, null);
     }
 
-    public static Builder UseKebabCaseUrls(this Builder builder, Action<KebabCaseUrlProviderOptions>? optionsFactory)
+    public static InsightDocsBuilder UseKebabCaseUrls(this InsightDocsBuilder builder, Action<KebabCaseUrlProviderOptions>? optionsFactory)
     {
         builder.Services.AddSingleton<IUrlProvider<DotNetIndex>, KebabCaseUrlProvider>();
         builder.Services.AddSingleton<IUrlProvider<DotNetNamespace>, KebabCaseUrlProvider>();

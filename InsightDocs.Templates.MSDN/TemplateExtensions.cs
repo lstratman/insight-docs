@@ -8,7 +8,7 @@ namespace InsightDocs.Templates.MSDN;
 
 public static class TemplateExtensions
 {
-    public static Builder UseMSDNTemplate(this Builder builder)
+    public static InsightDocsBuilder UseMSDNTemplate(this InsightDocsBuilder builder)
     {
         builder.RegisterRazorItemTemplate<SiteIndex, Site.SiteIndex>();
         builder.RegisterRazorItemTemplate<DotNetIndex, DotNet.DotNetIndex>();

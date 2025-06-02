@@ -7,7 +7,7 @@ namespace InsightDocs.DotNet;
 
 public static class DotNetExtensions
 {
-    public static Builder UseDotNet(this Builder builder)
+    public static InsightDocsBuilder UseDotNet(this InsightDocsBuilder builder)
     {
         builder.Services.AddSingleton<IXmlDocProcessor, XmlDocProcessor>();
         builder.Services.AddScoped<IXmlDocUrlResolver, XmlDocUrlResolver>();
