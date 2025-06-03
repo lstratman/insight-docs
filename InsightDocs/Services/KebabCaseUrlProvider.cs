@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options) 
+public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider) 
     : IUrlProvider<DotNetType>,
       IUrlProvider<DotNetIndex>,
       IUrlProvider<DotNetNamespace>,
@@ -23,13 +23,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         set;
     } = options;
 
-    public string GetUrl(DotNetType item, string? urlPrefix = null)
+    public string GetUrl(DotNetType item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -55,13 +55,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(DotNetIndex item, string? urlPrefix = null)
+    public string GetUrl(DotNetIndex item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -75,13 +75,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(DotNetNamespace item, string? urlPrefix = null)
+    public string GetUrl(DotNetNamespace item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -95,13 +95,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(DotNetMethod item, string? urlPrefix = null)
+    public string GetUrl(DotNetMethod item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -127,13 +127,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(DotNetProperty item, string? urlPrefix = null)
+    public string GetUrl(DotNetProperty item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -159,13 +159,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(DotNetField item, string? urlPrefix = null)
+    public string GetUrl(DotNetField item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -191,13 +191,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(DotNetMethodOverload item, string? urlPrefix = null)
+    public string GetUrl(DotNetMethodOverload item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -248,13 +248,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(SiteToc item, string? urlPrefix = null)
+    public string GetUrl(SiteToc item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -268,13 +268,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options)
         return url.ToString();
     }
 
-    public string GetUrl(SiteIndex item, string? urlPrefix = null)
+    public string GetUrl(SiteIndex item)
     {
         StringBuilder url = new();
 
-        if (!String.IsNullOrEmpty(urlPrefix))
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
         {
-            url.Append(urlPrefix);
+            url.Append(urlPrefixProvider.UrlPrefix);
             url.Append('/');
         }
 
@@ -307,15 +307,15 @@ public static class KebabCaseUrlProviderExtensions
 
     public static InsightDocsBuilder UseKebabCaseUrls(this InsightDocsBuilder builder, Action<KebabCaseUrlProviderOptions>? optionsFactory)
     {
-        builder.Services.AddSingleton<IUrlProvider<DotNetIndex>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<DotNetNamespace>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<DotNetType>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<DotNetMethod>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<DotNetMethodOverload>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<SiteToc>, KebabCaseUrlProvider>();
-        builder.Services.AddSingleton<IUrlProvider<SiteIndex>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetIndex>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetNamespace>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetType>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetMethod>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetMethodOverload>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetProperty>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<SiteToc>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<SiteIndex>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

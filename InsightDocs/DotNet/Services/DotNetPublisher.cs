@@ -28,8 +28,7 @@ public partial class DotNetPublisher(
     IUrlProvider<DotNetMethod> dotNetMethodUrlProvider,
     IUrlProvider<DotNetProperty> dotNetPropertyUrlProvider,
     IUrlProvider<DotNetField> dotNetFieldUrlProvider,
-    IPublisher publisher,
-    IUrlPrefixProvider urlPrefixProvider) : IDotNetPublisher
+    IPublisher publisher) : IDotNetPublisher
 {
     [LoggerMessage(LogLevel.Information, "Publishing topics")]
     public static partial void LogPublishingTopics(ILogger logger);
@@ -55,13 +54,13 @@ public partial class DotNetPublisher(
 
         byte[] html = await dotNetIndexTemplate.GetContent(indexData);
 
-        await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData, urlPrefixProvider.UrlPrefix), html);
+        await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData), html);
 
         foreach (DotNetNamespace ns in indexData.Namespaces.OrderBy(n => n.FullName))
         {
             LogPublishingNamespace(logger, ns.FullName);
 
-            string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns, urlPrefixProvider.UrlPrefix);
+            string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns);
             TocItem namespaceTocItem = tocRoot.AddTocItem(ns.FullName, namespaceUrl);
 
             html = await dotNetNamespaceTemplate.GetContent(ns);
@@ -71,7 +70,7 @@ public partial class DotNetPublisher(
             {
                 LogPublishingType(logger, type.FullName);
 
-                string typeUrl = dotNetTypeUrlProvider.GetUrl(type, urlPrefixProvider.UrlPrefix);
+                string typeUrl = dotNetTypeUrlProvider.GetUrl(type);
                 TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
 
                 html = await dotNetTypeTemplate.GetContent(type);
@@ -85,7 +84,7 @@ public partial class DotNetPublisher(
                     {
                         methodsTocItem ??= typeTocItem.AddTocItem("Methods");
 
-                        string methodUrl = dotNetMethodUrlProvider.GetUrl(method, urlPrefixProvider.UrlPrefix);
+                        string methodUrl = dotNetMethodUrlProvider.GetUrl(method);
                         methodsTocItem.AddTocItem(method.Name, methodUrl);
 
                         html = await dotNetMethodTemplate.GetContent(method);
@@ -101,7 +100,7 @@ public partial class DotNetPublisher(
                     {
                         propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
 
-                        string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property, urlPrefixProvider.UrlPrefix);
+                        string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property);
                         propertiesTocItem.AddTocItem(property.Name, propertyUrl);
 
                         html = await dotNetPropertyTemplate.GetContent(property);
@@ -117,7 +116,7 @@ public partial class DotNetPublisher(
                     {
                         fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
 
-                        string fieldUrl = dotNetFieldUrlProvider.GetUrl(field, urlPrefixProvider.UrlPrefix);
+                        string fieldUrl = dotNetFieldUrlProvider.GetUrl(field);
                         fieldsTocItem.AddTocItem(field.Name, fieldUrl);
 
                         html = await dotNetFieldTemplate.GetContent(field);

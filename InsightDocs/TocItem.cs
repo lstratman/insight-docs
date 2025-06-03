@@ -51,7 +51,7 @@ public class TocItem
                 }
             }
 
-            return UrlPrefix;
+            return String.IsNullOrEmpty(UrlPrefix) ? UrlPrefix : "/" + UrlPrefix;
         }
     }
 

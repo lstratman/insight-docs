@@ -37,7 +37,7 @@ public class HtmlFilePublisher(HtmlFilePublisherOptions options) : IPublisher
 
     public async Task Publish(string url, byte[] contents)
     {
-        string outputPath = Path.Combine(Options.OutputDirectory, url);
+        string outputPath = Path.Combine(Options.OutputDirectory, url.StartsWith('/') ? url[1..] : url);
 
         if (!Directory.Exists(Path.GetDirectoryName(outputPath)))
         {
