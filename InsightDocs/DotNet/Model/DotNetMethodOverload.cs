@@ -119,15 +119,26 @@ public class DotNetMethodOverload : DotNetMemberInfo
 
             if (GenericArguments != null && GenericArguments.Count > 0)
             {
-                key.Append('{');
-                key.Append(String.Join(',', GenericArguments.Select(a => a.Name)));
-                key.Append('}');
+                key.Append($"``{GenericArguments.Count}");
             }
 
             if (Parameters != null)
             {
                 key.Append('(');
-                key.Append(String.Join(',', Parameters.Select(p => p.Type.XmlDocKey + (p.IsByRef ? "@" : ""))));
+
+                string parameters = String.Join(',', Parameters.Select(p => p.Type.XmlDocKey + (p.IsByRef ? "@" : "")));
+
+                if (GenericArguments != null && GenericArguments.Count > 0)
+                {
+                    for (int i = 0; i < GenericArguments.Count; i++)
+                    {
+                        DotNetTypeParameter genericArgument = GenericArguments[i];
+                        parameters = parameters.Replace("{" + genericArgument.Name + "}", "{``" + i + "}").Replace("{" + genericArgument.Name + ",", "{``" + i + ",").Replace("," + genericArgument.Name + ",", ",``" + i + ",").Replace("," + genericArgument.Name + "}", ",``" + i + "}");
+
+                    }
+                }
+
+                key.Append(parameters);
                 key.Append(')');
             }
 
