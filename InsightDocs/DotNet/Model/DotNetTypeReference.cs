@@ -4,6 +4,27 @@ namespace InsightDocs.DotNet.Model;
 
 public class DotNetTypeReference
 {
+    protected static Dictionary<string, string> CSharpTypeNames = new()
+    {
+        { "System.Int32", "int" },
+        { "System.String", "string" },
+        { "System.Boolean", "bool" },
+        { "System.Double", "double" },
+        { "System.Single", "float" },
+        { "System.Decimal", "decimal" },
+        { "System.Object", "object" },
+        { "System.Void", "void" },
+        { "System.Char", "char" },
+        { "System.Byte", "byte" },
+        { "System.SByte", "sbyte" },
+        { "System.Int16", "short" },
+        { "System.UInt16", "ushort" },
+        { "System.Int64", "long" },
+        { "System.UInt64", "ulong" },
+        { "System.IntPtr", "nint" },
+        { "System.UIntPtr", "nuint" }
+    };
+
     public DotNetType? Type
     {
         get;
@@ -120,6 +141,33 @@ public class DotNetTypeReference
             }
 
             return output.ToString();
+        }
+    }
+
+    public string CSharpCode
+    {
+        get
+        {
+            if (!CSharpTypeNames.TryGetValue(Namespace?.FullName + "." + Name, out string? name))
+            {
+                name = Name;
+            }
+
+            StringBuilder code = new StringBuilder(name);
+
+            if (GenericArguments != null && GenericArguments.Count > 0)
+            {
+                code.Append('<');
+                code.Append(String.Join(", ", GenericArguments.Select(a => a.CSharpCode)));
+                code.Append('>');
+            }
+
+            if (IsArray)
+            {
+                code.Append("[]");
+            }
+
+            return code.ToString();
         }
     }
 }

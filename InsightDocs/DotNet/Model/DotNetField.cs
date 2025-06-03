@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace InsightDocs.DotNet.Model;
 
@@ -18,10 +19,17 @@ public class DotNetField : DotNetMemberInfo
         Remarks = field.Remarks;
         ReturnsDescription = field.ReturnsDescription;
         DeclaringType = field.DeclaringType;
+        IsReadOnly = field.IsReadOnly;
     }
 
     public DotNetField()
     {
+    }
+
+    public bool IsReadOnly
+    {
+        get;
+        set;
     }
 
     public override string MemberDisplayName
@@ -80,6 +88,26 @@ public class DotNetField : DotNetMemberInfo
         {
             string? typeDocKey = DeclaringType?.XmlDocKey;
             return typeDocKey == null ? null : typeDocKey + "." + Name;
+        }
+    }
+
+    public override string CSharpCode
+    {
+        get
+        {
+            StringBuilder code = new StringBuilder(base.CSharpCode);
+
+            if (IsReadOnly)
+            {
+                code.Append("readonly ");
+            }
+
+            code.Append(FieldType.CSharpCode);
+            code.Append(' ');
+            code.Append(Name);
+            code.Append(';');
+
+            return code.ToString();
         }
     }
 }

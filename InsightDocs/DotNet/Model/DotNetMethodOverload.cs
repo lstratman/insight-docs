@@ -134,4 +134,33 @@ public class DotNetMethodOverload : DotNetMemberInfo
             return key.ToString();
         }
     }
+
+    public override string CSharpCode
+    {
+        get
+        {
+            StringBuilder output = new(base.CSharpCode);
+
+            output.Append(ReturnType.CSharpCode);
+            output.Append(' ');
+            output.Append(Name);
+
+            if (GenericArguments != null)
+            {
+                output.Append('<');
+                output.Append(String.Join(", ", GenericArguments.Select(a => a.Name)));
+                output.Append('>');
+            }
+
+            output.Append('(');
+
+            if (Parameters != null)
+            {
+                output.Append(String.Join(", ", Parameters.Select(p => p.Type.CSharpCode + " " + p.Name)));
+            }
+
+            output.Append(");");
+            return output.ToString();
+        }
+    }
 }

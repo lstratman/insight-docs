@@ -1,4 +1,5 @@
 using InsightDocs.Abstractions;
+using System.Text;
 
 namespace InsightDocs.DotNet.Model;
 
@@ -42,6 +43,46 @@ public abstract class DotNetMemberInfo : DotNetXmlDocSource, ILinkTarget
     {
         get;
         set;
+    }
+
+    public virtual string CSharpCode
+    {
+        get
+        {
+            StringBuilder code = new StringBuilder();
+
+            if (AccessType == DotNetMemberInfoAccessType.Public)
+            {
+                code.Append("public ");
+            }
+
+            else if (AccessType == DotNetMemberInfoAccessType.Protected)
+            {
+                code.Append("protected ");
+            }
+
+            else if (AccessType == DotNetMemberInfoAccessType.Private)
+            {
+                code.Append("private ");
+            }
+
+            if (IsInternal)
+            {
+                code.Append("internal ");
+            }
+
+            if (IsAbstract)
+            {
+                code.Append("abstract ");
+            }
+
+            if (IsStatic)
+            {
+                code.Append("static ");
+            }
+
+            return code.ToString();
+        }
     }
 }
 

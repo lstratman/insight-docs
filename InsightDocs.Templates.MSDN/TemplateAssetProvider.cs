@@ -45,5 +45,21 @@ public class TemplateAssetProvider(IPublisher publisher) : ITemplateAssetProvide
             await resourceStream.CopyToAsync(memoryStream);
             await Publisher.Publish("segoe-ui-roman-vf.woff2", memoryStream.ToArray());
         }
+
+        resourceStream = executingAssembly.GetManifestResourceStream("InsightDocs.Templates.MSDN.Assets.highlightjs.highlight.min.js") ?? throw new Exception("Unable to load the resource stream for highlight.js JavaScript.");
+
+        using (MemoryStream memoryStream = new())
+        {
+            await resourceStream.CopyToAsync(memoryStream);
+            await Publisher.Publish("_assets/highlightjs/highlight.min.js", memoryStream.ToArray());
+        }
+
+        resourceStream = executingAssembly.GetManifestResourceStream("InsightDocs.Templates.MSDN.Assets.highlightjs.styles.vs.min.css") ?? throw new Exception("Unable to load the resource stream for highlight.js CSS.");
+
+        using (MemoryStream memoryStream = new())
+        {
+            await resourceStream.CopyToAsync(memoryStream);
+            await Publisher.Publish("_assets/highlightjs/styles/vs.min.css", memoryStream.ToArray());
+        }
     }
 }

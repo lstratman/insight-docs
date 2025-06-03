@@ -12932,6 +12932,7 @@ dl.halfStack, .halfStack {
 
 .cdlHolder .cdl:after {
   content: ", ";
+  margin-right: 6px;
 }
 
 .pdlHolder .pdl:after {

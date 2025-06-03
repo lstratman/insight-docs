@@ -45,4 +45,20 @@ public class DotNetGenericArgument
             }
         }
     }
+
+    public string CSharpCode
+    {
+        get
+        {
+            if (Type != null)
+            {
+                return Type.CSharpCode;
+            }
+
+            else
+            {
+                return TypeParameterName!;
+            }
+        }
+    }
 }

@@ -234,11 +234,28 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 Namespace = ns,
                 Name = name,
                 FullName = String.IsNullOrEmpty(type.Namespace) ? name : type.Namespace + "." + name,
-                IsSealed = type.IsSealed,
-                IsAbstract = type.IsAbstract,
+                IsStatic = type.IsAbstract && type.IsSealed,
+                IsSealed = type.IsSealed && !type.IsAbstract,
+                IsAbstract = type.IsAbstract && !type.IsInterface && !type.IsSealed,
+                IsInternal = type.IsNestedAssembly,
                 TypeName = typeName,
                 DisplayName = typeParameters != null && typeParameters.Length > 0 ? name + "<" + String.Join(", ", typeParameters.Select(a => a.Name)) + ">" : name
             };
+
+            if (type.IsPublic || type.IsNestedPublic)
+            {
+                typeMetadata.AccessType = DotNetMemberInfoAccessType.Public;
+            }
+
+            else if (type.IsNestedPrivate)
+            {
+                typeMetadata.AccessType = DotNetMemberInfoAccessType.Private;
+            }
+
+            else if (type.IsNestedFamily)
+            {
+                typeMetadata.AccessType = DotNetMemberInfoAccessType.Protected;
+            }
 
             if (ns != null)
             {
@@ -588,7 +605,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             Name = method.Name.Contains('.') ? method.Name[(method.Name.LastIndexOf('.') + 1)..] : method.Name,
             IsStatic = method.IsStatic,
             IsInternal = method.IsAssembly,
-            IsAbstract = method.IsAbstract,
+            IsAbstract = method.IsAbstract && (method.DeclaringType == null || !method.DeclaringType.IsInterface),
             MethodCollection = methodCollection,
             ReturnType = LoadTypeReference(method.ReturnType)
         };
@@ -700,7 +717,8 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             FieldType = LoadTypeReference(field.FieldType),
             IsStatic = field.IsStatic,
             IsInternal = field.IsAssembly,
-            IsAbstract = false
+            IsAbstract = false,
+            IsReadOnly = field.IsInitOnly
         };
 
         if (field.IsPublic)

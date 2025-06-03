@@ -3,6 +3,8 @@
 <html>
     <head>
         <link rel="stylesheet" href="../../msdn.css"/>
+        <script type="text/javascript" src="../../_assets/highlightjs/highlight.min.js"></script>
+        <script type="text/javascript">hljs.highlightAll();</script>
     </head>
     <body>
         <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
@@ -38,7 +40,21 @@
                                     <div class="summaryHolder">@Raw(Item.Description.ToHtml())</div>
                                 }
 
-                                <!-- TODO: code -->
+                                <div class="codeHeader">
+                                    <span class="language">C#</span>
+		                            <button type="button" class="action position-relative display-none-print">
+			                            <span class="icon margin-right-xxs" aria-hidden="true">
+				                            <span class="docon docon-edit-copy"></span>
+			                            </span>
+			                            <span>Copy</span>
+			                            <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				                            <span class="icon font-size-lg">
+					                            <span class="docon docon-check-mark"></span>
+				                            </span>
+			                            </div>
+		                            </button>
+	                            </div>
+                                <pre class="wrap has-inner-focus"><code class="csharp language-csharp" dir="ltr">@Item.CSharpCode</code></pre>
 
                                 <div class="heading-wrapper" data-heading-level="h4">
                                     <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>

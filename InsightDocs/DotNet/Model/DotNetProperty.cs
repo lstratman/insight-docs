@@ -120,4 +120,81 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         get;
         set;
     }
+
+    public string CSharpCode
+    {
+        get
+        {
+            StringBuilder code = new StringBuilder();
+            DotNetMethodOverload method = GetMethod ?? SetMethod!;
+
+            if (method.AccessType == DotNetMemberInfoAccessType.Public)
+            {
+                code.Append("public ");
+            }
+
+            else if (method.AccessType == DotNetMemberInfoAccessType.Protected)
+            {
+                code.Append("protected ");
+            }
+
+            else if (method.AccessType == DotNetMemberInfoAccessType.Private)
+            {
+                code.Append("private ");
+            }
+
+            if (method.IsInternal)
+            {
+                code.Append("internal ");
+            }
+
+            if (method.IsAbstract)
+            {
+                code.Append("abstract ");
+            }
+
+            if (method.IsStatic)
+            {
+                code.Append("static ");
+            }
+
+            code.Append(PropertyType.CSharpCode);
+            code.Append(' ');
+            code.Append(Name);
+
+            code.Append(" {");
+
+            if (GetMethod != null)
+            {
+                code.Append(" get;");
+            }
+
+            if (SetMethod != null)
+            {
+                if (GetMethod != null && SetMethod.AccessType != GetMethod.AccessType)
+                {
+                    if (SetMethod.AccessType == DotNetMemberInfoAccessType.Public)
+                    {
+                        code.Append(" public");
+                    }
+
+                    else if (SetMethod.AccessType == DotNetMemberInfoAccessType.Protected)
+                    {
+                        code.Append(" protected");
+                    }
+
+                    else if (SetMethod.AccessType == DotNetMemberInfoAccessType.Private)
+                    {
+                        code.Append(" private");
+                    }
+                }
+
+                code.Append(" set;");
+            }
+
+            code.Append(" }");
+
+            return code.ToString();
+        }
+    }
 }
