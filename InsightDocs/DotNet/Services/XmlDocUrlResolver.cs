@@ -9,7 +9,6 @@ public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlRes
 {
     protected readonly Dictionary<string, string> Urls = [];
     protected readonly Dictionary<string, string> LinkTexts = [];
-    protected IServiceProvider _serviceProvider = serviceProvider;
 
     public string GetUrl(string key)
     {
@@ -23,7 +22,7 @@ public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlRes
 
                     if (type != null)
                     {
-                        _serviceProvider.GetRequiredService<IDotNetLoader>().LoadType(type);
+                        serviceProvider.GetRequiredService<IDotNetLoader>().LoadType(type);
                         Urls.TryGetValue(key, out string? value2);
                         value = value2;
                     }
@@ -66,7 +65,7 @@ public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlRes
             throw new Exception("XmlDoc target already registered for key: " + key + ".");
         }
 
-        IUrlProvider<T> urlProvider = _serviceProvider.GetService<IUrlProvider<T>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(T) + ".");
+        IUrlProvider<T> urlProvider = serviceProvider.GetService<IUrlProvider<T>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(T) + ".");
         Urls[key] = urlProvider.GetUrl(target);
         LinkTexts[key] = target.LinkText;
     }

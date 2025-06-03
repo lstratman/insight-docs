@@ -6,15 +6,12 @@ using System.Xml;
 
 namespace InsightDocs.DotNet.Services;
 
-public partial class DotNetLoader(IXmlDocUrlResolver _xmlDocUrlResolver, IXmlDocProcessor _xmlDocProcessor, ILoggerFactory _loggerFactory) : IDotNetLoader
+public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocProcessor xmlDocProcessor, ILoggerFactory loggerFactory) : IDotNetLoader
 {
     protected readonly Dictionary<string, DotNetType> TypeCache = [];
     protected readonly Dictionary<string, DotNetTypeReference> TypeReferenceCache = [];
     protected readonly Dictionary<string, DotNetAssembly> AssemblyCache = [];
     protected readonly Dictionary<string, DotNetNamespace> NamespaceCache = [];
-    protected IXmlDocUrlResolver xmlDocUrlResolver = _xmlDocUrlResolver;
-    protected IXmlDocProcessor xmlDocProcessor = _xmlDocProcessor;
-    protected ILoggerFactory loggerFactory = _loggerFactory;
 
     [LoggerMessage(LogLevel.Information, "Loading {assemblyPath}")]
     public static partial void LogAssemblyLoad(ILogger logger, string assemblyPath);

@@ -1,0 +1,134 @@
+﻿using InsightDocs.Abstractions;
+using InsightDocs.DotNet.Abstractions;
+using InsightDocs.DotNet.Model;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InsightDocs.DotNet.Services;
+
+public partial class DotNetPublisher(
+    ILoggerFactory loggerFactory, 
+    IDotNetLoader dotNetLoader,
+    IItemTemplateProvider<DotNetIndex> dotNetIndexTemplate,
+    IItemTemplateProvider<DotNetNamespace> dotNetNamespaceTemplate,
+    IItemTemplateProvider<DotNetType> dotNetTypeTemplate,
+    IItemTemplateProvider<DotNetMethod> dotNetMethodTemplate,
+    IItemTemplateProvider<DotNetProperty> dotNetPropertyTemplate,
+    IItemTemplateProvider<DotNetField> dotNetFieldTemplate,
+    IUrlProvider<DotNetIndex> dotNetIndexUrlProvider,
+    IUrlProvider<DotNetNamespace> dotNetNamespaceUrlProvider,
+    IUrlProvider<DotNetType> dotNetTypeUrlProvider,
+    IUrlProvider<DotNetMethod> dotNetMethodUrlProvider,
+    IUrlProvider<DotNetProperty> dotNetPropertyUrlProvider,
+    IUrlProvider<DotNetField> dotNetFieldUrlProvider,
+    IPublisher publisher,
+    IUrlPrefixProvider urlPrefixProvider) : IDotNetPublisher
+{
+    [LoggerMessage(LogLevel.Information, "Publishing topics")]
+    public static partial void LogPublishingTopics(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
+    public static partial void LogFinishedPublishingTopics(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Publishing topics for namespace {ns}")]
+    public static partial void LogPublishingNamespace(ILogger logger, string ns);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics for namespace {ns}")]
+    public static partial void LogFinishedPublishingNamespace(ILogger logger, string ns);
+
+    [LoggerMessage(LogLevel.Debug, "Publishing topic for type {type}")]
+    public static partial void LogPublishingType(ILogger logger, string type);
+
+    public virtual async Task PublishTopics(TocItem tocRoot, List<string> assemblyPaths, List<string> runtimeAssemblyPaths, Func<Type, bool>? typeFilter)
+    {
+        ILogger logger = loggerFactory.CreateLogger("InsightDocs.DotNet");
+        DotNetIndex indexData = dotNetLoader.LoadAssemblies(assemblyPaths, runtimeAssemblyPaths, typeFilter);
+
+        LogPublishingTopics(logger);
+
+        byte[] html = await dotNetIndexTemplate.GetContent(indexData);
+
+        await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData, urlPrefixProvider.UrlPrefix), html);
+
+        foreach (DotNetNamespace ns in indexData.Namespaces.OrderBy(n => n.FullName))
+        {
+            LogPublishingNamespace(logger, ns.FullName);
+
+            string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns, urlPrefixProvider.UrlPrefix);
+            TocItem namespaceTocItem = tocRoot.AddTocItem(ns.FullName, namespaceUrl);
+
+            html = await dotNetNamespaceTemplate.GetContent(ns);
+            await publisher.Publish(namespaceUrl, html);
+
+            foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
+            {
+                LogPublishingType(logger, type.FullName);
+
+                string typeUrl = dotNetTypeUrlProvider.GetUrl(type, urlPrefixProvider.UrlPrefix);
+                TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
+
+                html = await dotNetTypeTemplate.GetContent(type);
+                await publisher.Publish(typeUrl, html);
+
+                if (type.Methods != null)
+                {
+                    TocItem? methodsTocItem = null;
+
+                    foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)))
+                    {
+                        methodsTocItem ??= typeTocItem.AddTocItem("Methods");
+
+                        string methodUrl = dotNetMethodUrlProvider.GetUrl(method, urlPrefixProvider.UrlPrefix);
+                        methodsTocItem.AddTocItem(method.Name, methodUrl);
+
+                        html = await dotNetMethodTemplate.GetContent(method);
+                        await publisher.Publish(methodUrl, html);
+                    }
+                }
+
+                if (type.Properties != null)
+                {
+                    TocItem? propertiesTocItem = null;
+
+                    foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type))
+                    {
+                        propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
+
+                        string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property, urlPrefixProvider.UrlPrefix);
+                        propertiesTocItem.AddTocItem(property.Name, propertyUrl);
+
+                        html = await dotNetPropertyTemplate.GetContent(property);
+                        await publisher.Publish(propertyUrl, html);
+                    }
+                }
+
+                if (type.Fields != null)
+                {
+                    TocItem? fieldsTocItem = null;
+
+                    foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type))
+                    {
+                        fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
+
+                        string fieldUrl = dotNetFieldUrlProvider.GetUrl(field, urlPrefixProvider.UrlPrefix);
+                        fieldsTocItem.AddTocItem(field.Name, fieldUrl);
+
+                        html = await dotNetFieldTemplate.GetContent(field);
+                        await publisher.Publish(fieldUrl, html);
+                    }
+                }
+            }
+
+            LogFinishedPublishingNamespace(logger, ns.FullName);
+        }
+
+        LogFinishedPublishingTopics(logger);
+    }
+}

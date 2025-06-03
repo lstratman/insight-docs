@@ -1,9 +1,7 @@
 using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Abstractions;
-using InsightDocs.DotNet.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.Logging;
 
 namespace InsightDocs.DotNet;
 
@@ -72,29 +70,10 @@ public partial class DotNetTocItem : TocItem
         _baseTocItem.RegisterExecutor(executor);
     }
 
-    [LoggerMessage(LogLevel.Information, "Publishing topics")]
-    public static partial void LogPublishingTopics(ILogger logger);
-
-    [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
-    public static partial void LogFinishedPublishingTopics(ILogger logger);
-
-    [LoggerMessage(LogLevel.Information, "Publishing topics for namespace {ns}")]
-    public static partial void LogPublishingNamespace(ILogger logger, string ns);
-
-    [LoggerMessage(LogLevel.Information, "Finished publishing topics for namespace {ns}")]
-    public static partial void LogFinishedPublishingNamespace(ILogger logger, string ns);
-
-    [LoggerMessage(LogLevel.Debug, "Publishing topic for type {type}")]
-    public static partial void LogPublishingType(ILogger logger, string type);
-
     protected async Task DotNetExecutor(IServiceProvider serviceProvider)
     {
         if (RootedAssemblyGlobMatchers != null)
         {
-            IDotNetLoader dotNetLoader = serviceProvider.GetRequiredService<IDotNetLoader>();
-            ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            ILogger logger = loggerFactory.CreateLogger("InsightDocs.DotNet");
-
             List<string> assemblyPaths = [];
             List<string> runtimeAssemblyPaths = [];
 
@@ -109,106 +88,18 @@ public partial class DotNetTocItem : TocItem
                 {
                     runtimeAssemblyPaths.AddRange(matcherAndRoot.Value.GetResultsInFullPath(matcherAndRoot.Key));
                 }
-            }            
-
-            DotNetIndex indexData = dotNetLoader.LoadAssemblies(assemblyPaths, runtimeAssemblyPaths, TypeFilter);
-
-            LogPublishingTopics(logger);
-
-            IItemTemplateProvider<DotNetIndex> dotNetIndexTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetIndex.");
-            IItemTemplateProvider<DotNetNamespace> dotNetNamespaceTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetNamespace>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetNamespace.");
-            IItemTemplateProvider<DotNetType> dotNetTypeTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetType>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetType.");
-            IItemTemplateProvider<DotNetMethod> dotNetMethodTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetMethod>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetMethod.");
-            IItemTemplateProvider<DotNetProperty> dotNetPropertyTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetProperty>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetProperty.");
-            IItemTemplateProvider<DotNetField> dotNetFieldTemplate = serviceProvider.GetService<IItemTemplateProvider<DotNetField>>() ?? throw new Exception("No IItemTemplateProvider service was registered for DotNetField.");
-            IUrlProvider<DotNetIndex> dotNetIndexUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetIndex>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetIndex.");
-            IUrlProvider<DotNetNamespace> dotNetNamespaceUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetNamespace>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetNamespace.");
-            IUrlProvider<DotNetType> dotNetTypeUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetType>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetType.");
-            IUrlProvider<DotNetMethod> dotNetMethodUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetMethod>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetMethod.");
-            IUrlProvider<DotNetProperty> dotNetPropertyUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetProperty>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetProperty.");
-            IUrlProvider<DotNetField> dotNetFieldUrlProvider = serviceProvider.GetService<IUrlProvider<DotNetField>>() ?? throw new Exception("No IUrlProvider service was registered for DotNetField.");
-            IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
-
-            byte[] html = await dotNetIndexTemplate.GetContent(indexData);
-            string? urlPrefix = FullUrlPrefix;
-
-            await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData, urlPrefix), html);
-
-            foreach (DotNetNamespace ns in indexData.Namespaces.OrderBy(n => n.FullName))
-            {
-                LogPublishingNamespace(logger, ns.FullName);
-
-                string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns, urlPrefix);
-                TocItem namespaceTocItem = AddTocItem(ns.FullName, namespaceUrl);
-
-                html = await dotNetNamespaceTemplate.GetContent(ns);
-                await publisher.Publish(namespaceUrl, html);
-
-                foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
-                {
-                    LogPublishingType(logger, type.FullName);
-
-                    string typeUrl = dotNetTypeUrlProvider.GetUrl(type, urlPrefix);
-                    TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
-
-                    html = await dotNetTypeTemplate.GetContent(type);
-                    await publisher.Publish(typeUrl, html);
-
-                    if (type.Methods != null)
-                    {
-                        TocItem? methodsTocItem = null;
-
-                        foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)))
-                        {
-                            methodsTocItem ??= typeTocItem.AddTocItem("Methods");
-
-                            string methodUrl = dotNetMethodUrlProvider.GetUrl(method, urlPrefix);
-                            methodsTocItem.AddTocItem(method.Name, methodUrl);
-
-                            html = await dotNetMethodTemplate.GetContent(method);
-                            await publisher.Publish(methodUrl, html);
-                        }
-                    }
-
-                    if (type.Properties != null)
-                    {
-                        TocItem? propertiesTocItem = null;
-
-                        foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type))
-                        {
-                            propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
-
-                            string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property, urlPrefix);
-                            propertiesTocItem.AddTocItem(property.Name, propertyUrl);
-
-                            html = await dotNetPropertyTemplate.GetContent(property);
-                            await publisher.Publish(propertyUrl, html);
-                        }
-                    }
-
-                    if (type.Fields != null)
-                    {
-                        TocItem? fieldsTocItem = null;
-
-                        foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type))
-                        {
-                            fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
-
-                            string fieldUrl = dotNetFieldUrlProvider.GetUrl(field, urlPrefix);
-                            fieldsTocItem.AddTocItem(field.Name, fieldUrl);
-
-                            html = await dotNetFieldTemplate.GetContent(field);
-                            await publisher.Publish(fieldUrl, html);
-                        }
-                    }
-                }
-
-                LogFinishedPublishingNamespace(logger, ns.FullName);
             }
 
-            LogFinishedPublishingTopics(logger);
-        }
+            IServiceScopeFactory serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-        await base.Execute(serviceProvider);
+            using (IServiceScope serviceScope = serviceScopeFactory.CreateScope())
+            {
+                IUrlPrefixProvider prefixProvider = serviceScope.ServiceProvider.GetRequiredService<IUrlPrefixProvider>();
+                prefixProvider.UrlPrefix = FullUrlPrefix;
+
+                IDotNetPublisher dotNetPublisher = serviceScope.ServiceProvider.GetRequiredService<IDotNetPublisher>();
+                await dotNetPublisher.PublishTopics(this, assemblyPaths, runtimeAssemblyPaths, TypeFilter);
+            }
+        }
     }
 }

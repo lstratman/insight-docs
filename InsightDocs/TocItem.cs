@@ -84,9 +84,9 @@ public class TocItem
         }
 
         foreach (TocItem child in Children)
-            {
-                await child.Execute(serviceProvider);
-            }
+        {
+            await child.Execute(serviceProvider);
+        }
     }
 
     public TocItem AddTocItem(string title, string? url = null, string? urlPrefix = null)

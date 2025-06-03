@@ -10,19 +10,18 @@ namespace InsightDocs.Extensions;
 
 public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvider) : IItemTemplateProvider<T> where TTemplate: IComponent
 {
-    protected IServiceProvider _serviceProvider = serviceProvider;
     protected ILoggerFactory _loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
     public async Task<byte[]> GetContent(T item)
     {
-        using HtmlRenderer htmlRenderer = new(_serviceProvider, _loggerFactory);
+        using HtmlRenderer htmlRenderer = new(serviceProvider, _loggerFactory);
 
         return await htmlRenderer.Dispatcher.InvokeAsync(async () =>
         {
             var dictionary = new Dictionary<string, object?>
             {
                 { "Item", item },
-                { "ServiceProvider", _serviceProvider }
+                { "ServiceProvider", serviceProvider }
             };
 
             ParameterView parameters = ParameterView.FromDictionary(dictionary);
@@ -37,7 +36,7 @@ public static class RazorTemplateExtensions
 {
     public static void RegisterRazorItemTemplate<T, TTemplate>(this InsightDocsBuilder builder) where TTemplate : IComponent
     {
-        builder.Services.AddSingleton<IItemTemplateProvider<T>>((serviceProvider) => {
+        builder.Services.AddScoped<IItemTemplateProvider<T>>((serviceProvider) => {
             return new RazorTemplateRenderer<T, TTemplate>(serviceProvider);
         });
     }

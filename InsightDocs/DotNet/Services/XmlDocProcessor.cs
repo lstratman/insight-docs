@@ -6,8 +6,6 @@ namespace InsightDocs.DotNet.Services;
 
 public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcessor
 {
-    protected IServiceProvider _serviceProvider = serviceProvider;
-
     protected virtual void ProcessCommentNodeChild(XmlNode node, List<XmlDocCommentComponent> components)
     {
         if (node is XmlText xmlText)
@@ -19,13 +17,13 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
         {
             if (xmlElement.Name == "para")
             {
-                components.Add(new XmlDocCommentHtmlTagComponent("p", xmlElement, _serviceProvider));
+                components.Add(new XmlDocCommentHtmlTagComponent("p", xmlElement, serviceProvider));
             }
 
             // TODO: move to custom
             else if (xmlElement.Name == "b" || xmlElement.Name == "i" || xmlElement.Name == "u" || xmlElement.Name == "strike" || xmlElement.Name == "p" || xmlElement.Name == "br")
             {
-                components.Add(new XmlDocCommentHtmlTagComponent(xmlElement.Name, xmlElement, _serviceProvider));
+                components.Add(new XmlDocCommentHtmlTagComponent(xmlElement.Name, xmlElement, serviceProvider));
             }
 
             else if (xmlElement.Name == "list")
@@ -35,12 +33,12 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
 
             else if (xmlElement.Name == "code" || xmlElement.Name == "c")
             {
-                components.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement, _serviceProvider));
+                components.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement, serviceProvider));
             }
 
             else if (xmlElement.Name == "see" || xmlElement.Name == "seealso")
             {
-                components.Add(new XmlDocSeeTagComponent(xmlElement, _serviceProvider));
+                components.Add(new XmlDocSeeTagComponent(xmlElement, serviceProvider));
             }
 
             else if (xmlElement.Name == "example")
@@ -50,7 +48,7 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
 
             else if (xmlElement.Name == "paramref" || xmlElement.Name == "typeparamref")
             {
-                XmlDocCommentHtmlTagComponent codeTag = new("code", null, _serviceProvider);
+                XmlDocCommentHtmlTagComponent codeTag = new("code", null, serviceProvider);
                 codeTag.ChildComponents.Add(new XmlDocCommentTextComponent(xmlElement.GetAttribute("name")));
 
                 components.Add(codeTag);
@@ -117,7 +115,7 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
             else if (childNode.Name == "seealso")
             {
                 xmlDocEntry.SeeAlso ??= [];
-                xmlDocEntry.SeeAlso.Add(new XmlDocSeeTagComponent(childNode, _serviceProvider));
+                xmlDocEntry.SeeAlso.Add(new XmlDocSeeTagComponent(childNode, serviceProvider));
             }
 
             else if (childNode.Name == "example")
@@ -143,7 +141,7 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
             else if (childNode.Name == "exception")
             {
                 xmlDocEntry.Exceptions ??= [];
-                xmlDocEntry.Exceptions.Add(new(childNode, _serviceProvider));
+                xmlDocEntry.Exceptions.Add(new(childNode, serviceProvider));
             }
 
             else if (childNode.Name == "inheritdoc")

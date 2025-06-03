@@ -105,8 +105,6 @@ public class XmlDocCommentHtmlTagComponent : XmlDocCommentComponent
 
 public class XmlDocSeeTagComponent(XmlElement xmlElement, IServiceProvider serviceProvider) : XmlDocCommentComponent
 {
-    protected IServiceProvider _serviceProvider = serviceProvider;
-
     public string CRef
     {
         get;
@@ -146,7 +144,7 @@ public class XmlDocSeeTagComponent(XmlElement xmlElement, IServiceProvider servi
 
         else if (!String.IsNullOrEmpty(CRef))
         {
-            IXmlDocUrlResolver xmlDocUrlResolver = _serviceProvider.GetRequiredService<IXmlDocUrlResolver>();
+            IXmlDocUrlResolver xmlDocUrlResolver = serviceProvider.GetRequiredService<IXmlDocUrlResolver>();
 
             string url = CRef.StartsWith('!') ? "about:blank" : xmlDocUrlResolver.GetUrl(CRef);
             string linkText = String.IsNullOrEmpty(LinkText) ? xmlDocUrlResolver.GetLinkText(CRef) : LinkText;

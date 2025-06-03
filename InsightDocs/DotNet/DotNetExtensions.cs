@@ -9,9 +9,10 @@ public static class DotNetExtensions
 {
     public static InsightDocsBuilder UseDotNet(this InsightDocsBuilder builder)
     {
-        builder.Services.AddSingleton<IXmlDocProcessor, XmlDocProcessor>();
+        builder.Services.AddScoped<IXmlDocProcessor, XmlDocProcessor>();
         builder.Services.AddScoped<IXmlDocUrlResolver, XmlDocUrlResolver>();
         builder.Services.AddScoped<IDotNetLoader, DotNetLoader>();
+        builder.Services.AddScoped<IDotNetPublisher, DotNetPublisher>();
 
         return builder;
     }
