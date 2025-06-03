@@ -1,14 +1,18 @@
 using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Abstractions;
-using InsightDocs.DotNet.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace InsightDocs.DotNet.Services;
 
-public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlResolver
+public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILoggerFactory loggerFactory) : IXmlDocUrlResolver
 {
     protected readonly Dictionary<string, string> Urls = [];
     protected readonly Dictionary<string, string> LinkTexts = [];
+    protected ILogger logger = loggerFactory.CreateLogger<XmlDocUrlResolver>();
+
+    [LoggerMessage(LogLevel.Warning, "No XmlDoc target registered for key {key}")]
+    public static partial void LogNoXmlDocTargetRegistered(ILogger logger, string key);
 
     public string GetUrl(string key)
     {
@@ -35,9 +39,8 @@ public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlRes
 
             if (value == null)
             {
-                Console.WriteLine("Warning: No XmlDoc target registered for key " + key);
-                // TODO
-                //throw new Exception("No XmlDoc target registered for key: " + key + ".");
+                // TODO: customizable behavior
+                LogNoXmlDocTargetRegistered(logger, key);
                 value = "";
             }
         }
@@ -49,10 +52,9 @@ public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlRes
     {
         if (!LinkTexts.TryGetValue(key, out string? value))
         {
-            Console.WriteLine("Warning: No XmlDoc target registered for key " + key);
+            // TODO: customizable behavior
+            LogNoXmlDocTargetRegistered(logger, key);
             return "";
-            // TODO
-            // throw new Exception("No XmlDoc target registered for key: " + key + ".");
         }
 
         return value;
