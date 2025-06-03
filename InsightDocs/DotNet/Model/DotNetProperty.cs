@@ -1,4 +1,4 @@
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using InsightDocs.Abstractions;
 
@@ -6,6 +6,7 @@ namespace InsightDocs.DotNet.Model;
 
 public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
 {
+    [SetsRequiredMembers]
     public DotNetProperty(DotNetProperty property)
     {
         Name = property.Name;
@@ -18,71 +19,8 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         DeclaringType = property.DeclaringType;
     }
 
-    public DotNetProperty(PropertyInfo property, IServiceProvider serviceProvider)
+    public DotNetProperty()
     {
-        Name = property.Name;
-
-        if (Name.Contains('.'))
-        {
-            Name = Name[(Name.LastIndexOf('.') + 1)..];
-        }
-        
-        PropertyType = DotNetTypeReference.Resolve(property.PropertyType, serviceProvider);
-
-        if (property.DeclaringType != null)
-        {
-            DeclaringType = DotNetTypeReference.Resolve(property.DeclaringType, serviceProvider);
-
-            if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
-            {
-                DeclaringType.Type.Assembly.XmlDocEntries.TryGetValue("P:" + XmlDocKey, out XmlDocEntry? xmlDocEntry);
-
-                if (xmlDocEntry != null)
-                {
-                    if (xmlDocEntry.Summary != null)
-                    {
-                        Description = new XmlDocHtml(xmlDocEntry.Summary);
-                    }
-
-                    if (xmlDocEntry.Remarks != null)
-                    {
-                        Remarks = new XmlDocHtml(xmlDocEntry.Remarks);
-                    }
-
-                    if (xmlDocEntry.Value != null)
-                    {
-                        ValueDescription = new XmlDocHtml(xmlDocEntry.Value);
-                    }
-
-                    if (xmlDocEntry.SeeAlso != null)
-                    {
-                        SeeAlso = [];
-
-                        foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
-                        {
-                            SeeAlso.Add(new XmlDocHtml([seeAlso]));
-                        }
-                    }
-                }
-            }
-        }
-
-        if (property.GetMethod != null)
-        {
-            GetMethod = new DotNetMethodOverload(property.GetMethod, serviceProvider);
-        }
-
-        if (property.SetMethod != null)
-        {
-            SetMethod = new DotNetMethodOverload(property.SetMethod, serviceProvider);
-        }
-
-        ParameterInfo[] indexParameters = property.GetIndexParameters();
-
-        if (indexParameters != null && indexParameters.Length > 0)
-        {
-            IndexParameters = [.. indexParameters.Select(p => new DotNetMethodParameter(p, serviceProvider))];
-        }
     }
 
     public DotNetMethodOverload? GetMethod
@@ -97,13 +35,13 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
-    public string Name
+    public required string Name
     {
         get;
         set;
     }
 
-    public DotNetTypeReference PropertyType
+    public required DotNetTypeReference PropertyType
     {
         get;
         set;

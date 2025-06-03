@@ -1,7 +1,6 @@
-using System.Reflection;
 using InsightDocs.Abstractions;
+using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
-using InsightDocs.DotNet.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Logging;
@@ -73,12 +72,6 @@ public partial class DotNetTocItem : TocItem
         _baseTocItem.RegisterExecutor(executor);
     }
 
-    [LoggerMessage(LogLevel.Information, "Loading {assemblyPath}")]
-    public static partial void LogAssemblyLoad(ILogger logger, string assemblyPath);
-
-    [LoggerMessage(LogLevel.Information, "Finished loading {assemblyPath}")]
-    public static partial void LogFinishedAssemblyLoad(ILogger logger, string assemblyPath);
-
     [LoggerMessage(LogLevel.Information, "Publishing topics")]
     public static partial void LogPublishingTopics(ILogger logger);
 
@@ -94,18 +87,13 @@ public partial class DotNetTocItem : TocItem
     [LoggerMessage(LogLevel.Debug, "Publishing topic for type {type}")]
     public static partial void LogPublishingType(ILogger logger, string type);
 
-    [LoggerMessage(LogLevel.Debug, "Skipping type {type}")]
-    public static partial void LogSkippingLoadingType(ILogger logger, string type);
-
-    [LoggerMessage(LogLevel.Debug, "Loading type {type}")]
-    public static partial void LogLoadingType(ILogger logger, string type);
-
     protected async Task DotNetExecutor(IServiceProvider serviceProvider)
     {
         if (RootedAssemblyGlobMatchers != null)
         {
-            ILoggerFactory loggerFactory = serviceProvider.GetService<ILoggerFactory>()!;
-            ILogger logger = loggerFactory.CreateLogger("DotNet");
+            IDotNetLoader dotNetLoader = serviceProvider.GetRequiredService<IDotNetLoader>();
+            ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            ILogger logger = loggerFactory.CreateLogger("InsightDocs.DotNet");
 
             List<string> assemblyPaths = [];
             List<string> runtimeAssemblyPaths = [];
@@ -121,50 +109,9 @@ public partial class DotNetTocItem : TocItem
                 {
                     runtimeAssemblyPaths.AddRange(matcherAndRoot.Value.GetResultsInFullPath(matcherAndRoot.Key));
                 }
-            }
+            }            
 
-            Dictionary<string, DotNetNamespace> namespaces = [];
-            PathAssemblyResolver pathAssemblyResolver = new(runtimeAssemblyPaths.Concat(assemblyPaths));
-
-            foreach (string assemblyPath in assemblyPaths)
-            {
-                LogAssemblyLoad(logger, assemblyPath);
-                MetadataLoadContext metadataLoadContext = new(pathAssemblyResolver);
-                Assembly assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
-                LogFinishedAssemblyLoad(logger, assemblyPath);
-
-                foreach (Type type in assembly.GetTypes())
-                {
-                    if (type.Name.StartsWith('<') || type.Name.StartsWith("_Closure$") || type.Name.StartsWith("VB$StateMachine_"))
-                    {
-                        LogSkippingLoadingType(logger, type.FullName!);
-                        continue;
-                    }
-
-                    if (TypeFilter != null && !TypeFilter(type))
-                    {
-                        LogSkippingLoadingType(logger, type.FullName!);
-                        continue;
-                    }
-
-                    LogLoadingType(logger, type.FullName!);
-
-                    string ns = type.Namespace ?? "";
-
-                    if (!namespaces.TryGetValue(ns, out DotNetNamespace? namespaceMetadata))
-                    {
-                        namespaceMetadata = DotNetNamespace.Resolve(ns);
-                        namespaces[ns] = namespaceMetadata;
-                    }
-
-                    namespaceMetadata.Types.Add(DotNetType.Resolve(type, serviceProvider));
-                }
-            }
-
-            DotNetIndex indexData = new()
-            {
-                Namespaces = [.. namespaces.Values]
-            };
+            DotNetIndex indexData = dotNetLoader.LoadAssemblies(assemblyPaths, runtimeAssemblyPaths, TypeFilter);
 
             LogPublishingTopics(logger);
 

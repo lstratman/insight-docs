@@ -23,7 +23,7 @@ public class XmlDocUrlResolver(IServiceProvider serviceProvider) : IXmlDocUrlRes
 
                     if (type != null)
                     {
-                        DotNetType.Resolve(type, _serviceProvider);
+                        _serviceProvider.GetRequiredService<IDotNetLoader>().LoadType(type);
                         Urls.TryGetValue(key, out string? value2);
                         value = value2;
                     }

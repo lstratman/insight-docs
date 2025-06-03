@@ -1,9 +1,10 @@
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace InsightDocs.DotNet.Model;
 
 public class DotNetField : DotNetMemberInfo
 {
+    [SetsRequiredMembers]
     public DotNetField(DotNetField field)
     {
         Name = field.Name;
@@ -19,66 +20,8 @@ public class DotNetField : DotNetMemberInfo
         DeclaringType = field.DeclaringType;
     }
 
-    public DotNetField(FieldInfo field, IServiceProvider serviceProvider)
+    public DotNetField()
     {
-        Name = field.Name;
-        FieldType = DotNetTypeReference.Resolve(field.FieldType, serviceProvider);
-        IsStatic = field.IsStatic;
-        IsInternal = field.IsAssembly;
-        IsAbstract = false;
-
-        if (field.IsPublic)
-        {
-            AccessType = DotNetMemberInfoAccessType.Public;
-        }
-
-        else if (field.IsPrivate)
-        {
-            AccessType = DotNetMemberInfoAccessType.Private;
-        }
-
-        else if (field.IsFamily)
-        {
-            AccessType = DotNetMemberInfoAccessType.Protected;
-        }
-
-        if (field.DeclaringType != null)
-        {
-            DeclaringType = DotNetTypeReference.Resolve(field.DeclaringType, serviceProvider);
-
-            if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
-            {
-                DeclaringType.Type.Assembly.XmlDocEntries.TryGetValue("F:" + XmlDocKey, out XmlDocEntry? xmlDocEntry);
-
-                if (xmlDocEntry != null)
-                {
-                    if (xmlDocEntry.Summary != null)
-                    {
-                        Description = new XmlDocHtml(xmlDocEntry.Summary);
-                    }
-
-                    if (xmlDocEntry.Remarks != null)
-                    {
-                        Remarks = new XmlDocHtml(xmlDocEntry.Remarks);
-                    }
-
-                    if (xmlDocEntry.Returns != null)
-                    {
-                        ReturnsDescription = new XmlDocHtml(xmlDocEntry.Returns);
-                    }
-
-                    if (xmlDocEntry.SeeAlso != null)
-                    {
-                        SeeAlso = [];
-
-                        foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
-                        {
-                            SeeAlso.Add(new XmlDocHtml([seeAlso]));
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public override string MemberDisplayName
@@ -113,7 +56,7 @@ public class DotNetField : DotNetMemberInfo
         }
     }
 
-    public string Name
+    public required string Name
     {
         get;
         set;
@@ -125,7 +68,7 @@ public class DotNetField : DotNetMemberInfo
         set;
     }
 
-    public DotNetTypeReference FieldType
+    public required DotNetTypeReference FieldType
     {
         get;
         set;

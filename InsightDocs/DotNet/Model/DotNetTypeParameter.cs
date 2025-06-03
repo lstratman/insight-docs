@@ -1,12 +1,12 @@
 namespace InsightDocs.DotNet.Model;
 
-public class DotNetTypeParameter(Type type)
+public class DotNetTypeParameter
 {
-    public string Name
+    public required string Name
     {
         get;
         set;
-    } = type.Name;
+    }
 
     public XmlDocHtml? Description
     {

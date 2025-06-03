@@ -2,19 +2,6 @@ namespace InsightDocs.DotNet.Model;
 
 public class DotNetGenericArgument
 {
-    public DotNetGenericArgument(Type type, IServiceProvider serviceProvider)
-    {
-        if (type.IsGenericParameter)
-        {
-            TypeParameterName = type.Name;
-        }
-
-        else
-        {
-            Type = DotNetTypeReference.Resolve(type, serviceProvider);
-        }
-    }
-
     public DotNetTypeReference? Type
     {
         get;

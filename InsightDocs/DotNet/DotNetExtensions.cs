@@ -11,7 +11,8 @@ public static class DotNetExtensions
     {
         builder.Services.AddSingleton<IXmlDocProcessor, XmlDocProcessor>();
         builder.Services.AddScoped<IXmlDocUrlResolver, XmlDocUrlResolver>();
-        
+        builder.Services.AddScoped<IDotNetLoader, DotNetLoader>();
+
         return builder;
     }
 }

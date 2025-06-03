@@ -1,10 +1,11 @@
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace InsightDocs.DotNet.Model;
 
 public class DotNetMethodOverload : DotNetMemberInfo
 {
+    [SetsRequiredMembers]
     public DotNetMethodOverload(DotNetMethodOverload method)
     {
         Name = method.Name;
@@ -21,108 +22,8 @@ public class DotNetMethodOverload : DotNetMemberInfo
         DeclaringType = method.DeclaringType;
     }
 
-    public DotNetMethodOverload(MethodInfo method, IServiceProvider serviceProvider, DotNetMethod? methodCollection = null)
+    public DotNetMethodOverload()
     {
-        Name = method.Name;
-        IsStatic = method.IsStatic;
-        IsInternal = method.IsAssembly;
-        IsAbstract = method.IsAbstract;
-        MethodCollection = methodCollection;
-
-        if (method.IsPublic)
-        {
-            AccessType = DotNetMemberInfoAccessType.Public;
-        }
-
-        else if (method.IsPrivate)
-        {
-            AccessType = DotNetMemberInfoAccessType.Private;
-        }
-
-        else if (method.IsFamily)
-        {
-            AccessType = DotNetMemberInfoAccessType.Protected;
-        }
-
-        if (Name.Contains('.'))
-        {
-            Name = Name[(Name.LastIndexOf('.') + 1)..];
-        }
-
-        Type[] genericArguments = method.GetGenericArguments();
-
-        if (genericArguments != null && genericArguments.Length > 0)
-        {
-            GenericArguments = [.. genericArguments.Select(a => new DotNetTypeParameter(a))];
-        }
-
-        ParameterInfo[] parameters = method.GetParameters();
-
-        if (parameters != null && parameters.Length > 0)
-        {
-            Parameters = [.. parameters.Select(p => new DotNetMethodParameter(p, serviceProvider))];
-        }
-
-        ReturnType = DotNetTypeReference.Resolve(method.ReturnType, serviceProvider);
-
-        if (method.DeclaringType != null)
-        {
-            DeclaringType = DotNetTypeReference.Resolve(method.DeclaringType, serviceProvider);
-
-            if (DeclaringType.Type?.Assembly?.XmlDocEntries != null && XmlDocKey != null)
-            {
-                DeclaringType.Type.Assembly.XmlDocEntries.TryGetValue("M:" + XmlDocKey, out XmlDocEntry? xmlDocEntry);
-
-                if (xmlDocEntry != null)
-                {
-                    if (xmlDocEntry.Summary != null)
-                    {
-                        Description = new XmlDocHtml(xmlDocEntry.Summary);
-                    }
-
-                    if (xmlDocEntry.Remarks != null)
-                    {
-                        Remarks = new XmlDocHtml(xmlDocEntry.Remarks);
-                    }
-
-                    if (xmlDocEntry.Returns != null)
-                    {
-                        ReturnsDescription = new XmlDocHtml(xmlDocEntry.Returns);
-                    }
-
-                    if (Parameters != null && xmlDocEntry.Parameters != null)
-                    {
-                        foreach (DotNetMethodParameter parameter in Parameters)
-                        {
-                            if (xmlDocEntry.Parameters.TryGetValue(parameter.Name, out List<XmlDocCommentComponent>? components))
-                            {
-                                parameter.Description = new XmlDocHtml(components);
-                            }
-                        }
-                    }
-
-                    if (xmlDocEntry.Exceptions != null)
-                    {
-                        Exceptions = [];
-
-                        foreach (XmlDocException exception in xmlDocEntry.Exceptions)
-                        {
-                            Exceptions.Add(new(new XmlDocHtml([exception.Exception]), exception.Text == null || exception.Text.Count == 0 ? null : new XmlDocHtml(exception.Text)));
-                        }
-                    }
-
-                    if (xmlDocEntry.SeeAlso != null)
-                    {
-                        SeeAlso = [];
-
-                        foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
-                        {
-                            SeeAlso.Add(new XmlDocHtml([seeAlso]));
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public DotNetMethod? MethodCollection
@@ -131,7 +32,7 @@ public class DotNetMethodOverload : DotNetMemberInfo
         set;
     }
 
-    public string Name
+    public required string Name
     {
         get;
         set;
@@ -149,7 +50,7 @@ public class DotNetMethodOverload : DotNetMemberInfo
         set;
     }
 
-    public DotNetTypeReference ReturnType
+    public required DotNetTypeReference ReturnType
     {
         get;
         set;

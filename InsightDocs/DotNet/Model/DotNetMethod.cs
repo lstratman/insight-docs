@@ -1,9 +1,11 @@
 using InsightDocs.Abstractions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace InsightDocs.DotNet.Model;
 
 public class DotNetMethod : ILinkTarget
 {
+    [SetsRequiredMembers]
     public DotNetMethod(DotNetMethod method)
     {
         Name = method.Name;
@@ -11,25 +13,17 @@ public class DotNetMethod : ILinkTarget
         Overloads = [.. Overloads.Select(o => new DotNetMethodOverload(o))];
     }
 
-    public DotNetMethod(string name, DotNetTypeReference declaringType)
+    public DotNetMethod()
     {
-        Name = name;
-
-        if (Name.Contains('.'))
-        {
-            Name = Name[(Name.LastIndexOf('.') + 1)..];
-        }
-
-        DeclaringType = declaringType;
     }
 
-    public string Name
+    public required string Name
     {
         get;
         set;
     }
 
-    public DotNetTypeReference DeclaringType
+    public required DotNetTypeReference DeclaringType
     {
         get;
         set;
