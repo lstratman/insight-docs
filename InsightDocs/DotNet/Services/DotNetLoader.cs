@@ -86,7 +86,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
     public virtual DotNetIndex LoadAssemblies(List<string> assemblyPaths, List<string> runtimeAssemblyPaths, Func<Type, bool>? typeFilter)
     {
-        ILogger logger = loggerFactory.CreateLogger("InsightDocs.DotNet");
+        ILogger logger = loggerFactory.CreateLogger<DotNetLoader>();
         PathAssemblyResolver pathAssemblyResolver = new(runtimeAssemblyPaths.Concat(assemblyPaths));
         Dictionary<string, DotNetNamespace> namespaces = [];
 

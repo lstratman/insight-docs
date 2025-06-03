@@ -47,7 +47,7 @@ public partial class DotNetPublisher(
 
     public virtual async Task PublishTopics(TocItem tocRoot, List<string> assemblyPaths, List<string> runtimeAssemblyPaths, Func<Type, bool>? typeFilter)
     {
-        ILogger logger = loggerFactory.CreateLogger("InsightDocs.DotNet");
+        ILogger logger = loggerFactory.CreateLogger<DotNetPublisher>();
         DotNetIndex indexData = dotNetLoader.LoadAssemblies(assemblyPaths, runtimeAssemblyPaths, typeFilter);
 
         LogPublishingTopics(logger);
