@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace InsightDocs.DotNet.Services;
 
-public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocProcessor xmlDocProcessor, ILoggerFactory loggerFactory) : IDotNetLoader
+public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocProcessor xmlDocProcessor, ILoggerFactory loggerFactory, DotNetOptions dotNetOptions) : IDotNetLoader
 {
     protected readonly Dictionary<string, DotNetType> TypeCache = [];
     protected readonly Dictionary<string, DotNetTypeReference> TypeReferenceCache = [];
@@ -108,6 +108,12 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 }
 
                 if (typeFilter != null && !typeFilter(type))
+                {
+                    LogSkippingLoadingType(logger, type.FullName!);
+                    continue;
+                }
+
+                if (dotNetOptions.OmitPrivateMembers && type.IsNestedPrivate)
                 {
                     LogSkippingLoadingType(logger, type.FullName!);
                     continue;
@@ -338,7 +344,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 typeMetadata.ImplementedInterfaces = [.. implementedInterfaces.Select(LoadTypeReference)];
             }
 
-            FieldInfo[] fields = [.. type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(f => !f.Name.StartsWith('<'))];
+            FieldInfo[] fields = [.. type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(f => !f.Name.StartsWith('<') && (!dotNetOptions.OmitPrivateMembers || !f.IsPrivate))];
 
             if (fields != null && fields.Length > 0)
             {
@@ -350,7 +356,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 }
             }
 
-            MethodInfo[] methods = [.. type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("op_") && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_") && !m.Name.Contains(".op_") && !m.Name.Contains(".get_") && !m.Name.Contains(".set_"))];
+            MethodInfo[] methods = [.. type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.Name.StartsWith('<') && !m.Name.StartsWith("op_") && !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_") && !m.Name.Contains(".op_") && !m.Name.Contains(".get_") && !m.Name.Contains(".set_") && (!dotNetOptions.OmitPrivateMembers || !m.IsPrivate))];
 
             if (methods != null && methods.Length > 0)
             {
@@ -386,7 +392,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             }
 
             // TODO: explicitly implemented interface properties
-            PropertyInfo[] properties = [.. type.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(p => !p.Name.Contains('.'))];
+            PropertyInfo[] properties = [.. type.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(p => !p.Name.Contains('.') && (!dotNetOptions.OmitPrivateMembers || (!p.GetMethod?.IsPrivate ?? false) || (!p.SetMethod?.IsPrivate ?? false)))];
 
             if (properties != null && properties.Length > 0)
             {

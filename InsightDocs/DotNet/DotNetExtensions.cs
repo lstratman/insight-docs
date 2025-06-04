@@ -25,6 +25,12 @@ public class DotNetOptions
         get;
         set;
     } = ErrorBehavior.Error;
+
+    public bool OmitPrivateMembers
+    {
+        get;
+        set;
+    } = true;
 }
 
 public static class DotNetExtensions
