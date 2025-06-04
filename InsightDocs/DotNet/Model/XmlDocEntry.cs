@@ -97,9 +97,15 @@ public class XmlDocCommentHtmlTagComponent : XmlDocCommentComponent
         set;
     }
 
+    public Dictionary<string, string>? Attributes
+    {
+        get;
+        set;
+    }
+
     public override string ToHtml()
     {
-        return $"<{TagName}>{String.Join(" ", ChildComponents.Select(c => c.ToHtml()))}</{TagName}>";
+        return $"<{TagName}{(Attributes != null && Attributes.Any() ? (" " + String.Join(' ', Attributes.Select(a => a.Key + "=\"" + a.Value + "\""))) : "")}>{String.Join(" ", ChildComponents.Select(c => c.ToHtml()))}</{TagName}>";
     }
 }
 

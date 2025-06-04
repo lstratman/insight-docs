@@ -28,7 +28,128 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
 
             else if (xmlElement.Name == "list")
             {
-                // TODO
+                if (xmlElement.GetAttribute("type") == "bullet")
+                {
+                    components.Add(new XmlDocCommentHtmlTagComponent("ul", xmlElement, serviceProvider));
+                }
+
+                else if (xmlElement.GetAttribute("type") == "number")
+                {
+                    components.Add(new XmlDocCommentHtmlTagComponent("ol", xmlElement, serviceProvider));
+                }
+
+                else if (xmlElement.GetAttribute("type") == "table")
+                {
+                    components.Add(new XmlDocCommentHtmlTagComponent("table", xmlElement, serviceProvider)
+                    {
+                        Attributes = new Dictionary<string, string>
+                        {
+                            { "class", "table table-sm table-complex" }
+                        }
+                    });
+                }
+
+                else
+                {
+                    throw new Exception("Unsupported XMLDoc <list> type attribute: " + xmlElement.GetAttribute("type") + ".");
+                }
+            }
+
+            else if (xmlElement.Name == "item")
+            {
+                if (xmlElement.ParentNode is XmlElement parentElement)
+                {
+                    if (parentElement.GetAttribute("type") == "bullet" || parentElement.GetAttribute("type") == "number")
+                    {
+                        components.Add(new XmlDocCommentHtmlTagComponent("li", xmlElement, serviceProvider));
+                    }
+
+                    else if (parentElement.GetAttribute("type") == "table")
+                    {
+                        components.Add(new XmlDocCommentHtmlTagComponent("tr", xmlElement, serviceProvider));
+                    }
+
+                    else
+                    {
+                        throw new Exception("Unsupported XMLDoc <list> type attribute: " + parentElement.GetAttribute("type") + ".");
+                    }
+                }
+
+                else
+                {
+                    throw new Exception("Unable to determine parent list type for <item> node.");
+                }
+            }
+
+            else if (xmlElement.Name == "listheader")
+            {
+                XmlDocCommentHtmlTagComponent thead = new XmlDocCommentHtmlTagComponent("thead", null, serviceProvider);
+                thead.ChildComponents.Add(new XmlDocCommentHtmlTagComponent("tr", xmlElement, serviceProvider));
+
+                components.Add(thead);
+            }
+
+            else if (xmlElement.Name == "term")
+            {
+                if (xmlElement.ParentNode is XmlElement parentElement && parentElement.ParentNode is XmlElement grandParentElement)
+                {
+                    if (grandParentElement.GetAttribute("type") == "bullet" || grandParentElement.GetAttribute("type") == "number")
+                    {
+                        foreach (XmlNode childNode in xmlElement.ChildNodes)
+                        {
+                            ProcessCommentNodeChild(childNode, components);
+                        }
+                    }
+
+                    else if (grandParentElement.GetAttribute("type") == "table")
+                    {
+                        components.Add(new XmlDocCommentHtmlTagComponent("td", xmlElement, serviceProvider));
+                    }
+
+                    else
+                    {
+                        throw new Exception("Unsupported XMLDoc <list> type attribute: " + grandParentElement.GetAttribute("type") + ".");
+                    }
+                }
+
+                else
+                {
+                    throw new Exception("Unable to determine parent list type for <item> node.");
+                }
+            }
+
+            else if (xmlElement.Name == "description")
+            {
+                if (xmlElement.ParentNode is XmlElement parentElement && parentElement.ParentNode is XmlElement grandParentElement)
+                {
+                    if (grandParentElement.GetAttribute("type") == "bullet" || grandParentElement.GetAttribute("type") == "number")
+                    {
+                        if (parentElement.SelectSingleNode("term") != null)
+                        {
+                            components.Add(new XmlDocCommentTextComponent(" - "));
+                        }
+
+                        foreach (XmlNode childNode in xmlElement.ChildNodes)
+                        {
+                            ProcessCommentNodeChild(childNode, components);
+                        }
+                    }
+
+                    else if (grandParentElement.GetAttribute("type") == "table")
+                    {
+                        components.Add(new XmlDocCommentHtmlTagComponent("td", xmlElement, serviceProvider));
+                    }
+
+                    else
+                    {
+                        throw new Exception("Unsupported XMLDoc <list> type attribute: " + grandParentElement.GetAttribute("type") + ".");
+                    }
+                }
+
+                else
+                {
+                    throw new Exception("Unable to determine parent list type for <item> node.");
+                }
             }
 
             else if (xmlElement.Name == "code" || xmlElement.Name == "c")
