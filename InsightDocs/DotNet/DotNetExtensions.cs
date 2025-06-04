@@ -5,14 +5,52 @@ using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace InsightDocs.DotNet;
 
+public enum ErrorBehavior
+{
+    Ignore,
+    Warn,
+    Error
+}
+
+public class DotNetOptions
+{
+    public ErrorBehavior UnsupportedXmlDocTagBehavior
+    {
+        get;
+        set;
+    } = ErrorBehavior.Error;
+
+    public ErrorBehavior UnresolvedXmlDocLinkBehavior
+    {
+        get;
+        set;
+    } = ErrorBehavior.Error;
+}
+
 public static class DotNetExtensions
 {
-    public static InsightDocsBuilder UseDotNet(this InsightDocsBuilder builder)
+    public static InsightDocsBuilder UseDotNet(this InsightDocsBuilder builder, Action<DotNetOptions>? optionsFactory = null)
     {
         builder.Services.AddScoped<IXmlDocProcessor, XmlDocProcessor>();
         builder.Services.AddScoped<IXmlDocUrlResolver, XmlDocUrlResolver>();
         builder.Services.AddScoped<IDotNetLoader, DotNetLoader>();
         builder.Services.AddScoped<IDotNetPublisher, DotNetPublisher>();
+
+        if (optionsFactory != null)
+        {
+            builder.Services.AddSingleton((serviceProvider) =>
+            {
+                DotNetOptions options = new();
+                optionsFactory(options);
+
+                return options;
+            });
+        }
+
+        else
+        {
+            builder.Services.AddSingleton(new DotNetOptions());
+        }
 
         return builder;
     }

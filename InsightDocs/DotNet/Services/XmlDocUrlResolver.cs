@@ -5,13 +5,13 @@ using Microsoft.Extensions.Logging;
 
 namespace InsightDocs.DotNet.Services;
 
-public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILoggerFactory loggerFactory) : IXmlDocUrlResolver
+public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, DotNetOptions dotNetOptions) : IXmlDocUrlResolver
 {
     protected readonly Dictionary<string, string> Urls = [];
     protected readonly Dictionary<string, string> LinkTexts = [];
     protected ILogger logger = loggerFactory.CreateLogger<XmlDocUrlResolver>();
 
-    [LoggerMessage(LogLevel.Warning, "No XmlDoc target registered for key {key}")]
+    [LoggerMessage(LogLevel.Warning, "No XMLDoc target registered for key: {key}")]
     public static partial void LogNoXmlDocTargetRegistered(ILogger logger, string key);
 
     public string GetUrl(string key)
@@ -39,8 +39,16 @@ public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILogger
 
             if (value == null)
             {
-                // TODO: customizable behavior
-                LogNoXmlDocTargetRegistered(logger, key);
+                if (dotNetOptions.UnresolvedXmlDocLinkBehavior == ErrorBehavior.Warn)
+                {
+                    LogNoXmlDocTargetRegistered(logger, key);
+                }
+
+                else if (dotNetOptions.UnresolvedXmlDocLinkBehavior == ErrorBehavior.Error)
+                {
+                    throw new Exception("No XMLDoc target registered for key: " + key + ".");
+                }
+
                 value = "";
             }
         }
@@ -52,8 +60,16 @@ public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILogger
     {
         if (!LinkTexts.TryGetValue(key, out string? value))
         {
-            // TODO: customizable behavior
-            LogNoXmlDocTargetRegistered(logger, key);
+            if (dotNetOptions.UnresolvedXmlDocLinkBehavior == ErrorBehavior.Warn)
+            {
+                LogNoXmlDocTargetRegistered(logger, key);
+            }
+
+            else if (dotNetOptions.UnresolvedXmlDocLinkBehavior == ErrorBehavior.Error)
+            {
+                throw new Exception("No XMLDoc target registered for key: " + key + ".");
+            }
+
             return "";
         }
 
@@ -64,7 +80,7 @@ public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILogger
     {
         if (Urls.ContainsKey(key))
         {
-            throw new Exception("XmlDoc target already registered for key: " + key + ".");
+            throw new Exception("XMLDoc target already registered for key: " + key + ".");
         }
 
         IUrlProvider<T> urlProvider = serviceProvider.GetService<IUrlProvider<T>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(T) + ".");

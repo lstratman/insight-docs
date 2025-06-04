@@ -1,12 +1,22 @@
-using System.Text.RegularExpressions;
-using System.Xml;
 using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
+using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace InsightDocs.DotNet.Services;
 
-public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcessor
+public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOptions dotNetOptions, ILoggerFactory loggerFactory) : IXmlDocProcessor
 {
+    protected ILogger _logger = loggerFactory.CreateLogger<XmlDocProcessor>();
+
+    [LoggerMessage(LogLevel.Warning, "Unsupported XMLDoc node: {nodeName}")]
+    public static partial void LogWarnUnsupportedXmlDocNode(ILogger logger, string nodeName);
+
+    [LoggerMessage(LogLevel.Warning, "Unsupported XMLDoc node type: {nodeType}")]
+    public static partial void LogWarnUnsupportedXmlDocNodeType(ILogger logger, string nodeType);
+
     protected virtual void ProcessCommentNodeChild(XmlNode node, List<XmlDocCommentComponent> components)
     {
         if (node is XmlText xmlText)
@@ -19,12 +29,6 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
             if (xmlElement.Name == "para")
             {
                 components.Add(new XmlDocCommentHtmlTagComponent("p", xmlElement, serviceProvider));
-            }
-
-            // TODO: move to custom
-            else if (xmlElement.Name == "b" || xmlElement.Name == "i" || xmlElement.Name == "u" || xmlElement.Name == "strike" || xmlElement.Name == "p" || xmlElement.Name == "br")
-            {
-                components.Add(new XmlDocCommentHtmlTagComponent(xmlElement.Name, xmlElement, serviceProvider));
             }
 
             else if (xmlElement.Name == "list")
@@ -210,11 +214,6 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
                 components.Add(new XmlDocSeeTagComponent(xmlElement, serviceProvider));
             }
 
-            else if (xmlElement.Name == "example")
-            {
-                // TODO
-            }
-
             else if (xmlElement.Name == "paramref" || xmlElement.Name == "typeparamref")
             {
                 XmlDocCommentHtmlTagComponent codeTag = new("code", null, serviceProvider);
@@ -225,13 +224,29 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
 
             else
             {
-                throw new Exception("Unsupported XmlDoc node: " + xmlElement.Name + ".");
+                if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Warn)
+                {
+                    LogWarnUnsupportedXmlDocNode(_logger, xmlElement.Name);
+                }
+
+                else if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Error)
+                {
+                    throw new Exception("Unsupported XMLDoc node: " + xmlElement.Name + ".");
+                }
             }
         }
 
         else
         {
-            throw new Exception("Unsupported XmlDoc node type: " + node.NodeType.ToString("G") + ".");
+            if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Warn)
+            {
+                LogWarnUnsupportedXmlDocNodeType(_logger, node.NodeType.ToString("G"));
+            }
+
+            else if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Error)
+            {
+                throw new Exception("Unsupported XMLDoc node type: " + node.NodeType.ToString("G") + ".");
+            }
         }
     }
 
@@ -306,21 +321,6 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
             }
         }
 
-        else if (childNode.Name == "history")
-        {
-            // TODO
-        }
-
-        else if (childNode.Name == "para")
-        {
-            // TODO: possibly fix source
-        }
-
-        else if (childNode.Name == "return")
-        {
-            // TODO: possibly fix source
-        }
-
         else if (childNode.Name == "exception")
         {
             xmlDocEntry.Exceptions ??= [];
@@ -334,7 +334,15 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
 
         else
         {
-            throw new Exception("Unsupported XmlDoc node: " + childNode.Name + ".");
+            if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Warn)
+            {
+                LogWarnUnsupportedXmlDocNodeType(_logger, childNode.Name);
+            }
+
+            else if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Error)
+            {
+                throw new Exception("Unsupported XMLDoc node: " + childNode.Name + ".");
+            }
         }
     }
 
