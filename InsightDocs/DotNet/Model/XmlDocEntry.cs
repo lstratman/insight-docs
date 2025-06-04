@@ -60,6 +60,12 @@ public class XmlDocEntry(string key)
         get;
         set;
     }
+
+    public List<Tuple<string, List<XmlDocCommentComponent>>>? Examples
+    {
+        get;
+        set;
+    }
 }
 
 public abstract class XmlDocCommentComponent

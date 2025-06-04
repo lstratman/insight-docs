@@ -19,4 +19,10 @@ public abstract class DotNetXmlDocSource
         get;
         set;
     }
+
+    public List<Tuple<string, XmlDocHtml>>? Examples
+    {
+        get;
+        set;
+    }
 }

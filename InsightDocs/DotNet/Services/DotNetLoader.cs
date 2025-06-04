@@ -305,6 +305,16 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                             typeMetadata.SeeAlso.Add(new XmlDocHtml([seeAlso]));
                         }
                     }
+
+                    if (xmlDocEntry.Examples != null)
+                    {
+                        typeMetadata.Examples = [];
+
+                        foreach (Tuple<string, List<XmlDocCommentComponent>> example in xmlDocEntry.Examples)
+                        {
+                            typeMetadata.Examples.Add(new Tuple<string, XmlDocHtml>(example.Item1, new XmlDocHtml(example.Item2)));
+                        }
+                    }
                 }
             }
 
@@ -574,6 +584,16 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                             propertyMetadata.SeeAlso.Add(new XmlDocHtml([seeAlso]));
                         }
                     }
+
+                    if (xmlDocEntry.Examples != null)
+                    {
+                        propertyMetadata.Examples = [];
+
+                        foreach (Tuple<string, List<XmlDocCommentComponent>> example in xmlDocEntry.Examples)
+                        {
+                            propertyMetadata.Examples.Add(new Tuple<string, XmlDocHtml>(example.Item1, new XmlDocHtml(example.Item2)));
+                        }
+                    }
                 }
             }
         }
@@ -694,6 +714,16 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                             overloadMetadata.SeeAlso.Add(new XmlDocHtml([seeAlso]));
                         }
                     }
+
+                    if (xmlDocEntry.Examples != null)
+                    {
+                        overloadMetadata.Examples = [];
+
+                        foreach (Tuple<string, List<XmlDocCommentComponent>> example in xmlDocEntry.Examples)
+                        {
+                            overloadMetadata.Examples.Add(new Tuple<string, XmlDocHtml>(example.Item1, new XmlDocHtml(example.Item2)));
+                        }
+                    }
                 }
             }
         }
@@ -768,6 +798,16 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                         foreach (XmlDocSeeTagComponent seeAlso in xmlDocEntry.SeeAlso)
                         {
                             fieldMetadata.SeeAlso.Add(new XmlDocHtml([seeAlso]));
+                        }
+                    }
+
+                    if (xmlDocEntry.Examples != null)
+                    {
+                        fieldMetadata.Examples = [];
+
+                        foreach (Tuple<string, List<XmlDocCommentComponent>> example in xmlDocEntry.Examples)
+                        {
+                            fieldMetadata.Examples.Add(new Tuple<string, XmlDocHtml>(example.Item1, new XmlDocHtml(example.Item2)));
                         }
                     }
                 }

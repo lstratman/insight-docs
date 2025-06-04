@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Xml;
 using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
@@ -152,9 +153,56 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
                 }
             }
 
-            else if (xmlElement.Name == "code" || xmlElement.Name == "c")
+            else if (xmlElement.Name == "c")
             {
                 components.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement, serviceProvider));
+            }
+
+            else if (xmlElement.Name == "code")
+            {
+                if (xmlElement.ParentNode is XmlElement parentElement && parentElement.Name == "example")
+                {
+                    XmlDocCommentHtmlTagComponent preTag = new XmlDocCommentHtmlTagComponent("pre", null, serviceProvider);
+
+                    if (xmlElement.ChildNodes != null && xmlElement.ChildNodes[0] is XmlText textNode)
+                    {
+                        string codeText = textNode.InnerText;
+
+                        if (codeText.StartsWith('\r'))
+                        {
+                            codeText = codeText.Substring(1);
+                        }
+
+                        if (codeText.StartsWith('\n'))
+                        {
+                            codeText = codeText.Substring(1);
+                        }
+
+                        Match leadingSpaces = Regex.Match(codeText, @"^\s+");
+
+                        if (leadingSpaces.Success)
+                        {
+                            codeText = codeText.Trim().Replace("\n" + leadingSpaces.Value, "\n");
+                        }
+
+                        XmlDocCommentHtmlTagComponent codeTag = new XmlDocCommentHtmlTagComponent("code", null, serviceProvider);
+                        codeTag.ChildComponents.Add(new XmlDocCommentTextComponent(codeText));
+
+                        preTag.ChildComponents.Add(codeTag);
+                    }
+
+                    else
+                    {
+                        preTag.ChildComponents.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement, serviceProvider));
+                    }
+
+                    components.Add(preTag);
+                }
+
+                else
+                {
+                    components.Add(new XmlDocCommentHtmlTagComponent("code", xmlElement, serviceProvider));
+                }
             }
 
             else if (xmlElement.Name == "see" || xmlElement.Name == "seealso")
@@ -202,78 +250,92 @@ public class XmlDocProcessor(IServiceProvider serviceProvider) : IXmlDocProcesso
     protected virtual void ProcessMemberNodeChild(XmlDocEntry xmlDocEntry, XmlElement childNode)
     {
         if (childNode.Name == "summary")
-            {
-                xmlDocEntry.Summary = ProcessCommentNode(childNode);
-            }
+        {
+            xmlDocEntry.Summary = ProcessCommentNode(childNode);
+        }
 
-            else if (childNode.Name == "remarks")
-            {
-                xmlDocEntry.Remarks = ProcessCommentNode(childNode);
-            }
+        else if (childNode.Name == "remarks")
+        {
+            xmlDocEntry.Remarks = ProcessCommentNode(childNode);
+        }
 
-            else if (childNode.Name == "returns")
-            {
-                xmlDocEntry.Returns = ProcessCommentNode(childNode);
-            }
+        else if (childNode.Name == "returns")
+        {
+            xmlDocEntry.Returns = ProcessCommentNode(childNode);
+        }
 
-            else if (childNode.Name == "value")
-            {
-                xmlDocEntry.Value = ProcessCommentNode(childNode);
-            }
+        else if (childNode.Name == "value")
+        {
+            xmlDocEntry.Value = ProcessCommentNode(childNode);
+        }
 
-            else if (childNode.Name == "param")
-            {
-                xmlDocEntry.Parameters ??= [];
-                xmlDocEntry.Parameters[childNode.GetAttribute("name")] = ProcessCommentNode(childNode);
-            }
+        else if (childNode.Name == "param")
+        {
+            xmlDocEntry.Parameters ??= [];
+            xmlDocEntry.Parameters[childNode.GetAttribute("name")] = ProcessCommentNode(childNode);
+        }
 
-            else if (childNode.Name == "typeparam")
-            {
-                xmlDocEntry.TypeParameters ??= [];
-                xmlDocEntry.TypeParameters[childNode.GetAttribute("name")] = ProcessCommentNode(childNode);
-            }
+        else if (childNode.Name == "typeparam")
+        {
+            xmlDocEntry.TypeParameters ??= [];
+            xmlDocEntry.TypeParameters[childNode.GetAttribute("name")] = ProcessCommentNode(childNode);
+        }
 
-            else if (childNode.Name == "seealso")
-            {
-                xmlDocEntry.SeeAlso ??= [];
-                xmlDocEntry.SeeAlso.Add(new XmlDocSeeTagComponent(childNode, serviceProvider));
-            }
+        else if (childNode.Name == "seealso")
+        {
+            xmlDocEntry.SeeAlso ??= [];
+            xmlDocEntry.SeeAlso.Add(new XmlDocSeeTagComponent(childNode, serviceProvider));
+        }
 
-            else if (childNode.Name == "example")
-            {
-                // TODO
-            }
+        else if (childNode.Name == "example")
+        {
+            List<XmlDocCommentComponent> example = ProcessCommentNode(childNode);
+            string sampleDescription = "";
 
-            else if (childNode.Name == "history")
+            if (example.Count > 0)
             {
-                // TODO
-            }
+                xmlDocEntry.Examples ??= [];
 
-            else if (childNode.Name == "para")
-            {
-                // TODO: possibly fix source
-            }
+                if (example[0] is XmlDocCommentTextComponent textComponent)
+                {
+                    sampleDescription = textComponent.Text;
+                    example.RemoveAt(0);
+                }
 
-            else if (childNode.Name == "return")
-            {
-                // TODO: possibly fix source
+                xmlDocEntry.Examples.Add(new Tuple<string, List<XmlDocCommentComponent>>(sampleDescription, example));
             }
+        }
 
-            else if (childNode.Name == "exception")
-            {
-                xmlDocEntry.Exceptions ??= [];
-                xmlDocEntry.Exceptions.Add(new(childNode, serviceProvider));
-            }
+        else if (childNode.Name == "history")
+        {
+            // TODO
+        }
 
-            else if (childNode.Name == "inheritdoc")
-            {
-                // TODO
-            }
+        else if (childNode.Name == "para")
+        {
+            // TODO: possibly fix source
+        }
 
-            else
-            {
-                throw new Exception("Unsupported XmlDoc node: " + childNode.Name + ".");
-            }
+        else if (childNode.Name == "return")
+        {
+            // TODO: possibly fix source
+        }
+
+        else if (childNode.Name == "exception")
+        {
+            xmlDocEntry.Exceptions ??= [];
+            xmlDocEntry.Exceptions.Add(new(childNode, serviceProvider));
+        }
+
+        else if (childNode.Name == "inheritdoc")
+        {
+            // TODO
+        }
+
+        else
+        {
+            throw new Exception("Unsupported XmlDoc node: " + childNode.Name + ".");
+        }
     }
 
     public virtual XmlDocEntry ProcessMemberNode(XmlElement memberNode)
