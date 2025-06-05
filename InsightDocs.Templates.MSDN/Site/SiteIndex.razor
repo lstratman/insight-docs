@@ -9,6 +9,7 @@
             let tocData = await tocResponse.json();
             let navbar = document.getElementById('navbar');
             let topicContent = document.getElementById('topicContentIFrame');
+            let tocItemLookup = {};
 
             function addTocItemChildren(indices, container) {
                 if (!indices) {
@@ -60,6 +61,8 @@
 
                     tocElement.appendChild(tocElementLabel);
                     container.appendChild(tocElement);
+
+                    tocItemLookup[index.toString()] = tocElement;
                 }
             }
 
@@ -107,10 +110,77 @@
                 }
             });
 
+            function selectNavbarListItem(url) {
+                let tocItemIndex = tocData.UrlLookups[url];
+
+                if (typeof tocItemIndex === 'undefined') {
+                    return;
+                }
+
+                if (!tocItemLookup[tocItemIndex.toString()]) {
+                    let tocItem = tocData.Items[tocItemIndex];
+
+                    if (!tocItem) {
+                        return;
+                    }
+
+                    let tocItemHierarchy = [tocItemIndex];
+                    let currentParentIndex = tocItem.p;
+
+                    while (typeof currentParentIndex !== 'undefined') {
+                        tocItemHierarchy.splice(0, 0, currentParentIndex);
+                        currentParentIndex = tocData.Items[currentParentIndex].p;
+                    }
+
+                    let i = 0;
+
+                    for (; i < tocItemHierarchy.length; i++) {
+                        if (!tocItemLookup[tocItemHierarchy[i].toString()]) {
+                            break;
+                        }
+                    }
+
+                    if (i < tocItemHierarchy.length) {
+                        for (let x = i - 1; x < tocItemHierarchy.length; x++) {
+                            let currentTocItem = tocData.Items[tocItemHierarchy[x]];
+                            let currentContainer = tocItemLookup[tocItemHierarchy[x]];
+
+                            let childList = document.createElement('ul');
+                            childList.classList.add('tree-group');
+
+                            currentContainer.appendChild(childList);
+
+                            addTocItemChildren(currentTocItem.c, childList);
+                            currentContainer.classList.add('is-expanded');
+                            currentContainer.classList.remove('is-collapsed');
+                        }
+                    }
+                }
+
+                navbar.querySelectorAll('.is-selected').forEach(e => e.classList.remove('is-selected'));
+
+                if (tocItemLookup[tocItemIndex.toString()].classList.contains('tree-item')) {
+                    tocItemLookup[tocItemIndex.toString()].classList.add('is-selected');
+                }
+
+                else {
+                    tocItemLookup[tocItemIndex.toString()].querySelector('.tree-item').classList.add('is-selected');
+                }
+
+                let tocItem = tocItemLookup[tocItemIndex.toString()];
+                let navbarClientHeight = navbar.clientHeight;
+
+                if (tocItem.offsetTop < navbar.scrollTop || tocItem.offsetTop > navbar.scrollTop + navbarClientHeight) {
+                    navbar.scrollTop = tocItem.offsetTop - (navbarClientHeight / 2);
+                }
+            }
+
             topicContent.addEventListener('load', () => {
                 if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname) {
                     document.location.replace('#' + topicContent.contentDocument.location.pathname);
                 }
+
+                selectNavbarListItem(topicContent.contentDocument.location.pathname);
             });
 
             let navbarRootList = document.createElement('ul');
@@ -159,6 +229,27 @@
         .tree-item {
             word-wrap: normal;
             color: var(--theme-text) !important;
+        }
+
+        .tree-item.is-selected.is-expanded * {
+            font-weight: normal;
+        }
+
+        .tree-item.is-selected.is-expanded .tree-group {
+            background-color: white;
+        }
+
+        .tree-item.is-selected.is-expanded > .tree-expander > a {
+            font-weight: 600 !important;
+        }
+
+        .tree-item.is-selected.is-expanded > a {
+            font-weight: 600 !important;
+        }
+
+        .tree-group {
+            margin-left: 0 !important;
+            padding-left: 1rem;
         }
     </style>
 </head>
