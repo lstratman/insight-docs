@@ -36,13 +36,13 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         if (item.Namespace != null)
         {
-            url.Append(item.Namespace.FullName.ToLower().Replace(".", "-"));
-            url.Append('-');
+            url.Append(item.Namespace.FullName);
+            url.Append('.');
         }
 
-        url.Append(item.Name.ToLower().Replace(".", "-"));
+        url.Append(item.Name);
 
-        if (item.TypeParameters != null)
+        if (item.TypeParameters != null && item.TypeParameters.Count > 0)
         {
             url.Append('-');
             url.Append(item.TypeParameters.Count);
@@ -86,7 +86,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             url.Append('/');
         }
 
-        url.Append(item.FullName.ToLower().Replace(".", "-"));
+        url.Append(item.FullName);
 
         if (Options.IncludeFileExtensions)
         {
@@ -110,15 +110,22 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         {
             if (item.DeclaringType.Namespace != null)
             {
-                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
-                url.Append('-');
+                url.Append(item.DeclaringType.Namespace.FullName);
+                url.Append('.');
             }
 
-            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append("/m/");
+            url.Append(item.DeclaringType.Name);
+
+            if (item.DeclaringType.Type != null && item.DeclaringType.Type.TypeParameters != null && item.DeclaringType.Type.TypeParameters.Count > 0)
+            {
+                url.Append('-');
+                url.Append(item.DeclaringType.Type.TypeParameters.Count);
+            }
+
+            url.Append('.');
         }
         
-        url.Append(item.Name.ToLower().Replace(".", "-"));
+        url.Append(item.Name);
 
         if (Options.IncludeFileExtensions)
         {
@@ -142,15 +149,22 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         {
             if (item.DeclaringType.Namespace != null)
             {
-                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
-                url.Append('-');
+                url.Append(item.DeclaringType.Namespace.FullName);
+                url.Append('.');
             }
 
-            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append("/p/");
+            url.Append(item.DeclaringType.Name);
+
+            if (item.DeclaringType.Type != null && item.DeclaringType.Type.TypeParameters != null && item.DeclaringType.Type.TypeParameters.Count > 0)
+            {
+                url.Append('-');
+                url.Append(item.DeclaringType.Type.TypeParameters.Count);
+            }
+
+            url.Append('.');
         }
         
-        url.Append(item.Name.ToLower().Replace(".", "-"));
+        url.Append(item.Name);
 
         if (Options.IncludeFileExtensions)
         {
@@ -174,15 +188,22 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         {
             if (item.DeclaringType.Namespace != null)
             {
-                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
-                url.Append('-');
+                url.Append(item.DeclaringType.Namespace.FullName);
+                url.Append('.');
             }
 
-            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append("/f/");
+            url.Append(item.DeclaringType.Name);
+
+            if (item.DeclaringType.Type != null && item.DeclaringType.Type.TypeParameters != null && item.DeclaringType.Type.TypeParameters.Count > 0)
+            {
+                url.Append('-');
+                url.Append(item.DeclaringType.Type.TypeParameters.Count);
+            }
+
+            url.Append('.');
         }
         
-        url.Append(item.Name.ToLower().Replace(".", "-"));
+        url.Append(item.Name);
 
         if (Options.IncludeFileExtensions)
         {
@@ -206,15 +227,22 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         {
             if (item.DeclaringType.Namespace != null)
             {
-                url.Append(item.DeclaringType.Namespace.FullName.ToLower().Replace(".", "-"));
-                url.Append('-');
+                url.Append(item.DeclaringType.Namespace.FullName);
+                url.Append('.');
             }
 
-            url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append("/m/");
+            url.Append(item.DeclaringType.Name);
+
+            if (item.DeclaringType.Type != null && item.DeclaringType.Type.TypeParameters != null && item.DeclaringType.Type.TypeParameters.Count > 0)
+            {
+                url.Append('-');
+                url.Append(item.DeclaringType.Type.TypeParameters.Count);
+            }
+
+            url.Append('.');
         }
         
-        url.Append(item.Name.ToLower().Replace(".", "-"));
+        url.Append(item.Name);
 
         if (Options.IncludeFileExtensions)
         {

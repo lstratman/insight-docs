@@ -109,6 +109,12 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
+    public DotNetMethod? Indexers
+    {
+        get;
+        set;
+    }
+
     public List<DotNetField>? Fields
     {
         get;

@@ -5,6 +5,11 @@ namespace InsightDocs.Services;
 
 public class HtmlFilePublisher(HtmlFilePublisherOptions options) : IPublisher
 {
+    protected HashSet<string> PublishedUrls 
+    { 
+        get; 
+    } = new HashSet<string>();
+
     protected HtmlFilePublisherOptions Options
     {
         get;
@@ -37,6 +42,13 @@ public class HtmlFilePublisher(HtmlFilePublisherOptions options) : IPublisher
 
     public async Task Publish(string url, byte[] contents)
     {
+        if (PublishedUrls.Contains(url))
+        {
+            throw new Exception($"The URL {url} has already been published. Each URL must be unique.");
+        }
+
+        PublishedUrls.Add(url);
+
         string outputPath = Path.Combine(Options.OutputDirectory, url.StartsWith('/') ? url[1..] : url);
 
         if (!Directory.Exists(Path.GetDirectoryName(outputPath)))

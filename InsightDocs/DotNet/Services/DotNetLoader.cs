@@ -213,6 +213,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 typeName = "Interface";
             }
 
+            // TODO: separate enum type
             else if (type.IsEnum)
             {
                 typeName = "Enum";
@@ -396,11 +397,28 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
             if (properties != null && properties.Length > 0)
             {
-                typeMetadata.Properties = [.. properties.Select(LoadProperty)];
-
-                foreach (DotNetProperty property in typeMetadata.Properties.Where(p => p.DeclaringType?.Type == typeMetadata && p.XmlDocKey != null))
+                foreach (PropertyInfo property in properties)
                 {
-                    xmlDocUrlResolver.RegisterLookup(property, "P:" + property.XmlDocKey!);
+                    ParameterInfo[] indexParameters = property.GetIndexParameters();
+
+                    if (indexParameters != null && indexParameters.Length > 0)
+                    {
+                        // TODO: populate indexer properties
+                    }
+
+                    else
+                    {
+                        typeMetadata.Properties ??= [];
+                        typeMetadata.Properties.Add(LoadProperty(property));
+                    }
+                }
+
+                if (typeMetadata.Properties != null && typeMetadata.Properties.Count > 0)
+                {
+                    foreach (DotNetProperty property in typeMetadata.Properties.Where(p => p.DeclaringType?.Type == typeMetadata && p.XmlDocKey != null))
+                    {
+                        xmlDocUrlResolver.RegisterLookup(property, "P:" + property.XmlDocKey!);
+                    }
                 }
             }
 
