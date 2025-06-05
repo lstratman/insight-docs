@@ -1,0 +1,152 @@
+@inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetIndexer>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="@GetUrl(TemplateAssets.MsdnCss)"/>
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
+        <script type="text/javascript">hljs.highlightAll();</script>
+    </head>
+    <body>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    <div class="content">
+                        <div data-chunk-ids="0">
+                            <h1>@Item!.Title</h1>
+
+                            <h2>Definition</h2>
+
+                            <div class="metadata">
+                                @if (Item.DeclaringType?.Namespace != null)
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Namespace:</dt>
+                                        <dd>@GetLink(Item.DeclaringType.Namespace)</dd>
+                                    </dl>
+                                }
+
+                                @if (!String.IsNullOrEmpty(Item.DeclaringType?.Assembly?.Name))
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Assembly:</dt>
+                                        <dd>@Item.DeclaringType.Assembly.Name</dd>
+                                    </dl>
+                                }
+                            </div>
+
+                            @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
+                            {
+                                <h2 id="overloads">Overloads</h2>
+                            }
+
+                            @foreach (InsightDocs.DotNet.Model.DotNetProperty overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
+                            {
+                                <div>
+                                    @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
+                                    {
+                                        <div class="heading-wrapper" data-heading-level="h2">
+                                            <h2 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h2>
+                                        </div>
+
+                                        @Raw("<div class=\"memberInfo\">")
+                                    }
+
+                                    @if (overload.Description != null)
+                                    {
+                                        <div class="summaryHolder">@Raw(overload.Description.ToHtml())</div>
+                                    }
+
+                                    <div class="codeHeader">
+                                        <span class="language">C#</span>
+		                                <button type="button" class="action position-relative display-none-print">
+			                                <span class="icon margin-right-xxs" aria-hidden="true">
+				                                <span class="docon docon-edit-copy"></span>
+			                                </span>
+			                                <span>Copy</span>
+			                                <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				                                <span class="icon font-size-lg">
+					                                <span class="docon docon-check-mark"></span>
+				                                </span>
+			                                </div>
+		                                </button>
+	                                </div>
+                                    <pre class="wrap has-inner-focus"><code class="csharp language-csharp" dir="ltr">@overload.CSharpCode</code></pre>
+
+                                    <div class="heading-wrapper" data-heading-level="h4">
+                                        <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>
+                                    </div>
+
+                                    <div class="propertyInfo">@GetLink(overload.PropertyType)</div>
+
+                                    @if (overload.ValueDescription != null)
+                                    {
+                                        @Raw(overload.ValueDescription.ToHtml(), "p")
+                                    }
+
+                                    @if (overload.Examples != null)
+                                    {
+                                        <div class="heading-wrapper" data-heading-level="h2">
+                                            <h2 id="examples" class="heading-anchor">Examples</h2>
+                                        </div>
+
+                                        @foreach (Tuple<string, InsightDocs.DotNet.Model.XmlDocHtml> example in overload.Examples)
+                                        {
+                                            if (!String.IsNullOrEmpty(example.Item1))
+                                            {
+                                                <p>@Raw(example.Item1)</p>
+                                            }
+
+                                            <div class="codeHeader">
+                                                <span class="language"></span>
+		                                        <button type="button" class="action position-relative display-none-print">
+			                                        <span class="icon margin-right-xxs" aria-hidden="true">
+				                                        <span class="docon docon-edit-copy"></span>
+			                                        </span>
+			                                        <span>Copy</span>
+			                                        <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				                                        <span class="icon font-size-lg">
+					                                        <span class="docon docon-check-mark"></span>
+				                                        </span>
+			                                        </div>
+		                                        </button>
+	                                        </div>
+                                            @Raw(example.Item2.ToHtml())
+                                        }
+                                    }
+
+                                    @if (overload.Remarks != null)
+                                    {
+                                        <div class="heading-wrapper" data-heading-level="h2">
+                                            <h2 id="remarks" class="heading-anchor">Remarks</h2>
+                                        </div>
+
+                                        @Raw(overload.Remarks.ToHtml(), "p")
+                                    }
+
+                                    @if (overload.SeeAlso != null)
+                                    {
+                                        <div class="heading-wrapper" data-heading-level="h2">
+                                            <h2 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h2>
+                                        </div>
+
+                                        <ul>
+                                            @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in overload.SeeAlso)
+                                            {
+                                                <li>@Raw(seeAlso.ToHtml())</li>
+                                            }
+                                        </ul>
+                                    }
+
+                                    @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
+                                    {
+                                        @Raw("</div>")
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

@@ -16,7 +16,8 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<DotNetField>,
       IUrlProvider<SiteToc>,
       IUrlProvider<SiteIndex>,
-      IUrlProvider<ITemplateAsset>
+      IUrlProvider<ITemplateAsset>,
+      IUrlProvider<DotNetIndexer>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -321,6 +322,45 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
     {
         return $"/_assets/{item.FilePath.Replace("\\", "/")}";
     }
+
+    public string GetUrl(DotNetIndexer item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        if (item.DeclaringType != null)
+        {
+            if (item.DeclaringType.Namespace != null)
+            {
+                url.Append(item.DeclaringType.Namespace.FullName);
+                url.Append('.');
+            }
+
+            url.Append(item.DeclaringType.Name);
+
+            if (item.DeclaringType.Type != null && item.DeclaringType.Type.TypeParameters != null && item.DeclaringType.Type.TypeParameters.Count > 0)
+            {
+                url.Append('-');
+                url.Append(item.DeclaringType.Type.TypeParameters.Count);
+            }
+
+            url.Append('.');
+        }
+
+        url.Append("Item");
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -351,6 +391,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<SiteToc>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<SiteIndex>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<ITemplateAsset>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<DotNetIndexer>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

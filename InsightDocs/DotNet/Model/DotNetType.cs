@@ -109,7 +109,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
-    public DotNetMethod? Indexers
+    public DotNetIndexer? Indexer
     {
         get;
         set;

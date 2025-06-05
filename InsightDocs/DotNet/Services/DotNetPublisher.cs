@@ -1,15 +1,7 @@
 ﻿using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InsightDocs.DotNet.Services;
 
@@ -22,12 +14,14 @@ public partial class DotNetPublisher(
     IItemTemplateProvider<DotNetMethod> dotNetMethodTemplate,
     IItemTemplateProvider<DotNetProperty> dotNetPropertyTemplate,
     IItemTemplateProvider<DotNetField> dotNetFieldTemplate,
+    IItemTemplateProvider<DotNetIndexer> dotNetIndexerTemplate,
     IUrlProvider<DotNetIndex> dotNetIndexUrlProvider,
     IUrlProvider<DotNetNamespace> dotNetNamespaceUrlProvider,
     IUrlProvider<DotNetType> dotNetTypeUrlProvider,
     IUrlProvider<DotNetMethod> dotNetMethodUrlProvider,
     IUrlProvider<DotNetProperty> dotNetPropertyUrlProvider,
     IUrlProvider<DotNetField> dotNetFieldUrlProvider,
+    IUrlProvider<DotNetIndexer> dotNetIndexerUrlProvider,
     IPublisher publisher) : IDotNetPublisher
 {
     [LoggerMessage(LogLevel.Information, "Publishing topics")]
@@ -75,6 +69,15 @@ public partial class DotNetPublisher(
 
                 html = await dotNetTypeTemplate.GetContent(type);
                 await publisher.Publish(typeUrl, html);
+
+                if (type.Indexer != null && type.Indexer.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
+                {
+                    string indexerUrl = dotNetIndexerUrlProvider.GetUrl(type.Indexer);
+                    typeTocItem.AddTocItem("Indexer", indexerUrl);
+
+                    html = await dotNetIndexerTemplate.GetContent(type.Indexer);
+                    await publisher.Publish(indexerUrl, html);
+                }
 
                 if (type.Methods != null)
                 {

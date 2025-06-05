@@ -59,6 +59,12 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
+    public bool IsIndexer
+    {
+        get;
+        set;
+    }
+
     public string? XmlDocKey
     {
         get
@@ -87,14 +93,30 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
     {
         get
         {
-            if (DeclaringType != null)
+            if (IsIndexer)
             {
-                return DeclaringType.DisplayName + "." + Name;
+                if (IndexParameters != null && IndexParameters.Count > 0)
+                {
+                    return "this[" + String.Join(", ", IndexParameters.Select(p => p.Type.DisplayName + " " + p.Name)) + "]";
+                }
+
+                else
+                {
+                    return "this[]";
+                }
             }
 
             else
             {
-                return Name;
+                if (DeclaringType != null)
+                {
+                    return DeclaringType.DisplayName + "." + Name;
+                }
+
+                else
+                {
+                    return Name;
+                }
             }
         }
     }
@@ -111,7 +133,23 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
     {
         get
         {
-            return Name;
+            if (IsIndexer)
+            {
+                if (IndexParameters != null && IndexParameters.Count > 0)
+                {
+                    return "this[" + String.Join(", ", IndexParameters.Select(p => p.Type.DisplayName + " " + p.Name)) + "]";
+                }
+
+                else
+                {
+                    return "this[]";
+                }
+            }
+
+            else
+            {
+                return Name;
+            }
         }
     }
 
@@ -160,7 +198,23 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
 
             code.Append(PropertyType.CSharpCode);
             code.Append(' ');
-            code.Append(Name);
+
+            if (IsIndexer)
+            {
+                code.Append("this[");
+
+                if (IndexParameters != null && IndexParameters.Count > 0)
+                {
+                    code.Append(String.Join(", ", IndexParameters.Select(p => p.Type.CSharpCode + " " + p.Name)));
+                }
+
+                code.Append(']');
+            }
+
+            else
+            {
+                code.Append(Name);
+            }
 
             code.Append(" {");
 

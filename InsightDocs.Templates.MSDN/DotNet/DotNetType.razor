@@ -184,6 +184,37 @@
                             <div data-no-chunk>
                                 <!-- TODO: constructors-->
 
+                                @if (Item.Indexer != null)
+                                {
+                                    <h2 id="properties">Indexers</h2>
+
+                                    <div class="has-inner-focus">
+                                        <table class="table table-sm margin-top-none" aria-label="Fields">
+        	                                <tbody>
+                                                @foreach (InsightDocs.DotNet.Model.DotNetProperty indexerOverload in Item.Indexer.Overloads.OrderBy(f => f.MemberDisplayName))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="break-text">@GetLink(indexerOverload)</span>
+                                                        </td>
+                                                        <td>
+                                                            @if (indexerOverload.Description != null)
+                                                            {
+                                                                <p>@Raw(indexerOverload.Description.ToHtml())</p>
+                                                            }
+
+                                                            @if (indexerOverload.DeclaringType != null && indexerOverload.DeclaringType.Type != Item)
+                                                            {
+                                                                <div>(Inherited from @GetLink(indexerOverload.DeclaringType))</div>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
                                 @if (Item.Fields != null && Item.Fields.Any())
                                 {
                                     <h2 id="properties">Fields</h2>

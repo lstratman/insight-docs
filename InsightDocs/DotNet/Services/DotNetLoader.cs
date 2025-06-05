@@ -403,7 +403,12 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
                     if (indexParameters != null && indexParameters.Length > 0)
                     {
-                        // TODO: populate indexer properties
+                        typeMetadata.Indexer ??= new DotNetIndexer
+                        {
+                            DeclaringType = LoadTypeReference(type)
+                        };
+
+                        typeMetadata.Indexer.Overloads.Add(LoadProperty(property));
                     }
 
                     else
@@ -460,6 +465,22 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                         clonedField.DeclaringType ??= typeMetadata.BaseType;
 
                         return clonedField;
+                    }));
+                }
+
+                if (typeMetadata.BaseType.Type.Indexer != null)
+                {
+                    typeMetadata.Indexer ??= new DotNetIndexer
+                    {
+                        DeclaringType = typeMetadata.BaseType
+                    };
+
+                    typeMetadata.Indexer.Overloads.AddRange(typeMetadata.BaseType.Type.Indexer.Overloads.Select(p =>
+                    {
+                        DotNetProperty clonedProperty = new(p);
+                        clonedProperty.DeclaringType ??= typeMetadata.BaseType;
+
+                        return clonedProperty;
                     }));
                 }
             }
@@ -636,7 +657,8 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
         if (indexParameters != null && indexParameters.Length > 0)
         {
-            propertyMetadata.IndexParameters = [.. indexParameters.Select(LoadMethodParameter)];
+            propertyMetadata.IndexParameters = [..indexParameters.Select(LoadMethodParameter)];
+            propertyMetadata.IsIndexer = true;
         }
 
         return propertyMetadata;
