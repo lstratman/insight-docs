@@ -115,7 +115,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             }
 
             url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append('-');
+            url.Append("/m/");
         }
         
         url.Append(item.Name.ToLower().Replace(".", "-"));
@@ -147,7 +147,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             }
 
             url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append('-');
+            url.Append("/p/");
         }
         
         url.Append(item.Name.ToLower().Replace(".", "-"));
@@ -179,7 +179,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             }
 
             url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append('-');
+            url.Append("/f/");
         }
         
         url.Append(item.Name.ToLower().Replace(".", "-"));
@@ -211,7 +211,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             }
 
             url.Append(item.DeclaringType.Name.ToLower().Replace(".", "-"));
-            url.Append('-');
+            url.Append("/m/");
         }
         
         url.Append(item.Name.ToLower().Replace(".", "-"));
