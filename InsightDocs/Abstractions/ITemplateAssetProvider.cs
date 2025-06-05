@@ -2,5 +2,5 @@ namespace InsightDocs.Abstractions;
 
 public interface ITemplateAssetProvider
 {
-    Task PublishAssets();
+    List<ITemplateAsset> GetAssets();
 }

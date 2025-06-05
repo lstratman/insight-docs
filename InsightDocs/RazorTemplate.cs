@@ -20,6 +20,12 @@ public class RazorTemplate<T> : ComponentBase
         set; 
     }
 
+    public virtual string GetUrl<TItem>(TItem item) where TItem : ILinkTarget
+    {
+        IUrlProvider<TItem> urlProvider = ServiceProvider!.GetService<IUrlProvider<TItem>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(TItem).Name + ".");
+        return urlProvider.GetUrl(item);
+    }
+
     public virtual RenderFragment GetLink<TItem>(TItem item) where TItem : ILinkTarget
     {
         IUrlProvider<TItem> urlProvider = ServiceProvider!.GetService<IUrlProvider<TItem>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(TItem).Name + ".");

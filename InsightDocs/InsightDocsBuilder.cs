@@ -67,7 +67,12 @@ public class InsightDocsBuilder
 
             if (templateAssetProvider != null)
             {
-                await templateAssetProvider.PublishAssets();
+                IUrlProvider<ITemplateAsset> templateAssetUrlProvider = serviceProvider.GetService<IUrlProvider<ITemplateAsset>>() ?? throw new Exception("No IUrlProvider service was registered for ITemplateAsset.");
+
+                foreach (ITemplateAsset templateAsset in templateAssetProvider.GetAssets())
+                {
+                    await publisher.Publish(templateAssetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents());
+                }
             }
         }
     }
