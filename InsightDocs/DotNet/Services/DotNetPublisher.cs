@@ -80,7 +80,7 @@ public partial class DotNetPublisher(
                 {
                     TocItem? methodsTocItem = null;
 
-                    foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)))
+                    foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)).OrderBy(m => m.Name))
                     {
                         methodsTocItem ??= typeTocItem.AddTocItem("Methods");
 
@@ -96,7 +96,7 @@ public partial class DotNetPublisher(
                 {
                     TocItem? propertiesTocItem = null;
 
-                    foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type))
+                    foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type).OrderBy(p => p.Name))
                     {
                         propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
 
@@ -112,7 +112,7 @@ public partial class DotNetPublisher(
                 {
                     TocItem? fieldsTocItem = null;
 
-                    foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type))
+                    foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type).OrderBy(f => f.Name))
                     {
                         fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
 
