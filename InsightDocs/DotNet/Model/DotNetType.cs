@@ -127,6 +127,12 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
+    public bool IsExternal
+    {
+        get;
+        set;
+    }
+
     public string XmlDocKey
     {
         get

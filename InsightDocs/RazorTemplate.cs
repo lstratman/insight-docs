@@ -40,7 +40,7 @@ public class RazorTemplate<T> : ComponentBase
 
             else
             {
-                builder.AddMarkupContent(0, $@"<a href=""{url}"">{item.LinkText.Replace("<", "&lt;").Replace(">", "&gt;")}</a>");
+                builder.AddMarkupContent(0, $@"<a href=""{url}""{(url.StartsWith("https://") || url.StartsWith("http://") ? " target=\"_blank\"" : "")}>{item.LinkText.Replace("<", "&lt;").Replace(">", "&gt;")}</a>");
             }
         };
     }

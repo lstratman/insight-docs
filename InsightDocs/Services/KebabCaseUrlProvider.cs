@@ -1,12 +1,14 @@
 using System.Text;
 using InsightDocs.Abstractions;
+using InsightDocs.DotNet;
+using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
 using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider) 
+public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, DotNetOptions dotNetOptions) 
     : IUrlProvider<DotNetType>,
       IUrlProvider<DotNetIndex>,
       IUrlProvider<DotNetNamespace>,
@@ -27,6 +29,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(DotNetType item)
     {
+        if (item.IsExternal)
+        {
+            return dotNetOptions.ResolveMicrosoftDocsUrls && microsoftDocsUrlResolver.IsMicrosoftType(item) ? microsoftDocsUrlResolver.GetUrl(item) : "";
+        }
+
         StringBuilder url = new();
 
         if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
@@ -79,6 +86,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(DotNetNamespace item)
     {
+        if (item.IsExternal)
+        {
+            return dotNetOptions.ResolveMicrosoftDocsUrls && microsoftDocsUrlResolver.IsMicrosoftNamespace(item.FullName) ? microsoftDocsUrlResolver.GetUrl(item) : "";
+        }
+
         StringBuilder url = new();
 
         if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
@@ -138,6 +150,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(DotNetProperty item)
     {
+        if (item.DeclaringType != null && item.DeclaringType.Type != null && item.DeclaringType.Type.IsExternal)
+        {
+            return dotNetOptions.ResolveMicrosoftDocsUrls && microsoftDocsUrlResolver.IsMicrosoftType(item.DeclaringType.Type) ? microsoftDocsUrlResolver.GetUrl(item) : "";
+        }
+
         StringBuilder url = new();
 
         if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
@@ -177,6 +194,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(DotNetField item)
     {
+        if (item.DeclaringType != null && item.DeclaringType.Type != null && item.DeclaringType.Type.IsExternal)
+        {
+            return dotNetOptions.ResolveMicrosoftDocsUrls && microsoftDocsUrlResolver.IsMicrosoftType(item.DeclaringType.Type) ? microsoftDocsUrlResolver.GetUrl(item) : "";
+        }
+
         StringBuilder url = new();
 
         if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
@@ -216,6 +238,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(DotNetMethodOverload item)
     {
+        if (item.DeclaringType != null && item.DeclaringType.Type != null && item.DeclaringType.Type.IsExternal)
+        {
+            return dotNetOptions.ResolveMicrosoftDocsUrls && microsoftDocsUrlResolver.IsMicrosoftType(item.DeclaringType.Type) ? microsoftDocsUrlResolver.GetUrl(item) : "";
+        }
+
         StringBuilder url = new();
 
         if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))

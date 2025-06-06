@@ -31,6 +31,12 @@ public class DotNetOptions
         get;
         set;
     } = true;
+
+    public bool ResolveMicrosoftDocsUrls
+    {
+        get;
+        set;
+    } = true;
 }
 
 public static class DotNetExtensions
@@ -41,6 +47,7 @@ public static class DotNetExtensions
         builder.Services.AddScoped<IXmlDocUrlResolver, XmlDocUrlResolver>();
         builder.Services.AddScoped<IDotNetLoader, DotNetLoader>();
         builder.Services.AddScoped<IDotNetPublisher, DotNetPublisher>();
+        builder.Services.AddScoped<IMicrosoftDocsUrlResolver, MicrosoftDocsUrlResolver>();
 
         if (optionsFactory != null)
         {

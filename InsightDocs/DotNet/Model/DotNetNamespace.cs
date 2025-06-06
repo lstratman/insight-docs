@@ -22,6 +22,12 @@ public class DotNetNamespace : ILinkTarget
         set;
     }
 
+    public bool IsExternal
+    {
+        get;
+        set;
+    }
+
     public List<DotNetType> Types
     {
         get;

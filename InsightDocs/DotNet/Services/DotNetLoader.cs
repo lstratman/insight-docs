@@ -122,9 +122,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 LogLoadingType(logger, type.FullName!);
 
                 DotNetType typeMetadata = LoadType(type);
+                typeMetadata.IsExternal = false;
 
                 if (typeMetadata.Namespace != null && !namespaces.ContainsKey(typeMetadata.Namespace.FullName))
                 {
+                    typeMetadata.Namespace.IsExternal = false;
                     namespaces[typeMetadata.Namespace.FullName] = typeMetadata.Namespace;
                 }
             }
@@ -183,7 +185,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
     {
         if (!NamespaceCache.TryGetValue(ns, out DotNetNamespace? namespaceMetadata))
         {
-            namespaceMetadata = new DotNetNamespace(ns);
+            namespaceMetadata = new DotNetNamespace(ns)
+            {
+                IsExternal = true
+            };
+
             NamespaceCache[ns] = namespaceMetadata;
         }
 
@@ -244,6 +250,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 IsSealed = type.IsSealed && !type.IsAbstract,
                 IsAbstract = type.IsAbstract && !type.IsInterface && !type.IsSealed,
                 IsInternal = type.IsNestedAssembly,
+                IsExternal = true,
                 TypeName = typeName,
                 DisplayName = typeParameters != null && typeParameters.Length > 0 ? name + "<" + String.Join(", ", typeParameters.Select(a => a.Name)) + ">" : name
             };
