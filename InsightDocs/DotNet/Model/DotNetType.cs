@@ -247,6 +247,8 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
                 code.Append(String.Join(", ", ImplementedInterfaces.Select(i => i.CSharpCode)));
             }
 
+            // TODO: type parameter constraints
+
             return code.ToString();
         }
     }

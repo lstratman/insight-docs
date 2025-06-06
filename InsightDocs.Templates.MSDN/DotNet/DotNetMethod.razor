@@ -72,7 +72,27 @@
 	                                </div>
                                     <pre class="wrap has-inner-focus"><code class="csharp language-csharp" dir="ltr">@overload.CSharpCode</code></pre>
 
-                                    <!-- TODO: type parameters -->
+                                    @if (overload.GenericArguments != null && overload.GenericArguments.Count > 0)
+                                    {
+                                        <h3 class="propertyInfoTitle stack">Generic Arguments</h3>
+
+                                        @foreach (InsightDocs.DotNet.Model.DotNetTypeParameter genericArgument in overload.GenericArguments)
+                                        {
+                                            <div class="propertyInfo">
+                                                <dl class="parameterList">
+                                                    <dt>
+                                                        @genericArgument.Name
+                                                    </dt>
+                                                    <dd></dd>
+                                                </dl>
+                                            </div>
+
+                                            @if (genericArgument.Description != null)
+                                            {
+                                                @Raw(genericArgument.Description.ToHtml(), "p")
+                                            }
+                                        }
+                                    }
 
                                     @if (overload.Parameters != null)
                                     {
