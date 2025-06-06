@@ -135,7 +135,9 @@
                     let i = 0;
 
                     for (; i < tocItemHierarchy.length; i++) {
-                        if (!tocItemLookup[tocItemHierarchy[i].toString()]) {
+                        let currentTocItem = tocItemLookup[tocItemHierarchy[i].toString()];
+
+                        if (!currentTocItem) {
                             break;
                         }
                     }
@@ -155,6 +157,19 @@
                             currentContainer.classList.remove('is-collapsed');
                         }
                     }
+                }
+
+                let currentTocItemData = tocData.Items[tocItemIndex];
+                let currentTocItem = tocItemLookup[tocItemIndex.toString()];
+
+                while (currentTocItem) {
+                    if (!currentTocItem.classList.contains('is-leaf')) {
+                        currentTocItem.classList.add('is-expanded');
+                        currentTocItem.classList.remove('is-collapsed');
+                    }
+
+                    currentTocItem = typeof currentTocItemData.p === 'undefined' ? null : tocItemLookup[currentTocItemData.p.toString()];
+                    currentTocItemData = typeof currentTocItemData.p === 'undefined' ? null : tocData.Items[currentTocItemData.p];
                 }
 
                 navbar.querySelectorAll('.is-selected').forEach(e => e.classList.remove('is-selected'));
