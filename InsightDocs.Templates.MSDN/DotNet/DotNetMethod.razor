@@ -94,13 +94,16 @@
                                         }
                                     }
 
-                                    <h3 class="propertyInfoTitle stack">Returns</h3>
-
-                                    <div class="propertyInfo">@GetLink(overload.ReturnType)</div>
-
-                                    @if (overload.ReturnsDescription != null)
+                                    @if (!overload.IsConstructor)
                                     {
-                                        @Raw(overload.ReturnsDescription.ToHtml(), "p")
+                                        <h3 class="propertyInfoTitle stack">Returns</h3>
+
+                                        <div class="propertyInfo">@GetLink(overload.ReturnType)</div>
+
+                                        @if (overload.ReturnsDescription != null)
+                                        {
+                                            @Raw(overload.ReturnsDescription.ToHtml(), "p")
+                                        }
                                     }
 
                                     @if (overload.Exceptions != null)

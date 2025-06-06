@@ -62,6 +62,12 @@ public class DotNetMethodOverload : DotNetMemberInfo
         set;
     }
 
+    public bool IsConstructor
+    {
+        get;
+        set;
+    }
+
     public List<Tuple<XmlDocHtml, XmlDocHtml?>>? Exceptions
     {
         get;
@@ -72,7 +78,7 @@ public class DotNetMethodOverload : DotNetMemberInfo
     {
         get
         {
-            StringBuilder output = new(Name);
+            StringBuilder output = new(IsConstructor ? DeclaringType!.Name : Name);
 
             if (GenericArguments != null)
             {
@@ -153,8 +159,12 @@ public class DotNetMethodOverload : DotNetMemberInfo
             StringBuilder output = new(base.CSharpCode);
 
             output.Append(ReturnType.CSharpCode);
-            output.Append(' ');
-            output.Append(Name);
+
+            if (!IsConstructor)
+            {
+                output.Append(' ');
+                output.Append(Name);
+            }
 
             if (GenericArguments != null)
             {

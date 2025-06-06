@@ -222,7 +222,36 @@
                             @if (Item.TypeName != "Enum")
                             {
                                 <div data-no-chunk>
-                                    <!-- TODO: constructors-->
+                                    @if (Item.Constructor != null && Item.Constructor.Overloads.Any())
+                                    {
+                                        <h2 id="methods">Constructors</h2>
+
+                                        <div class="has-inner-focus">
+                                            <table class="table table-sm margin-top-none" aria-label="Methods">
+        	                                    <tbody>
+                                                    @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload methodOverload in Item.Constructor.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <span class="break-text">@GetLink(methodOverload)</span>
+                                                            </td>
+                                                            <td>
+                                                                @if (methodOverload.Description != null)
+                                                                {
+                                                                    <p>@Raw(methodOverload.Description.ToHtml())</p>
+                                                                }
+
+                                                                @if (methodOverload.DeclaringType != null && methodOverload.DeclaringType.Type != Item)
+                                                                {
+                                                                    <div>(Inherited from @GetLink(methodOverload.DeclaringType))</div>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
 
                                     @if (Item.Indexer != null)
                                     {

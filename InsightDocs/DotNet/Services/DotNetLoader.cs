@@ -390,6 +390,27 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                     }
                 }
             }
+ 
+            if (Convert.ToInt32(type.Name[0]) < 127)
+            {
+                ConstructorInfo[] constructors = [.. type.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !dotNetOptions.OmitPrivateMembers || !m.IsPrivate)];
+
+                if (constructors != null && constructors.Length > 0 && constructors.Any(c => c.GetParameters().Length > 0))
+                {
+                    typeMetadata.Constructor = LoadConstuctor(type);
+
+                    foreach (ConstructorInfo constructor in constructors)
+                    {
+                        DotNetMethodOverload overload = LoadMethodOverload(constructor, typeMetadata.Constructor);
+                        typeMetadata.Constructor.Overloads.Add(overload);
+                    }
+
+                    foreach (DotNetMethodOverload overload in typeMetadata.Constructor.Overloads.Where(o => o.DeclaringType != null && o.DeclaringType.Type == typeMetadata && o.XmlDocKey != null))
+                    {
+                        xmlDocUrlResolver.RegisterLookup(overload, "M:" + overload.XmlDocKey);
+                    }
+                }
+            }
 
             // TODO: explicitly implemented interface properties
             PropertyInfo[] properties = [.. type.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(p => !p.Name.Contains('.') && (!dotNetOptions.OmitPrivateMembers || (!p.GetMethod?.IsPrivate ?? false) || (!p.SetMethod?.IsPrivate ?? false)))];
@@ -563,6 +584,18 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         return typeReference;
     }
 
+    protected virtual DotNetMethod LoadConstuctor(Type declaringType)
+    {
+        DotNetMethod methodMetadata = new DotNetMethod
+        {
+            Name = declaringType.Name,
+            DeclaringType = LoadTypeReference(declaringType),
+            IsConstructor = true
+        };
+
+        return methodMetadata;
+    }
+
     protected virtual DotNetMethod LoadMethod(MethodInfo method, Type declaringType)
     {
         DotNetMethod methodMetadata = new DotNetMethod
@@ -663,7 +696,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         return propertyMetadata;
     }
 
-    protected virtual DotNetMethodOverload LoadMethodOverload(MethodInfo method, DotNetMethod? methodCollection = null)
+    protected virtual DotNetMethodOverload LoadMethodOverload(MethodBase method, DotNetMethod? methodCollection = null)
     {
         DotNetMethodOverload overloadMetadata = new DotNetMethodOverload
         {
@@ -671,8 +704,9 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             IsStatic = method.IsStatic,
             IsInternal = method.IsAssembly,
             IsAbstract = method.IsAbstract && (method.DeclaringType == null || !method.DeclaringType.IsInterface),
+            IsConstructor = method is ConstructorInfo,
             MethodCollection = methodCollection,
-            ReturnType = LoadTypeReference(method.ReturnType)
+            ReturnType = method is MethodInfo methodInfo ? LoadTypeReference(methodInfo.ReturnType) : LoadTypeReference(method.DeclaringType!)
         };
 
         if (method.IsPublic)
@@ -690,11 +724,14 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             overloadMetadata.AccessType = DotNetMemberInfoAccessType.Protected;
         }
 
-        Type[] genericArguments = method.GetGenericArguments();
-
-        if (genericArguments != null && genericArguments.Length > 0)
+        if (!overloadMetadata.IsConstructor)
         {
-            overloadMetadata.GenericArguments = [.. genericArguments.Select(LoadTypeParameter)];
+            Type[] genericArguments = method.GetGenericArguments();
+
+            if (genericArguments != null && genericArguments.Length > 0)
+            {
+                overloadMetadata.GenericArguments = [.. genericArguments.Select(LoadTypeParameter)];
+            }
         }
 
         ParameterInfo[] parameters = method.GetParameters();

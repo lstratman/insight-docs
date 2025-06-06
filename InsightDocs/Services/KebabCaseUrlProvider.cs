@@ -126,7 +126,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             url.Append('.');
         }
         
-        url.Append(item.Name);
+        url.Append(item.IsConstructor ? "ctor" : item.Name);
 
         if (Options.IncludeFileExtensions)
         {
@@ -243,7 +243,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             url.Append('.');
         }
         
-        url.Append(item.Name);
+        url.Append(item.IsConstructor ? "ctor" : item.Name);
 
         if (Options.IncludeFileExtensions)
         {

@@ -72,6 +72,15 @@ public partial class DotNetPublisher(
 
                 if (type.TypeName != "Enum")
                 {
+                    if (type.Constructor != null && type.Constructor.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
+                    {
+                        string constructorUrl = dotNetMethodUrlProvider.GetUrl(type.Constructor);
+                        typeTocItem.AddTocItem("Constructors", constructorUrl);
+
+                        html = await dotNetMethodTemplate.GetContent(type.Constructor);
+                        await publisher.Publish(constructorUrl, html);
+                    }
+
                     if (type.Indexer != null && type.Indexer.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
                     {
                         string indexerUrl = dotNetIndexerUrlProvider.GetUrl(type.Indexer);

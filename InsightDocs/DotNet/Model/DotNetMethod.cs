@@ -29,6 +29,12 @@ public class DotNetMethod : ILinkTarget
         set;
     }
 
+    public bool IsConstructor
+    {
+        get;
+        set;
+    }
+
     public List<DotNetMethodOverload> Overloads
     {
         get;
@@ -39,7 +45,7 @@ public class DotNetMethod : ILinkTarget
     {
         get
         {
-            return MemberDisplayName + " Method";
+            return MemberDisplayName + (IsConstructor ? " Constructors" : " Method");
         }
     }
 
@@ -47,9 +53,9 @@ public class DotNetMethod : ILinkTarget
     {
         get
         {
-            if (DeclaringType != null)
+            if (DeclaringType != null && DeclaringType.Type != null)
             {
-                return DeclaringType.DisplayName + "." + (Overloads.Count == 1 ? Overloads[0].MemberDisplayName : Name);
+                return IsConstructor ? DeclaringType.Type.DisplayName : DeclaringType.Type.DisplayName + "." + (Overloads.Count == 1 ? Overloads[0].MemberDisplayName : Name);
             }
 
             else

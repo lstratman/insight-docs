@@ -121,6 +121,12 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
+    public DotNetMethod? Constructor
+    {
+        get;
+        set;
+    }
+
     public string XmlDocKey
     {
         get
