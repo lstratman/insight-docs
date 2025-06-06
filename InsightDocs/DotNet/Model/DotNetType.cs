@@ -180,6 +180,14 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
                 code.Append("internal ");
             }
 
+            if (TypeName == "Enum")
+            {
+                code.Append("enum ");
+                code.Append(Name);
+
+                return code.ToString();
+            }
+
             if (IsAbstract)
             {
                 code.Append("abstract ");

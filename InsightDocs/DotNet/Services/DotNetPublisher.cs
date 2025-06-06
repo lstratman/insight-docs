@@ -70,60 +70,63 @@ public partial class DotNetPublisher(
                 html = await dotNetTypeTemplate.GetContent(type);
                 await publisher.Publish(typeUrl, html);
 
-                if (type.Indexer != null && type.Indexer.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
+                if (type.TypeName != "Enum")
                 {
-                    string indexerUrl = dotNetIndexerUrlProvider.GetUrl(type.Indexer);
-                    typeTocItem.AddTocItem("Indexer", indexerUrl);
-
-                    html = await dotNetIndexerTemplate.GetContent(type.Indexer);
-                    await publisher.Publish(indexerUrl, html);
-                }
-
-                if (type.Methods != null)
-                {
-                    TocItem? methodsTocItem = null;
-
-                    foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)).OrderBy(m => m.Name))
+                    if (type.Indexer != null && type.Indexer.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
                     {
-                        methodsTocItem ??= typeTocItem.AddTocItem("Methods");
+                        string indexerUrl = dotNetIndexerUrlProvider.GetUrl(type.Indexer);
+                        typeTocItem.AddTocItem("Indexer", indexerUrl);
 
-                        string methodUrl = dotNetMethodUrlProvider.GetUrl(method);
-                        methodsTocItem.AddTocItem(method.Name, methodUrl);
-
-                        html = await dotNetMethodTemplate.GetContent(method);
-                        await publisher.Publish(methodUrl, html);
+                        html = await dotNetIndexerTemplate.GetContent(type.Indexer);
+                        await publisher.Publish(indexerUrl, html);
                     }
-                }
 
-                if (type.Properties != null)
-                {
-                    TocItem? propertiesTocItem = null;
-
-                    foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type).OrderBy(p => p.Name))
+                    if (type.Methods != null)
                     {
-                        propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
+                        TocItem? methodsTocItem = null;
 
-                        string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property);
-                        propertiesTocItem.AddTocItem(property.Name, propertyUrl);
+                        foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)).OrderBy(m => m.Name))
+                        {
+                            methodsTocItem ??= typeTocItem.AddTocItem("Methods");
 
-                        html = await dotNetPropertyTemplate.GetContent(property);
-                        await publisher.Publish(propertyUrl, html);
+                            string methodUrl = dotNetMethodUrlProvider.GetUrl(method);
+                            methodsTocItem.AddTocItem(method.Name, methodUrl);
+
+                            html = await dotNetMethodTemplate.GetContent(method);
+                            await publisher.Publish(methodUrl, html);
+                        }
                     }
-                }
 
-                if (type.Fields != null)
-                {
-                    TocItem? fieldsTocItem = null;
-
-                    foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type).OrderBy(f => f.Name))
+                    if (type.Properties != null)
                     {
-                        fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
+                        TocItem? propertiesTocItem = null;
 
-                        string fieldUrl = dotNetFieldUrlProvider.GetUrl(field);
-                        fieldsTocItem.AddTocItem(field.Name, fieldUrl);
+                        foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type).OrderBy(p => p.Name))
+                        {
+                            propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
 
-                        html = await dotNetFieldTemplate.GetContent(field);
-                        await publisher.Publish(fieldUrl, html);
+                            string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property);
+                            propertiesTocItem.AddTocItem(property.Name, propertyUrl);
+
+                            html = await dotNetPropertyTemplate.GetContent(property);
+                            await publisher.Publish(propertyUrl, html);
+                        }
+                    }
+
+                    if (type.Fields != null)
+                    {
+                        TocItem? fieldsTocItem = null;
+
+                        foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type).OrderBy(f => f.Name))
+                        {
+                            fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
+
+                            string fieldUrl = dotNetFieldUrlProvider.GetUrl(field);
+                            fieldsTocItem.AddTocItem(field.Name, fieldUrl);
+
+                            html = await dotNetFieldTemplate.GetContent(field);
+                            await publisher.Publish(fieldUrl, html);
+                        }
                     }
                 }
             }

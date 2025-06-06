@@ -82,6 +82,12 @@ public class DotNetField : DotNetMemberInfo
         set;
     }
 
+    public object? ConstantValue
+    {
+        get;
+        set;
+    }
+
     public string? XmlDocKey
     {
         get

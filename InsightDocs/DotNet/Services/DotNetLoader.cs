@@ -213,7 +213,6 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 typeName = "Interface";
             }
 
-            // TODO: separate enum type
             else if (type.IsEnum)
             {
                 typeName = "Enum";
@@ -858,6 +857,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                     }
                 }
             }
+        }
+
+        if (field.DeclaringType != null && field.DeclaringType.IsEnum && field.Name != "value__")
+        {
+            fieldMetadata.ConstantValue = field.GetRawConstantValue();
         }
 
         return fieldMetadata;

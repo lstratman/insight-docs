@@ -127,6 +127,44 @@
                                 </dl>
                             }
 
+                            @if (Item.TypeName == "Enum" && Item.Fields != null)
+                            {
+                                <h2 id="properties">Fields</h2>
+
+                                <div class="has-inner-focus">
+                                    <table class="table table-sm margin-top-none" aria-label="Fields">
+        	                            <tbody>
+                                            <tr>
+			                                    <th>Name</th>
+			                                    <th>Value</th>
+			                                    <th>Description</th>
+		                                    </tr>
+
+                                            @foreach (InsightDocs.DotNet.Model.DotNetField field in Item.Fields.Where(f => f.Name != "value__").OrderBy(f => f.Name))
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <span class="break-text">@field.Name</span>
+                                                    </td>
+                                                    <td>
+                                                        @if (field.ConstantValue != null)
+                                                        {
+                                                            @field.ConstantValue.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (field.Description != null)
+                                                        {
+                                                            <p>@Raw(field.Description.ToHtml())</p>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
                             @if (Item.Examples != null)
                             {
                                 <div class="heading-wrapper" data-heading-level="h2">
@@ -181,140 +219,143 @@
                                 </ul>
                             }
 
-                            <div data-no-chunk>
-                                <!-- TODO: constructors-->
+                            @if (Item.TypeName != "Enum")
+                            {
+                                <div data-no-chunk>
+                                    <!-- TODO: constructors-->
 
-                                @if (Item.Indexer != null)
-                                {
-                                    <h2 id="properties">Indexers</h2>
+                                    @if (Item.Indexer != null)
+                                    {
+                                        <h2 id="properties">Indexers</h2>
 
-                                    <div class="has-inner-focus">
-                                        <table class="table table-sm margin-top-none" aria-label="Fields">
-        	                                <tbody>
-                                                @foreach (InsightDocs.DotNet.Model.DotNetProperty indexerOverload in Item.Indexer.Overloads.OrderBy(f => f.MemberDisplayName))
-                                                {
-                                                    <tr>
-                                                        <td>
-                                                            <span class="break-text">@GetLink(indexerOverload)</span>
-                                                        </td>
-                                                        <td>
-                                                            @if (indexerOverload.Description != null)
-                                                            {
-                                                                <p>@Raw(indexerOverload.Description.ToHtml())</p>
-                                                            }
-
-                                                            @if (indexerOverload.DeclaringType != null && indexerOverload.DeclaringType.Type != Item)
-                                                            {
-                                                                <div>(Inherited from @GetLink(indexerOverload.DeclaringType))</div>
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-
-                                @if (Item.Fields != null && Item.Fields.Any())
-                                {
-                                    <h2 id="properties">Fields</h2>
-
-                                    <div class="has-inner-focus">
-                                        <table class="table table-sm margin-top-none" aria-label="Fields">
-        	                                <tbody>
-                                                @foreach (InsightDocs.DotNet.Model.DotNetField field in Item.Fields.OrderBy(f => f.Name))
-                                                {
-                                                    <tr>
-                                                        <td>
-                                                            <span class="break-text">@GetLink(field)</span>
-                                                        </td>
-                                                        <td>
-                                                            @if (field.Description != null)
-                                                            {
-                                                                <p>@Raw(field.Description.ToHtml())</p>
-                                                            }
-
-                                                            @if (field.DeclaringType != null && field.DeclaringType.Type != Item)
-                                                            {
-                                                                <div>(Inherited from @GetLink(field.DeclaringType))</div>
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-
-                                @if (Item.Properties != null && Item.Properties.Any())
-                                {
-                                    <h2 id="properties">Properties</h2>
-
-                                    <div class="has-inner-focus">
-                                        <table class="table table-sm margin-top-none" aria-label="Properties">
-        	                                <tbody>
-                                                @foreach (InsightDocs.DotNet.Model.DotNetProperty property in Item.Properties.OrderBy(p => p.Name))
-                                                {
-                                                    <tr>
-                                                        <td>
-                                                            <span class="break-text">@GetLink(property)</span>
-                                                        </td>
-                                                        <td>
-                                                            @if (property.Description != null)
-                                                            {
-                                                                <p>@Raw(property.Description.ToHtml())</p>
-                                                            }
-
-                                                            @if (property.DeclaringType != null && property.DeclaringType.Type != Item)
-                                                            {
-                                                                <div>(Inherited from @GetLink(property.DeclaringType))</div>
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-
-                                @if (Item.Methods != null && Item.Methods.Any())
-                                {
-                                    <h2 id="methods">Methods</h2>
-
-                                    <div class="has-inner-focus">
-                                        <table class="table table-sm margin-top-none" aria-label="Methods">
-        	                                <tbody>
-                                                @foreach (InsightDocs.DotNet.Model.DotNetMethod method in Item.Methods.OrderBy(m => m.Name))
-                                                {
-                                                    @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload methodOverload in method.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                        <div class="has-inner-focus">
+                                            <table class="table table-sm margin-top-none" aria-label="Fields">
+        	                                    <tbody>
+                                                    @foreach (InsightDocs.DotNet.Model.DotNetProperty indexerOverload in Item.Indexer.Overloads.OrderBy(f => f.MemberDisplayName))
                                                     {
                                                         <tr>
                                                             <td>
-                                                                <span class="break-text">@GetLink(methodOverload)</span>
+                                                                <span class="break-text">@GetLink(indexerOverload)</span>
                                                             </td>
                                                             <td>
-                                                                @if (methodOverload.Description != null)
+                                                                @if (indexerOverload.Description != null)
                                                                 {
-                                                                    <p>@Raw(methodOverload.Description.ToHtml())</p>
+                                                                    <p>@Raw(indexerOverload.Description.ToHtml())</p>
                                                                 }
 
-                                                                @if (methodOverload.DeclaringType != null && methodOverload.DeclaringType.Type != Item)
+                                                                @if (indexerOverload.DeclaringType != null && indexerOverload.DeclaringType.Type != Item)
                                                                 {
-                                                                    <div>(Inherited from @GetLink(methodOverload.DeclaringType))</div>
+                                                                    <div>(Inherited from @GetLink(indexerOverload.DeclaringType))</div>
                                                                 }
                                                             </td>
                                                         </tr>
                                                     }
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
 
-                                <!-- TODO: explicit interface implementations -->
+                                    @if (Item.Fields != null && Item.Fields.Any())
+                                    {
+                                        <h2 id="properties">Fields</h2>
 
-                                <!-- TODO: operators -->
-                            </div>
+                                        <div class="has-inner-focus">
+                                            <table class="table table-sm margin-top-none" aria-label="Fields">
+        	                                    <tbody>
+                                                    @foreach (InsightDocs.DotNet.Model.DotNetField field in Item.Fields.OrderBy(f => f.Name))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <span class="break-text">@GetLink(field)</span>
+                                                            </td>
+                                                            <td>
+                                                                @if (field.Description != null)
+                                                                {
+                                                                    <p>@Raw(field.Description.ToHtml())</p>
+                                                                }
+
+                                                                @if (field.DeclaringType != null && field.DeclaringType.Type != Item)
+                                                                {
+                                                                    <div>(Inherited from @GetLink(field.DeclaringType))</div>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+
+                                    @if (Item.Properties != null && Item.Properties.Any())
+                                    {
+                                        <h2 id="properties">Properties</h2>
+
+                                        <div class="has-inner-focus">
+                                            <table class="table table-sm margin-top-none" aria-label="Properties">
+        	                                    <tbody>
+                                                    @foreach (InsightDocs.DotNet.Model.DotNetProperty property in Item.Properties.OrderBy(p => p.Name))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <span class="break-text">@GetLink(property)</span>
+                                                            </td>
+                                                            <td>
+                                                                @if (property.Description != null)
+                                                                {
+                                                                    <p>@Raw(property.Description.ToHtml())</p>
+                                                                }
+
+                                                                @if (property.DeclaringType != null && property.DeclaringType.Type != Item)
+                                                                {
+                                                                    <div>(Inherited from @GetLink(property.DeclaringType))</div>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+
+                                    @if (Item.Methods != null && Item.Methods.Any())
+                                    {
+                                        <h2 id="methods">Methods</h2>
+
+                                        <div class="has-inner-focus">
+                                            <table class="table table-sm margin-top-none" aria-label="Methods">
+        	                                    <tbody>
+                                                    @foreach (InsightDocs.DotNet.Model.DotNetMethod method in Item.Methods.OrderBy(m => m.Name))
+                                                    {
+                                                        @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload methodOverload in method.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <span class="break-text">@GetLink(methodOverload)</span>
+                                                                </td>
+                                                                <td>
+                                                                    @if (methodOverload.Description != null)
+                                                                    {
+                                                                        <p>@Raw(methodOverload.Description.ToHtml())</p>
+                                                                    }
+
+                                                                    @if (methodOverload.DeclaringType != null && methodOverload.DeclaringType.Type != Item)
+                                                                    {
+                                                                        <div>(Inherited from @GetLink(methodOverload.DeclaringType))</div>
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+
+                                    <!-- TODO: explicit interface implementations -->
+
+                                    <!-- TODO: operators -->
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
