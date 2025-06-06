@@ -39,14 +39,28 @@
                                 <h2 id="overloads">Overloads</h2>
                             }
 
+                            @{
+                                bool reduceHeaderSize = Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1;
+                            }
+
                             @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
                             {
                                 <div>
                                     @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
                                     {
-                                        <div class="heading-wrapper" data-heading-level="h2">
-                                            <h2 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h2>
-                                        </div>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <div class="heading-wrapper" data-heading-level="h3">
+                                                <h3 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
+                                            </div>
+                                        }
+
+                                        else
+                                        {
+                                            <div class="heading-wrapper" data-heading-level="h2">
+                                                <h2 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h2>
+                                            </div>
+                                        }
 
                                         @Raw("<div class=\"memberInfo\">")
                                     }
@@ -74,7 +88,15 @@
 
                                     @if (overload.GenericArguments != null && overload.GenericArguments.Count > 0)
                                     {
-                                        <h3 class="propertyInfoTitle stack">Generic Arguments</h3>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack">Generic Arguments</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack">Generic Arguments</h3>
+                                        }
 
                                         @foreach (InsightDocs.DotNet.Model.DotNetTypeParameter genericArgument in overload.GenericArguments)
                                         {
@@ -96,7 +118,15 @@
 
                                     @if (overload.Parameters != null)
                                     {
-                                        <h3 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h3>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h3>
+                                        }
 
                                         @for (int i = 0; i < overload.Parameters.Count; i++)
                                         {
@@ -116,7 +146,15 @@
 
                                     @if (!overload.IsConstructor)
                                     {
-                                        <h3 class="propertyInfoTitle stack">Returns</h3>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h3>
+                                        }
 
                                         <div class="propertyInfo">@GetLink(overload.ReturnType)</div>
 
@@ -128,7 +166,15 @@
 
                                     @if (overload.Exceptions != null)
                                     {
-                                        <h3 class="propertyInfoTitle stack heading-anchor" id="exceptions">Exceptions</h3>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack heading-anchor" id="exceptions">Exceptions</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack heading-anchor" id="exceptions">Exceptions</h3>
+                                        }
 
                                         for (int i = 0; i < overload.Exceptions.Count; i++)
                                         {
@@ -149,7 +195,15 @@
 
                                     @if (overload.Examples != null)
                                     {
-                                        <h3 id="examples" class="heading-anchor">Examples</h3>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 id="examples" class="heading-anchor">Examples</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 id="examples" class="heading-anchor">Examples</h3>
+                                        }
 
                                         @foreach (Tuple<string, InsightDocs.DotNet.Model.XmlDocHtml> example in overload.Examples)
                                         {
@@ -178,14 +232,30 @@
 
                                     @if (overload.Remarks != null)
                                     {
-                                        <h3 id="remarks" class="heading-anchor">Remarks</h3>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 id="remarks" class="heading-anchor">Remarks</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 id="remarks" class="heading-anchor">Remarks</h3>
+                                        }
 
                                         @Raw(overload.Remarks.ToHtml(), "p")
                                     }
 
                                     @if (overload.SeeAlso != null)
                                     {
-                                        <h3 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h3>
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h3>
+                                        }
 
                                         <ul>
                                             @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in overload.SeeAlso)
