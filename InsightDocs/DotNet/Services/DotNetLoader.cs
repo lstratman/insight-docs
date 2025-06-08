@@ -824,7 +824,8 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
     {
         return new DotNetTypeParameter
         {
-            Name = type.Name
+            Name = type.Name,
+            TypeConstraint = type.BaseType != null && (String.IsNullOrEmpty(type.BaseType.FullName) || type.BaseType.FullName != "System.Object") ? LoadTypeReference(type.BaseType) : null
         };
     }
 

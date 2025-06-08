@@ -8,6 +8,12 @@ public class DotNetTypeParameter
         set;
     }
 
+    public DotNetTypeReference? TypeConstraint
+    {
+        get;
+        set;
+    }
+
     public XmlDocHtml? Description
     {
         get;

@@ -166,7 +166,7 @@ public class DotNetMethodOverload : DotNetMemberInfo
                 output.Append(Name);
             }
 
-            if (GenericArguments != null)
+            if (GenericArguments != null && GenericArguments.Count > 0)
             {
                 output.Append('<');
                 output.Append(String.Join(", ", GenericArguments.Select(a => a.Name)));
@@ -180,7 +180,15 @@ public class DotNetMethodOverload : DotNetMemberInfo
                 output.Append(String.Join(", ", Parameters.Select(p => p.Type.CSharpCode + " " + p.Name)));
             }
 
-            output.Append(");");
+            output.Append(')');
+
+            if (GenericArguments != null && GenericArguments.Count(a => a.TypeConstraint != null) > 0)
+            {
+                output.Append(" where ");
+                output.Append(String.Join(", ", GenericArguments.Where(a => a.TypeConstraint != null).Select(a => a.Name + " : " + a.TypeConstraint!.CSharpCode)));
+            }
+
+            output.Append(';');
             return output.ToString();
         }
     }

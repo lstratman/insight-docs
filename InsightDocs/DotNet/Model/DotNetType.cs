@@ -166,6 +166,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         }
     }
 
+    // TODO: VB code
     public string CSharpCode
     {
         get
@@ -247,7 +248,11 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
                 code.Append(String.Join(", ", ImplementedInterfaces.Select(i => i.CSharpCode)));
             }
 
-            // TODO: type parameter constraints
+            if (TypeParameters != null && TypeParameters.Count(p => p.TypeConstraint != null) > 0)
+            {
+                code.Append(" where ");
+                code.Append(String.Join(", ", TypeParameters.Where(p => p.TypeConstraint != null).Select(p => p.Name + " : " + p.TypeConstraint!.CSharpCode)));
+            }
 
             return code.ToString();
         }
