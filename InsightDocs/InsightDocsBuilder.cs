@@ -1,24 +1,24 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using InsightDocs.Abstractions;
+﻿using InsightDocs.Abstractions;
 using InsightDocs.Services;
 using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace InsightDocs;
 
 public class InsightDocsBuilder
 {
-    public static InsightDocsBuilder Create(IServiceCollection services)
+    public static InsightDocsBuilder Create()
     {
-        return new InsightDocsBuilder(services);
+        return new InsightDocsBuilder();
     }
 
-    private InsightDocsBuilder(IServiceCollection services)
+    private InsightDocsBuilder()
     {
-        Services = services;
-
+        Services = new ServiceCollection();
         Services.AddScoped<IUrlPrefixProvider, UrlPrefixProvider>();
     }
 
