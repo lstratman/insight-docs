@@ -294,10 +294,12 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             }
 
             url.Append(item.Name.ToLower().Replace(".", "-"));
-
             url.Append('(');
 
-            // TODO: parameters
+            if (item.Parameters != null && item.Parameters.Count > 0)
+            {
+                url.Append(String.Join('-', item.Parameters.Select(p => p.Type.XmlDocKey.ToLower().Replace(".", "-") + (p.IsByRef ? "@" : ""))));
+            }
 
             url.Append(')');
         }

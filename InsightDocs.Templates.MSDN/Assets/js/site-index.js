@@ -186,11 +186,17 @@
     }
 
     topicContent.addEventListener('load', () => {
-        if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname) {
-            document.location.replace('#' + topicContent.contentDocument.location.pathname);
+        if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23')) {
+            document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
         }
 
         selectNavbarListItem(topicContent.contentDocument.location.pathname);
+
+        topicContent.contentWindow.addEventListener('hashchange', () => {
+            if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23')) {
+                document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
+            }
+        });
     });
 
     let navbarRootList = document.createElement('ul');
@@ -203,6 +209,6 @@
     }
 
     if (document.location.hash) {
-        topicContent.src = document.location.hash.substr(1);
+        topicContent.src = document.location.hash.substr(1).replace('%23', '#');
     }
 }

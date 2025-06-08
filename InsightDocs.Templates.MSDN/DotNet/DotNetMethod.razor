@@ -1,4 +1,5 @@
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetMethod>
+@using Microsoft.Extensions.DependencyInjection
 
 <html>
     <head>
@@ -48,19 +49,20 @@
                                 <div>
                                     @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
                                     {
-                                        if (reduceHeaderSize)
-                                        {
-                                            <div class="heading-wrapper" data-heading-level="h3">
-                                                <h3 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
-                                            </div>
-                                        }
+                                        string overloadUrl = ServiceProvider!.GetRequiredService<InsightDocs.Abstractions.IUrlProvider<InsightDocs.DotNet.Model.DotNetMethodOverload>>().GetUrl(overload);
 
-                                        else
-                                        {
-                                            <div class="heading-wrapper" data-heading-level="h2">
-                                                <h2 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h2>
-                                            </div>
-                                        }
+                                        <div class="heading-wrapper" data-heading-level="h3">
+                                            @if (overloadUrl.IndexOf("#") != -1)
+                                            {
+                                                <a class="anchor-link docon docon-link" href="#@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)"></a>
+                                                <h3 id="@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)" class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
+                                            }
+
+                                            else
+                                            {
+                                                <h3 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
+                                            }
+                                        </div>
 
                                         @Raw("<div class=\"memberInfo\">")
                                     }
