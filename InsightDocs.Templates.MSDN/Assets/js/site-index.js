@@ -1,0 +1,208 @@
+﻿async function onSiteIndexLoad() {
+    // TODO: get URL dynamically
+    let tocResponse = await fetch('./table-of-contents.json');
+    let tocData = await tocResponse.json();
+    let navbar = document.getElementById('navbar');
+    let topicContent = document.getElementById('topicContentIFrame');
+    let tocItemLookup = {};
+
+    function addTocItemChildren(indices, container) {
+        if (!indices) {
+            return;
+        }
+
+        for (let index of indices) {
+            let tocItem = tocData.Items[index];
+            let tocElement = document.createElement('li');
+            let tocElementLabel = null;
+
+            tocElement.classList.add('tree-item');
+
+            if (tocItem.c && tocItem.c.length > 0) {
+                tocElementLabel = document.createElement('span');
+                tocElementLabel.classList.add('tree-expander');
+
+                if (tocItem.u) {
+                    tocElementLabel.innerHTML = `<span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span><a class="tree-item" href="${tocItem.u}" target="topicContentIFrame">${tocItem.t.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')}</a>`;
+                }
+
+                else {
+                    tocElementLabel.innerHTML = `<span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>${tocItem.t.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')}`;
+                }
+            }
+
+            else {
+                if (tocItem.u) {
+                    tocElementLabel = document.createElement('a');
+                    tocElementLabel.classList.add('tree-item');
+                    tocElementLabel.target = 'topicContentIFrame';
+                    tocElementLabel.href = tocItem.u;
+                }
+
+                else {
+                    tocElementLabel = document.createElement('span');
+                    tocElementLabel.classList.add('tree-expander');
+                }
+
+                tocElementLabel.innerHTML = tocItem.t.replace(/\</g, '&lt;').replace(/\>/g, '&gt;');
+            }
+
+            tocElement.appendChild(tocElementLabel);
+            tocElement.setAttribute('data-toc-item-index', index);
+
+            if (!tocItem.c || tocItem.c.length === 0) {
+                tocElementLabel.classList.add('is-leaf');
+            }
+
+            tocElement.appendChild(tocElementLabel);
+            container.appendChild(tocElement);
+
+            tocItemLookup[index.toString()] = tocElement;
+        }
+    }
+
+    navbar.addEventListener('click', (evt) => {
+        let target = null;
+
+        if (evt.target.tagName === 'LI') {
+            target = evt.target;
+        }
+
+        else if (evt.target.tagName === 'A' && evt.target.classList.contains('tree-item')) {
+            target = evt.target.parentElement.parentElement;
+        }
+
+        else if (evt.target.classList.contains('tree-expander') || evt.target.classList.contains('tree-item')) {
+            target = evt.target.parentElement;
+        }
+
+        else if (evt.target.classList.contains('tree-expander-indicator')) {
+            target = evt.target.parentElement.parentElement;
+        }
+
+        if (!target) {
+            return;
+        }
+
+        if (!target.classList.contains('is-leaf') && !target.classList.contains('is-expanded') && !target.classList.contains('is-collapsed')) {
+            let childList = document.createElement('ul');
+            childList.classList.add('tree-group');
+
+            target.appendChild(childList);
+
+            addTocItemChildren(tocData.Items[parseInt(target.getAttribute('data-toc-item-index'))].c, childList);
+            target.classList.add('is-collapsed');
+        }
+
+        if (target.classList.contains('is-collapsed')) {
+            target.classList.add('is-expanded');
+            target.classList.remove('is-collapsed');
+        }
+
+        else {
+            target.classList.remove('is-expanded');
+            target.classList.add('is-collapsed');
+        }
+    });
+
+    function selectNavbarListItem(url) {
+        let tocItemIndex = tocData.UrlLookups[url];
+
+        if (typeof tocItemIndex === 'undefined') {
+            return;
+        }
+
+        if (!tocItemLookup[tocItemIndex.toString()]) {
+            let tocItem = tocData.Items[tocItemIndex];
+
+            if (!tocItem) {
+                return;
+            }
+
+            let tocItemHierarchy = [tocItemIndex];
+            let currentParentIndex = tocItem.p;
+
+            while (typeof currentParentIndex !== 'undefined') {
+                tocItemHierarchy.splice(0, 0, currentParentIndex);
+                currentParentIndex = tocData.Items[currentParentIndex].p;
+            }
+
+            let i = 0;
+
+            for (; i < tocItemHierarchy.length; i++) {
+                let currentTocItem = tocItemLookup[tocItemHierarchy[i].toString()];
+
+                if (!currentTocItem) {
+                    break;
+                }
+            }
+
+            if (i < tocItemHierarchy.length) {
+                for (let x = i - 1; x < tocItemHierarchy.length; x++) {
+                    let currentTocItem = tocData.Items[tocItemHierarchy[x]];
+                    let currentContainer = tocItemLookup[tocItemHierarchy[x]];
+
+                    let childList = document.createElement('ul');
+                    childList.classList.add('tree-group');
+
+                    currentContainer.appendChild(childList);
+
+                    addTocItemChildren(currentTocItem.c, childList);
+                    currentContainer.classList.add('is-expanded');
+                    currentContainer.classList.remove('is-collapsed');
+                }
+            }
+        }
+
+        let currentTocItemData = tocData.Items[tocItemIndex];
+        let currentTocItem = tocItemLookup[tocItemIndex.toString()];
+
+        while (currentTocItem) {
+            if (!currentTocItem.classList.contains('is-leaf')) {
+                currentTocItem.classList.add('is-expanded');
+                currentTocItem.classList.remove('is-collapsed');
+            }
+
+            currentTocItem = typeof currentTocItemData.p === 'undefined' ? null : tocItemLookup[currentTocItemData.p.toString()];
+            currentTocItemData = typeof currentTocItemData.p === 'undefined' ? null : tocData.Items[currentTocItemData.p];
+        }
+
+        navbar.querySelectorAll('.is-selected').forEach(e => e.classList.remove('is-selected'));
+
+        if (tocItemLookup[tocItemIndex.toString()].classList.contains('tree-item')) {
+            tocItemLookup[tocItemIndex.toString()].classList.add('is-selected');
+        }
+
+        else {
+            tocItemLookup[tocItemIndex.toString()].querySelector('.tree-item').classList.add('is-selected');
+        }
+
+        let tocItem = tocItemLookup[tocItemIndex.toString()];
+        let navbarClientHeight = navbar.clientHeight;
+
+        if (tocItem.offsetTop < navbar.scrollTop || tocItem.offsetTop > navbar.scrollTop + navbarClientHeight) {
+            navbar.scrollTop = tocItem.offsetTop - (navbarClientHeight / 2);
+        }
+    }
+
+    topicContent.addEventListener('load', () => {
+        if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname) {
+            document.location.replace('#' + topicContent.contentDocument.location.pathname);
+        }
+
+        selectNavbarListItem(topicContent.contentDocument.location.pathname);
+    });
+
+    let navbarRootList = document.createElement('ul');
+    navbarRootList.classList.add('tree', 'table-of-contents', 'flex-grow-1', 'flex-shrink-1');
+
+    navbar.appendChild(navbarRootList);
+
+    for (let index of tocData.RootItems) {
+        addTocItemChildren(tocData.RootItems, navbarRootList);
+    }
+
+    if (document.location.hash) {
+        topicContent.src = document.location.hash.substr(1);
+    }
+}

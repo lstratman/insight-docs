@@ -12,7 +12,9 @@ public class TemplateAssetProvider : ITemplateAssetProvider
             TemplateAssets.DoconsFont,
             TemplateAssets.SegoeUIFont,
             TemplateAssets.SegoeUIRomanVfFont,
-            TemplateAssets.HighlightJsScript
+            TemplateAssets.HighlightJsScript,
+            TemplateAssets.SiteIndexScript,
+            TemplateAssets.SiteIndexCss
         ];
     }
 }

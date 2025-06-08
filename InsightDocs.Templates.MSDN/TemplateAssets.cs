@@ -28,4 +28,14 @@ public class TemplateAssets
     {
         get;
     } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "js/highlight.min.js");
+
+    public static ITemplateAsset SiteIndexScript
+    {
+        get;
+    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "js/site-index.js");
+
+    public static ITemplateAsset SiteIndexCss
+    {
+        get;
+    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "css/site-index.css");
 }
