@@ -2,9 +2,9 @@ using InsightDocs.Abstractions;
 
 namespace InsightDocs.Templates.MSDN;
 
-public class TemplateAssetProvider : ITemplateAssetProvider
+public class TemplateAssetProvider : IAssetProvider
 {
-    public List<ITemplateAsset> GetAssets()
+    public List<IAsset> GetAssets()
     {
         return
         [

@@ -18,7 +18,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<DotNetField>,
       IUrlProvider<SiteToc>,
       IUrlProvider<SiteIndex>,
-      IUrlProvider<ITemplateAsset>,
+      IUrlProvider<IAsset>,
       IUrlProvider<DotNetIndexer>
 {
     protected KebabCaseUrlProviderOptions Options
@@ -347,7 +347,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(ITemplateAsset item)
+    public string GetUrl(IAsset item)
     {
         return $"/_assets/{item.FilePath.Replace("\\", "/")}";
     }
@@ -419,7 +419,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<DotNetField>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<SiteToc>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<SiteIndex>, KebabCaseUrlProvider>();
-        builder.Services.AddScoped<IUrlProvider<ITemplateAsset>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<IAsset>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<DotNetIndexer>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)

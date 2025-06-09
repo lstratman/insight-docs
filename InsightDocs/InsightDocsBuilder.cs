@@ -52,7 +52,7 @@ public class InsightDocsBuilder
             IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetService<IUrlProvider<SiteToc>>() ?? throw new Exception("No IUrlProvider service was registered for SiteToc.");
             IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetService<IUrlProvider<SiteIndex>>() ?? throw new Exception("No IUrlProvider service was registered for SiteIndex.");
             IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<SiteIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for SiteIndex.");
-            ITemplateAssetProvider? templateAssetProvider = serviceProvider.GetService<ITemplateAssetProvider>();
+            IEnumerable<IAssetProvider> assetProviders = serviceProvider.GetServices<IAssetProvider>();
             SiteIndex siteIndex = new();
 
             await publisher.Initialize();
@@ -65,13 +65,16 @@ public class InsightDocsBuilder
             string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
             await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)));
 
-            if (templateAssetProvider != null)
+            if (assetProviders != null && assetProviders.Any())
             {
-                IUrlProvider<ITemplateAsset> templateAssetUrlProvider = serviceProvider.GetService<IUrlProvider<ITemplateAsset>>() ?? throw new Exception("No IUrlProvider service was registered for ITemplateAsset.");
+                IUrlProvider<IAsset> assetUrlProvider = serviceProvider.GetService<IUrlProvider<IAsset>>() ?? throw new Exception("No IUrlProvider service was registered for IAsset.");
 
-                foreach (ITemplateAsset templateAsset in templateAssetProvider.GetAssets())
+                foreach (IAssetProvider assetProvider in assetProviders)
                 {
-                    await publisher.Publish(templateAssetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents());
+                    foreach (IAsset templateAsset in assetProvider.GetAssets())
+                    {
+                        await publisher.Publish(assetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents());
+                    }
                 }
             }
         }

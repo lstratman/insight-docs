@@ -4,38 +4,38 @@ namespace InsightDocs.Templates.MSDN;
 
 public class TemplateAssets
 {
-    public static ITemplateAsset MsdnCss 
+    public static IAsset MsdnCss 
     { 
         get; 
-    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "css/msdn.css");
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/msdn.css");
 
-    public static ITemplateAsset DoconsFont
+    public static IAsset DoconsFont
     {
         get;
-    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "css/docons.woff2"); 
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/docons.woff2"); 
     
-    public static ITemplateAsset SegoeUIFont
+    public static IAsset SegoeUIFont
     {
         get;
-    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "css/segoe-ui.woff2");
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/segoe-ui.woff2");
 
-    public static ITemplateAsset SegoeUIRomanVfFont
+    public static IAsset SegoeUIRomanVfFont
     {
         get;
-    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "css/segoe-ui-roman-vf.woff2");
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/segoe-ui-roman-vf.woff2");
 
-    public static ITemplateAsset HighlightJsScript
+    public static IAsset HighlightJsScript
     {
         get;
-    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "js/highlight.min.js");
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "js/highlight.min.js");
 
-    public static ITemplateAsset SiteIndexScript
+    public static IAsset SiteIndexScript
     {
         get;
-    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "js/site-index.js");
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "js/site-index.js");
 
-    public static ITemplateAsset SiteIndexCss
+    public static IAsset SiteIndexCss
     {
         get;
-    } = new EmbeddedResourceTemplateAsset(typeof(TemplateAssets).Assembly, "Assets", "css/site-index.css");
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/site-index.css");
 }

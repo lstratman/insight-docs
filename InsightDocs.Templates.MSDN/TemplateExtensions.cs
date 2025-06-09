@@ -19,7 +19,7 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<DotNetField, DotNet.DotNetField>();
         builder.RegisterRazorItemTemplate<DotNetIndexer, DotNet.DotNetIndexer>();
 
-        builder.Services.AddSingleton<ITemplateAssetProvider, TemplateAssetProvider>();
+        builder.Services.AddSingleton<IAssetProvider, TemplateAssetProvider>();
 
         return builder;
     }
