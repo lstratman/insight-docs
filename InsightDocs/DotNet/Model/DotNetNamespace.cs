@@ -4,10 +4,17 @@ namespace InsightDocs.DotNet.Model;
 
 public class DotNetNamespace : ILinkTarget
 {
-    public DotNetNamespace(string ns)
+    public DotNetNamespace(string ns, DotNetIndex index)
     {
         Name = ns.Contains('.', StringComparison.CurrentCulture) ? ns[(ns.LastIndexOf('.') + 1)..] : ns;
         FullName = ns;
+        Index = index;
+    }
+
+    public DotNetIndex Index
+    {
+        get;
+        set;
     }
 
     public string Name

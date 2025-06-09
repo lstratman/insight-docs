@@ -10,11 +10,19 @@ public class DotNetIndex : ILinkTarget
         set;
     } = [];
 
+    public string Title
+    {
+        get
+        {
+            return ".NET API Reference";
+        }
+    }
+
     public string LinkText
     {
         get
         {
-            return ".NET API Index";
+            return Title;
         }
     }
 }

@@ -6249,7 +6249,7 @@ a.color-danger:active {
 }
 
 .breadcrumbs .breadcrumbs-item:not(.breadcrumbs-item-slashless):after {
-  margin-inline: .25em;
+  margin-inline: .75em;
 }
 
 .breadcrumbs.breadcrumbs-initial-slash .breadcrumbs-item:first-child:before, .breadcrumbs.breadcrumbs-initial-slash .breadcrumbs-item[hidden] + .breadcrumbs-item:before {

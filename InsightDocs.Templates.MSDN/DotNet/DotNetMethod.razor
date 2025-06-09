@@ -11,9 +11,38 @@
         <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
             <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
 				<div>
+                    <div id="article-header" class="background-color-body margin-bottom-xs display-none-print">
+			            <div class="display-flex align-items-center justify-content-space-between">
+		                    <bread-crumbs id="article-header-breadcrumbs" class="overflow-hidden flex-grow-1 margin-right-sm margin-right-md-tablet margin-right-lg-desktop margin-left-negative-xxs padding-left-xxs" style="display: block; white-space: nowrap; overflow: hidden;">
+			                    <nav>
+				                    <ol class="breadcrumbs">
+								        <li class="breadcrumbs-item">@GetLink(Item!.DeclaringType!.Type!.Index)</li>
+
+                                        @if (Item.DeclaringType.Type.Namespace != null)
+                                        {
+                                            <li class="breadcrumbs-item">
+                                                @GetLink(Item.DeclaringType.Type.Namespace)
+                                            </li>
+
+                                            <li class="breadcrumbs-item">
+                                                @GetLink(Item.DeclaringType.Type)
+                                            </li>
+                                        }
+				                    </ol>
+			                    </nav>
+                            </bread-crumbs>
+			            </div>
+		            </div>
+
                     <div class="content">
                         <div data-chunk-ids="0">
                             <h1>@Item!.Title</h1>
+
+                            <div class="margin-block-xxs">
+	                            <ul class="metadata page-metadata align-items-center">
+		                            <li>Reference</li>
+	                            </ul>
+                            </div>
 
                             <h2>Definition</h2>
 

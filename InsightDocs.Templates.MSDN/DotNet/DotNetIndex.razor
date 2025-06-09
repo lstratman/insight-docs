@@ -6,10 +6,10 @@
     </head>
     <body>
         <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">					
-			<div data-main-column="" class="padding-sm padding-top-none">
+			<div data-main-column="" class="padding-sm padding-top-l">
 				<div class="content">
-					<div class="container is-max-desktop padding-top-md">
-                        <h2 class="api-search-results-heading font-size-h3">.NET API Reference</h2>
+					<div class="padding-top-md">
+                        <h1>@Item!.Title</h1>
 
                         <table class="table api-search-results">
                             <thead>
@@ -19,7 +19,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (InsightDocs.DotNet.Model.DotNetNamespace ns in Item!.Namespaces)
+                                @foreach (InsightDocs.DotNet.Model.DotNetNamespace ns in Item.Namespaces)
                                 {
                                     <tr>
                                         <td>@GetLink(ns) Namespace</td>

@@ -166,6 +166,12 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         }
     }
 
+    public required DotNetIndex Index
+    {
+        get;
+        set;
+    }
+
     // TODO: VB code
     public string CSharpCode
     {

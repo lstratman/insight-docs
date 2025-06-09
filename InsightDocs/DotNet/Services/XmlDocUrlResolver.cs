@@ -26,7 +26,7 @@ public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILogger
 
                     if (type != null)
                     {
-                        serviceProvider.GetRequiredService<IDotNetLoader>().LoadType(type);
+                        serviceProvider.GetRequiredService<IDotNetLoader>().LoadType(type, new Model.DotNetIndex());
                         Urls.TryGetValue(key, out string? value2);
                         value = value2;
                     }

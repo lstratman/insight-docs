@@ -90,6 +90,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         PathAssemblyResolver pathAssemblyResolver = new(runtimeAssemblyPaths.Concat(assemblyPaths));
         Dictionary<string, DotNetNamespace> namespaces = [];
 
+        DotNetIndex index = new()
+        {
+            Namespaces = []
+        };
+
         foreach (string assemblyPath in assemblyPaths)
         {
             LogAssemblyLoad(logger, assemblyPath);
@@ -121,7 +126,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
                 LogLoadingType(logger, type.FullName!);
 
-                DotNetType typeMetadata = LoadType(type);
+                DotNetType typeMetadata = LoadType(type, index);
                 typeMetadata.IsExternal = false;
 
                 if (typeMetadata.Namespace != null && !namespaces.ContainsKey(typeMetadata.Namespace.FullName))
@@ -132,10 +137,8 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             }
         }
 
-        return new DotNetIndex
-        {
-            Namespaces = [.. namespaces.Values]
-        };
+        index.Namespaces.AddRange(namespaces.Values);
+        return index;
     }
 
     public virtual DotNetAssembly LoadAssembly(Assembly assembly)
@@ -181,11 +184,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         return assemblyMetadata;
     }
 
-    protected virtual DotNetNamespace LoadNamespace(string ns)
+    protected virtual DotNetNamespace LoadNamespace(string ns, DotNetIndex index)
     {
         if (!NamespaceCache.TryGetValue(ns, out DotNetNamespace? namespaceMetadata))
         {
-            namespaceMetadata = new DotNetNamespace(ns)
+            namespaceMetadata = new DotNetNamespace(ns, index)
             {
                 IsExternal = true
             };
@@ -196,11 +199,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         return namespaceMetadata;
     }
 
-    public virtual DotNetType LoadType(Type type)
+    public virtual DotNetType LoadType(Type type, DotNetIndex index)
     {
         if (type.IsByRef)
         {
-            return LoadType(type.GetElementType()!);
+            return LoadType(type.GetElementType()!, index);
         }
 
         string key = GetTypeCacheKey(type);
@@ -208,7 +211,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         if (!TypeCache.TryGetValue(key, out DotNetType? typeMetadata))
         {
             DotNetAssembly assembly = LoadAssembly(type.Assembly);
-            DotNetNamespace? ns = String.IsNullOrEmpty(type.Namespace) ? null : LoadNamespace(type.Namespace);
+            DotNetNamespace? ns = String.IsNullOrEmpty(type.Namespace) ? null : LoadNamespace(type.Namespace, index);
             string name = type.Name.Contains('`') ? type.Name[..type.Name.IndexOf('`')] : type.Name;
             Type[] typeParameters = type.GetGenericArguments();
             Type? currentDeclaringType = type.DeclaringType;
@@ -252,7 +255,8 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 IsInternal = type.IsNestedAssembly,
                 IsExternal = true,
                 TypeName = typeName,
-                DisplayName = typeParameters != null && typeParameters.Length > 0 ? name + "<" + String.Join(", ", typeParameters.Select(a => a.Name)) + ">" : name
+                DisplayName = typeParameters != null && typeParameters.Length > 0 ? name + "<" + String.Join(", ", typeParameters.Select(a => a.Name)) + ">" : name,
+                Index = index
             };
 
             if (type.IsPublic || type.IsNestedPublic)
@@ -279,7 +283,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
             if (typeParameters != null && typeParameters.Length > 0)
             {
-                typeMetadata.TypeParameters = [.. typeParameters.Select(LoadTypeParameter)];
+                typeMetadata.TypeParameters = [.. typeParameters.Select(p => LoadTypeParameter(p, index))];
             }
 
             if (assembly.XmlDocEntries != null)
@@ -340,7 +344,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
             if (baseType != null)
             {
-                typeMetadata.BaseType = LoadTypeReference(baseType);
+                typeMetadata.BaseType = LoadTypeReference(baseType, index);
             }
 
             Type[] baseTypeInterfaces = baseType == null ? [] : baseType.GetInterfaces();
@@ -348,14 +352,14 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
             if (implementedInterfaces != null && implementedInterfaces.Length > 0)
             {
-                typeMetadata.ImplementedInterfaces = [.. implementedInterfaces.Select(LoadTypeReference)];
+                typeMetadata.ImplementedInterfaces = [.. implementedInterfaces.Select(i => LoadTypeReference(i, index))];
             }
 
             FieldInfo[] fields = [.. type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(f => !f.Name.StartsWith('<') && (!dotNetOptions.OmitPrivateMembers || !f.IsPrivate))];
 
             if (fields != null && fields.Length > 0)
             {
-                typeMetadata.Fields = [.. fields.Select(LoadField)];
+                typeMetadata.Fields = [.. fields.Select(f => LoadField(f, index))];
 
                 foreach (DotNetField field in typeMetadata.Fields.Where(f => f.DeclaringType?.Type == typeMetadata && f.XmlDocKey != null))
                 {
@@ -381,11 +385,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
                     if (methodCollection == null)
                     {
-                        methodCollection = LoadMethod(method, type);
+                        methodCollection = LoadMethod(method, type, index);
                         typeMetadata.Methods.Add(methodCollection);
                     }
 
-                    DotNetMethodOverload overload = LoadMethodOverload(method, methodCollection);
+                    DotNetMethodOverload overload = LoadMethodOverload(method, index, methodCollection);
                     methodCollection.Overloads.Add(overload);
                 }
 
@@ -404,11 +408,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
                 if (constructors != null && constructors.Length > 0 && constructors.Any(c => c.GetParameters().Length > 0))
                 {
-                    typeMetadata.Constructor = LoadConstuctor(type);
+                    typeMetadata.Constructor = LoadConstuctor(type, index);
 
                     foreach (ConstructorInfo constructor in constructors)
                     {
-                        DotNetMethodOverload overload = LoadMethodOverload(constructor, typeMetadata.Constructor);
+                        DotNetMethodOverload overload = LoadMethodOverload(constructor, index, typeMetadata.Constructor);
                         typeMetadata.Constructor.Overloads.Add(overload);
                     }
 
@@ -432,16 +436,16 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                     {
                         typeMetadata.Indexer ??= new DotNetIndexer
                         {
-                            DeclaringType = LoadTypeReference(type)
+                            DeclaringType = LoadTypeReference(type, index)
                         };
 
-                        typeMetadata.Indexer.Overloads.Add(LoadProperty(property));
+                        typeMetadata.Indexer.Overloads.Add(LoadProperty(property, index));
                     }
 
                     else
                     {
                         typeMetadata.Properties ??= [];
-                        typeMetadata.Properties.Add(LoadProperty(property));
+                        typeMetadata.Properties.Add(LoadProperty(property, index));
                     }
                 }
 
@@ -523,7 +527,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         return typeMetadata;
     }
 
-    protected virtual DotNetGenericArgument LoadGenericArgument(Type type)
+    protected virtual DotNetGenericArgument LoadGenericArgument(Type type, DotNetIndex index)
     {
         DotNetGenericArgument genericArgument = new DotNetGenericArgument();
 
@@ -534,17 +538,17 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
         else
         {
-            genericArgument.Type = LoadTypeReference(type);
+            genericArgument.Type = LoadTypeReference(type, index);
         }
 
         return genericArgument;
     }
 
-    protected virtual DotNetTypeReference LoadTypeReference(Type type)
+    protected virtual DotNetTypeReference LoadTypeReference(Type type, DotNetIndex index)
     {
         if (type.IsByRef)
         {
-            return LoadTypeReference(type.GetElementType()!);
+            return LoadTypeReference(type.GetElementType()!, index);
         }
 
         string key = GetTypeReferenceCacheKey(type);
@@ -565,7 +569,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
                 foreach (Type genericArgument in type.GetGenericArguments())
                 {
-                    typeReference.GenericArguments.Add(LoadGenericArgument(genericArgument));
+                    typeReference.GenericArguments.Add(LoadGenericArgument(genericArgument, index));
                 }
 
                 if (type.IsGenericType)
@@ -582,7 +586,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
             else
             {
-                typeReference.Type = LoadType(type);
+                typeReference.Type = LoadType(type, index);
             }
 
             TypeReferenceCache[key] = typeReference;
@@ -591,30 +595,30 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         return typeReference;
     }
 
-    protected virtual DotNetMethod LoadConstuctor(Type declaringType)
+    protected virtual DotNetMethod LoadConstuctor(Type declaringType, DotNetIndex index)
     {
         DotNetMethod methodMetadata = new DotNetMethod
         {
             Name = declaringType.Name,
-            DeclaringType = LoadTypeReference(declaringType),
+            DeclaringType = LoadTypeReference(declaringType, index),
             IsConstructor = true
         };
 
         return methodMetadata;
     }
 
-    protected virtual DotNetMethod LoadMethod(MethodInfo method, Type declaringType)
+    protected virtual DotNetMethod LoadMethod(MethodInfo method, Type declaringType, DotNetIndex index)
     {
         DotNetMethod methodMetadata = new DotNetMethod
         {
             Name = method.Name.Contains('.') ? method.Name[(method.Name.LastIndexOf('.') + 1)..] : method.Name,
-            DeclaringType = LoadTypeReference(declaringType)
+            DeclaringType = LoadTypeReference(declaringType, index)
         };
 
         return methodMetadata;
     }
 
-    protected virtual DotNetMethodParameter LoadMethodParameter(ParameterInfo parameter)
+    protected virtual DotNetMethodParameter LoadMethodParameter(ParameterInfo parameter, DotNetIndex index)
     {
         return new DotNetMethodParameter
         {
@@ -622,21 +626,21 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             IsOut = parameter.IsOut,
             IsByRef = parameter.ParameterType.IsByRef,
             Name = parameter.Name!,
-            Type = LoadTypeReference(parameter.ParameterType)
+            Type = LoadTypeReference(parameter.ParameterType, index)
         };
     }
 
-    protected virtual DotNetProperty LoadProperty(PropertyInfo property)
+    protected virtual DotNetProperty LoadProperty(PropertyInfo property, DotNetIndex index)
     {
         DotNetProperty propertyMetadata = new DotNetProperty
         {
             Name = property.Name.Contains('.') ? property.Name[(property.Name.LastIndexOf('.') + 1)..] : property.Name,
-            PropertyType = LoadTypeReference(property.PropertyType)
+            PropertyType = LoadTypeReference(property.PropertyType, index)
         };
 
         if (property.DeclaringType != null)
         {
-            propertyMetadata.DeclaringType = LoadTypeReference(property.DeclaringType);
+            propertyMetadata.DeclaringType = LoadTypeReference(property.DeclaringType, index);
 
             if (propertyMetadata.DeclaringType.Type?.Assembly?.XmlDocEntries != null && propertyMetadata.XmlDocKey != null)
             {
@@ -684,26 +688,26 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
         if (property.GetMethod != null)
         {
-            propertyMetadata.GetMethod = LoadMethodOverload(property.GetMethod);
+            propertyMetadata.GetMethod = LoadMethodOverload(property.GetMethod, index);
         }
 
         if (property.SetMethod != null)
         {
-            propertyMetadata.SetMethod = LoadMethodOverload(property.SetMethod);
+            propertyMetadata.SetMethod = LoadMethodOverload(property.SetMethod, index);
         }
 
         ParameterInfo[] indexParameters = property.GetIndexParameters();
 
         if (indexParameters != null && indexParameters.Length > 0)
         {
-            propertyMetadata.IndexParameters = [..indexParameters.Select(LoadMethodParameter)];
+            propertyMetadata.IndexParameters = [..indexParameters.Select(p => LoadMethodParameter(p, index))];
             propertyMetadata.IsIndexer = true;
         }
 
         return propertyMetadata;
     }
 
-    protected virtual DotNetMethodOverload LoadMethodOverload(MethodBase method, DotNetMethod? methodCollection = null)
+    protected virtual DotNetMethodOverload LoadMethodOverload(MethodBase method, DotNetIndex index, DotNetMethod? methodCollection = null)
     {
         DotNetMethodOverload overloadMetadata = new DotNetMethodOverload
         {
@@ -713,7 +717,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             IsAbstract = method.IsAbstract && (method.DeclaringType == null || !method.DeclaringType.IsInterface),
             IsConstructor = method is ConstructorInfo,
             MethodCollection = methodCollection,
-            ReturnType = method is MethodInfo methodInfo ? LoadTypeReference(methodInfo.ReturnType) : LoadTypeReference(method.DeclaringType!)
+            ReturnType = method is MethodInfo methodInfo ? LoadTypeReference(methodInfo.ReturnType, index) : LoadTypeReference(method.DeclaringType!, index)
         };
 
         if (method.IsPublic)
@@ -737,7 +741,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
             if (genericArguments != null && genericArguments.Length > 0)
             {
-                overloadMetadata.GenericArguments = [.. genericArguments.Select(LoadTypeParameter)];
+                overloadMetadata.GenericArguments = [.. genericArguments.Select(a => LoadTypeParameter(a, index))];
             }
         }
 
@@ -745,12 +749,12 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
         if (parameters != null && parameters.Length > 0)
         {
-            overloadMetadata.Parameters = [.. parameters.Select(LoadMethodParameter)];
+            overloadMetadata.Parameters = [.. parameters.Select(p => LoadMethodParameter(p, index))];
         }
 
         if (method.DeclaringType != null)
         {
-            overloadMetadata.DeclaringType = LoadTypeReference(method.DeclaringType);
+            overloadMetadata.DeclaringType = LoadTypeReference(method.DeclaringType, index);
 
             if (overloadMetadata.DeclaringType.Type?.Assembly?.XmlDocEntries != null && overloadMetadata.XmlDocKey != null)
             {
@@ -820,21 +824,21 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
         return overloadMetadata;
     }
 
-    protected virtual DotNetTypeParameter LoadTypeParameter(Type type)
+    protected virtual DotNetTypeParameter LoadTypeParameter(Type type, DotNetIndex index)
     {
         return new DotNetTypeParameter
         {
             Name = type.Name,
-            TypeConstraint = type.BaseType != null && (String.IsNullOrEmpty(type.BaseType.FullName) || type.BaseType.FullName != "System.Object") ? LoadTypeReference(type.BaseType) : null
+            TypeConstraint = type.BaseType != null && (String.IsNullOrEmpty(type.BaseType.FullName) || type.BaseType.FullName != "System.Object") ? LoadTypeReference(type.BaseType, index) : null
         };
     }
 
-    protected virtual DotNetField LoadField(FieldInfo field)
+    protected virtual DotNetField LoadField(FieldInfo field, DotNetIndex index)
     {
         DotNetField fieldMetadata = new DotNetField
         {
             Name = field.Name,
-            FieldType = LoadTypeReference(field.FieldType),
+            FieldType = LoadTypeReference(field.FieldType, index),
             IsStatic = field.IsStatic,
             IsInternal = field.IsAssembly,
             IsAbstract = false,
@@ -858,7 +862,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
         if (field.DeclaringType != null)
         {
-            fieldMetadata.DeclaringType = LoadTypeReference(field.DeclaringType);
+            fieldMetadata.DeclaringType = LoadTypeReference(field.DeclaringType, index);
 
             if (fieldMetadata.DeclaringType.Type?.Assembly?.XmlDocEntries != null && fieldMetadata.XmlDocKey != null)
             {
