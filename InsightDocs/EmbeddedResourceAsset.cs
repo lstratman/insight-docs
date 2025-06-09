@@ -1,14 +1,9 @@
 ﻿using InsightDocs.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InsightDocs;
 
-public class EmbeddedResourceTemplateAsset(Assembly assembly, string containerNamespace, string filePath) : ITemplateAsset
+public class EmbeddedResourceAsset(Assembly assembly, string containerNamespace, string filePath) : IAsset
 {
     public string FilePath
     {

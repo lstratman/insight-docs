@@ -1,6 +1,6 @@
 namespace InsightDocs.Abstractions;
 
-public interface ITemplateAssetProvider
+public interface IAssetProvider
 {
-    List<ITemplateAsset> GetAssets();
+    List<IAsset> GetAssets();
 }

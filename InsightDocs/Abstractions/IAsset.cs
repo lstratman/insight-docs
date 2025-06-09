@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InsightDocs.Abstractions;
 
-public interface ITemplateAsset : ILinkTarget
+public interface IAsset : ILinkTarget
 {
     string FilePath
     {
