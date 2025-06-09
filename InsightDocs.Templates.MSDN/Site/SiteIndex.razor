@@ -1,3 +1,6 @@
+@using InsightDocs.Site.Abstractions
+@using Microsoft.Extensions.DependencyInjection
+
 @inherits InsightDocs.RazorTemplate<InsightDocs.Site.Model.SiteIndex>
 
 <html>
@@ -6,11 +9,24 @@
 
     <link rel="stylesheet" href="@GetUrl(TemplateAssets.MsdnCss)" />
     <link rel="stylesheet" href="@GetUrl(TemplateAssets.SiteIndexCss)" />
+
+    @AddAdditionalCss()
 </head>
 <body onload="onSiteIndexLoad()">
-    <div id="navbar"></div>
-    <div id="topicContent">
-        <iframe name="topicContentIFrame" id="topicContentIFrame" src="about:blank"></iframe>
+    @{
+        ISiteHeaderProvider? headerProvider = ServiceProvider!.GetService<ISiteHeaderProvider>();
+
+        if (headerProvider != null)
+        {
+            <div id="header">@Raw(headerProvider.GetHeader())</div>
+        }
+    }
+
+    <div id="mainContent">
+        <div id="navbar"></div>
+        <div id="topicContent">
+            <iframe name="topicContentIFrame" id="topicContentIFrame" src="about:blank"></iframe>
+        </div>
     </div>
 </body>
 </html>

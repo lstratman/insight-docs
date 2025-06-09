@@ -1,6 +1,7 @@
 using InsightDocs.Abstractions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text;
 
 namespace InsightDocs;
 
@@ -55,6 +56,33 @@ public class RazorTemplate<T> : ComponentBase
         return (builder) =>
         {
             builder.AddMarkupContent(0, html);
+        };
+    }
+
+    public virtual RenderFragment AddAdditionalCss()
+    {
+        IEnumerable<IAdditionalCssProvider<T>> additionalCssProviders = ServiceProvider!.GetServices<IAdditionalCssProvider<T>>();
+        List<IAsset> additionalCssAssets = new List<IAsset>();
+
+        if (additionalCssProviders != null && additionalCssProviders.Any())
+        {
+            foreach (IAdditionalCssProvider<T> additionalCssProvider in additionalCssProviders)
+            {
+                additionalCssAssets.AddRange(additionalCssProvider.GetAdditionalCssAssets(Item!));
+            }
+        }
+
+        return (builder) =>
+        {
+            StringBuilder cssLinks = new StringBuilder();
+
+            foreach (IAsset asset in additionalCssAssets)
+            {
+                string url = GetUrl(asset);
+                cssLinks.AppendLine($@"<link rel=""stylesheet"" type=""text/css"" href=""{url}"" />");
+            }
+
+            builder.AddMarkupContent(0, cssLinks.ToString());
         };
     }
 }
