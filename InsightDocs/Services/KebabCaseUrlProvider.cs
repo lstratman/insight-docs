@@ -1,8 +1,10 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using InsightDocs.Abstractions;
 using InsightDocs.DotNet;
 using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
+using InsightDocs.Markdown.Model;
 using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,13 +21,16 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<SiteToc>,
       IUrlProvider<SiteIndex>,
       IUrlProvider<IAsset>,
-      IUrlProvider<DotNetIndexer>
+      IUrlProvider<DotNetIndexer>,
+      IUrlProvider<MarkdownFile>
 {
     protected KebabCaseUrlProviderOptions Options
     {
         get;
         set;
     } = options;
+
+    protected static Regex NonAlphanumericCharacters = new Regex(@"[^a-zA-Z0-9\-]");
 
     public string GetUrl(DotNetType item)
     {
@@ -390,6 +395,26 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         return url.ToString();
     }
+
+    public string GetUrl(MarkdownFile item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append(NonAlphanumericCharacters.Replace(item.Title, "-").ToLower());
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -421,6 +446,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<SiteIndex>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<IAsset>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<DotNetIndexer>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<MarkdownFile>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

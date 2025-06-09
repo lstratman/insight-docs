@@ -1,0 +1,25 @@
+@inherits InsightDocs.RazorTemplate<InsightDocs.Markdown.Model.MarkdownFile>
+
+<html>
+<head>
+    <link rel="stylesheet" href="@GetUrl(TemplateAssets.MsdnCss)" />
+
+    @AddAdditionalCss()
+
+    <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
+    <script type="text/javascript">hljs.highlightAll();</script>
+</head>
+<body>
+    <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+        <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+			<div>
+                <div class="content">
+                    <div data-chunk-ids="0">
+                        @Raw(Item!.Html!.Replace("<table", "<table class=\"table\"").Replace("<code class=\"language-", "<code class=\"lang-"))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

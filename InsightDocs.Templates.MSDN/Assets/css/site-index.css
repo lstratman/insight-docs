@@ -14,11 +14,13 @@ body {
     display: flex;
     flex-direction: row;
     overflow: hidden;
+    flex-grow: 1;
 }
 
 #navbar {
     width: 400px;
     overflow: auto;
+    padding: 10px;
 }
 
 #topicContent {

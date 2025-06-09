@@ -1,6 +1,7 @@
 using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Model;
 using InsightDocs.Extensions;
+using InsightDocs.Markdown.Model;
 using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,7 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<DotNetProperty, DotNet.DotNetProperty>();
         builder.RegisterRazorItemTemplate<DotNetField, DotNet.DotNetField>();
         builder.RegisterRazorItemTemplate<DotNetIndexer, DotNet.DotNetIndexer>();
+        builder.RegisterRazorItemTemplate<MarkdownFile, Markdown.MarkdownFile>();
 
         builder.Services.AddSingleton<IAssetProvider, TemplateAssetProvider>();
 
