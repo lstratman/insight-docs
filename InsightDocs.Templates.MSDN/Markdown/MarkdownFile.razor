@@ -1,3 +1,4 @@
+@using System.Text.RegularExpressions
 @inherits InsightDocs.RazorTemplate<InsightDocs.Markdown.Model.MarkdownFile>
 
 <html>
@@ -15,7 +16,27 @@
 			<div>
                 <div class="content">
                     <div data-chunk-ids="0">
-                        @Raw(Item!.Html!.Replace("<table", "<table class=\"table\"").Replace("<code class=\"language-", "<code class=\"lang-"))
+                        @{
+                            string html = Item!.Html!.Replace("<table", "<table class=\"table\"").Replace("<code class=\"language-", "<code class=\"lang-");
+                            html = Regex.Replace(html, @"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", (evaluator) =>
+                            {
+                                string id = evaluator.Groups["id"].Value;
+                                string title = evaluator.Groups["title"].Value;
+                                int level = int.Parse(evaluator.Groups["level"].Value);
+
+                                if (level == 1)
+                                {
+                                    return evaluator.Value;
+                                }
+
+                                return $@"<div class=""heading-wrapper"" data-heading-level=""h{level}"">
+    <a class=""anchor-link docon docon-link"" href=""#{id}""></a>
+    {evaluator.Value}
+</div>";
+                            });
+                        }
+
+                        @Raw(html)
                     </div>
                 </div>
             </div>
