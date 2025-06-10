@@ -35,7 +35,7 @@ public class MarkdownLoader : IMarkdownLoader
         
         foreach (char c in input)
         {
-            if (c == '-')
+            if (c == '-' || c == ' ')
             {
                 toUpper = true;
                 output.Append(' ');

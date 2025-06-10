@@ -203,10 +203,7 @@
     navbarRootList.classList.add('tree', 'table-of-contents', 'flex-grow-1', 'flex-shrink-1');
 
     navbar.appendChild(navbarRootList);
-
-    for (let index of tocData.RootItems) {
-        addTocItemChildren(tocData.RootItems, navbarRootList);
-    }
+    addTocItemChildren(tocData.RootItems, navbarRootList);
 
     if (document.location.hash) {
         topicContent.src = document.location.hash.substr(1).replace('%23', '#');

@@ -34,9 +34,9 @@ public class InsightDocsBuilder
         private set;
     }
 
-    public TocItem AddTocItem(string title, string? urlPrefix = null)
+    public TocItem AddTocItem(string title, string? url = null, string? urlPrefix = null)
     {
-        return TocRoot.AddTocItem(title, urlPrefix);
+        return TocRoot.AddTocItem(title, url, urlPrefix);
     }
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
