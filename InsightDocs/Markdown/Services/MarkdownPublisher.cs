@@ -4,12 +4,14 @@ using InsightDocs.Markdown.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace InsightDocs.Markdown.Services;
 
 public partial class MarkdownPublisher(
     ILoggerFactory loggerFactory,
     IUrlProvider<MarkdownFile> markdownFileUrlProvider,
+    IUrlProvider<MarkdownImage> markdownImageUrlProvider,
     IMarkdownLoader markdownLoader,
     IPublisher publisher,
     IServiceProvider serviceProvider
@@ -23,6 +25,10 @@ public partial class MarkdownPublisher(
 
     [LoggerMessage(LogLevel.Debug, "Publishing topic for Markdown file {file}")]
     public static partial void LogPublishingMarkdownFile(ILogger logger, string file);
+
+    protected readonly static Regex ImageTagsRegex = new Regex(@"<img\s+(?<otherAttributes>[^>]*)src\s*=\s*[""'](?<url>[^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    protected Dictionary<string, string> _imageUrls = new Dictionary<string, string>();
 
     public virtual async Task PublishTopics(TocItem tocRoot, List<string> markdownFilePaths)
     {
@@ -40,6 +46,35 @@ public partial class MarkdownPublisher(
 
             markdownFile.Html = await markdownLoader.GetHtml(markdownFile);
             tocRoot.AddTocItem(markdownFile.Title, url);
+
+            string parentDirectory = Path.GetDirectoryName(markdownFilePath)!;
+            Dictionary<string, MarkdownImage> markdownImagesToPublish = new Dictionary<string, MarkdownImage>();
+
+            markdownFile.Html = ImageTagsRegex.Replace(markdownFile.Html, match =>
+            {
+                string imageUrl = match.Groups["url"].Value;
+                string otherAttributes = match.Groups["otherAttributes"].Value;
+                string imageFilePath = Path.GetFullPath(Path.Combine(parentDirectory, imageUrl));
+
+                if (!_imageUrls.TryGetValue(imageFilePath, out string? existingUrl))
+                {
+                    MarkdownImage markdownImage = new MarkdownImage(imageFilePath);
+                    existingUrl = markdownImageUrlProvider.GetUrl(markdownImage);
+
+                    markdownImagesToPublish[existingUrl] = markdownImage;
+                    _imageUrls[imageFilePath] = existingUrl;
+                }
+
+                return $"<img src=\"{_imageUrls[imageFilePath]}\" {otherAttributes}";
+            });
+
+            foreach (var markdownImage in markdownImagesToPublish)
+            {
+                byte[] imageContent = await File.ReadAllBytesAsync(markdownImage.Value.FilePath);
+                await publisher.Publish(markdownImage.Key, imageContent);
+            }
+
+            // TODO: add sub links
 
             if (markdownTemplateProvider != null)
             {

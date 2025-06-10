@@ -22,7 +22,8 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<SiteIndex>,
       IUrlProvider<IAsset>,
       IUrlProvider<DotNetIndexer>,
-      IUrlProvider<MarkdownFile>
+      IUrlProvider<MarkdownFile>,
+      IUrlProvider<MarkdownImage>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -415,6 +416,23 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         return url.ToString();
     }
+
+    public string GetUrl(MarkdownImage item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append("_images/");
+        url.Append(Guid.NewGuid().ToString("N").ToLowerInvariant());
+        url.Append(Path.GetExtension(item.FilePath).ToLowerInvariant());
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -447,6 +465,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<IAsset>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<DotNetIndexer>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<MarkdownFile>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<MarkdownImage>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

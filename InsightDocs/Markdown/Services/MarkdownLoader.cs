@@ -8,7 +8,7 @@ namespace InsightDocs.Markdown.Services;
 
 public class MarkdownLoader : IMarkdownLoader
 {
-    protected MarkdownPipeline _pipeline = new MarkdownPipelineBuilder().UseCustomContainers().UsePipeTables().Build();
+    protected MarkdownPipeline _pipeline = new MarkdownPipelineBuilder().UseCustomContainers().UsePipeTables().UseAutoIdentifiers().Build();
 
     public virtual async Task<string> GetHtml(MarkdownFile markdownFile)
     {
