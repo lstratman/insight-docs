@@ -28,6 +28,8 @@ public partial class MarkdownPublisher(
 
     protected readonly static Regex ImageTagsRegex = new Regex(@"<img\s+(?<otherAttributes>[^>]*)src\s*=\s*[""'](?<url>[^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+    protected readonly static Regex HeaderTagsRegex = new Regex(@"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     protected Dictionary<string, string> _imageUrls = new Dictionary<string, string>();
 
     public virtual async Task PublishTopics(TocItem tocRoot, List<string> markdownFilePaths)
@@ -45,7 +47,7 @@ public partial class MarkdownPublisher(
             IItemTemplateProvider<MarkdownFile>? markdownTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<MarkdownFile>>();
 
             markdownFile.Html = await markdownLoader.GetHtml(markdownFile);
-            tocRoot.AddTocItem(markdownFile.Title, url);
+            TocItem markdownFileTocItem = tocRoot.AddTocItem(markdownFile.Title, url);
 
             string parentDirectory = Path.GetDirectoryName(markdownFilePath)!;
             Dictionary<string, MarkdownImage> markdownImagesToPublish = new Dictionary<string, MarkdownImage>();
@@ -74,7 +76,26 @@ public partial class MarkdownPublisher(
                 await publisher.Publish(markdownImage.Key, imageContent);
             }
 
-            // TODO: add sub links
+            Stack<Tuple<int, TocItem>> headerStack = new Stack<Tuple<int, TocItem>>([new Tuple<int, TocItem>(1, markdownFileTocItem)]);
+
+            HeaderTagsRegex.Matches(markdownFile.Html).ToList().ForEach(match =>
+            {
+                string id = match.Groups["id"].Value;
+                string title = match.Groups["title"].Value;
+                int level = int.Parse(match.Groups["level"].Value);
+
+                if (level == 1)
+                {
+                    return;
+                }
+
+                while (headerStack.Peek().Item1 >= level)
+                {
+                    headerStack.Pop();
+                }
+
+                headerStack.Push(new Tuple<int, TocItem>(level, headerStack.Peek().Item2.AddTocItem(title, url + "#" + id)));
+            });
 
             if (markdownTemplateProvider != null)
             {
