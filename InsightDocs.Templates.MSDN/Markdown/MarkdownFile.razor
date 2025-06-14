@@ -34,6 +34,11 @@
     {evaluator.Value}
 </div>";
                             });
+
+                            html = Regex.Replace(html, @"<a href=""(?<protocol>http\:|https\:)", evaluator =>
+                            {
+                                return "<a target=\"_new\" href=\"" + evaluator.Groups["protocol"];
+                            });
                         }
 
                         @Raw(html)
