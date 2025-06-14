@@ -91,37 +91,8 @@
                                         <div class="summaryHolder">@Raw(overload.Description.ToHtml())</div>
                                     }
 
-                                    <div class="codeHeader">
-                                        <span class="language">C#</span>
-		                                <button type="button" class="action position-relative display-none-print">
-			                                <span class="icon margin-right-xxs" aria-hidden="true">
-				                                <span class="docon docon-edit-copy"></span>
-			                                </span>
-			                                <span>Copy</span>
-			                                <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
-				                                <span class="icon font-size-lg">
-					                                <span class="docon docon-check-mark"></span>
-				                                </span>
-			                                </div>
-		                                </button>
-	                                </div>
-                                    <pre class="wrap has-inner-focus"><code class="csharp language-csharp" dir="ltr">@overload.CSharpCode</code></pre>
-
-                                    <div class="codeHeader" hidden>
-                                        <span class="language">VB</span>
-		                                <button type="button" class="action position-relative display-none-print">
-			                                <span class="icon margin-right-xxs" aria-hidden="true">
-				                                <span class="docon docon-edit-copy"></span>
-			                                </span>
-			                                <span>Copy</span>
-			                                <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
-				                                <span class="icon font-size-lg">
-					                                <span class="docon docon-check-mark"></span>
-				                                </span>
-			                                </div>
-		                                </button>
-	                                </div>
-                                    <pre class="wrap has-inner-focus" hidden><code class="vb language-vb" dir="ltr">@overload.VBCode</code></pre>
+                                    <CodeBlock LanguageId="csharp" LanguageLabel="C#" Code="@overload.CSharpCode"/>
+                                    <CodeBlock LanguageId="vb" LanguageLabel="VB" Code="@overload.VBCode"/>
 
                                     <div class="heading-wrapper" data-heading-level="h4">
                                         <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>
