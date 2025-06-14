@@ -97,6 +97,25 @@ public class DotNetField : DotNetMemberInfo
         }
     }
 
+    public override string VBCode
+    {
+        get
+        {
+            StringBuilder code = new StringBuilder(base.VBCode);
+
+            if (IsReadOnly)
+            {
+                code.Append("ReadOnly ");
+            }
+
+            code.Append(Name);
+            code.Append(" As ");
+            code.Append(FieldType.VBCode);
+
+            return code.ToString();
+        }
+    }
+
     public override string CSharpCode
     {
         get

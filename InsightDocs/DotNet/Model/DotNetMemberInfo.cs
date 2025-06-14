@@ -45,6 +45,46 @@ public abstract class DotNetMemberInfo : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
+    public virtual string VBCode
+    {
+        get
+        {
+            StringBuilder code = new StringBuilder();
+
+            if (AccessType == DotNetMemberInfoAccessType.Public)
+            {
+                code.Append("Public ");
+            }
+
+            else if (AccessType == DotNetMemberInfoAccessType.Protected)
+            {
+                code.Append("Protected ");
+            }
+
+            else if (AccessType == DotNetMemberInfoAccessType.Private)
+            {
+                code.Append("Private ");
+            }
+
+            if (IsInternal)
+            {
+                code.Append("Friend ");
+            }
+
+            if (IsAbstract)
+            {
+                code.Append("MustInherit ");
+            }
+
+            if (IsStatic)
+            {
+                code.Append("Shared ");
+            }
+
+            return code.ToString();
+        }
+    }
+
     public virtual string CSharpCode
     {
         get

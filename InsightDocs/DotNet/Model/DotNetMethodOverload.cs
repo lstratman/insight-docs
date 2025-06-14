@@ -152,6 +152,41 @@ public class DotNetMethodOverload : DotNetMemberInfo
         }
     }
 
+    public override string VBCode
+    {
+        get
+        {
+            StringBuilder output = new(base.VBCode);
+
+            output.Append(!IsConstructor && (ReturnType.Type == null || ReturnType.Type.FullName != "System.Void") ? "Function " : "Sub ");
+            output.Append(IsConstructor ? "New" : Name);
+
+            if (GenericArguments != null && GenericArguments.Count > 0)
+            {
+                output.Append("(Of ");
+                output.Append(String.Join(", ", GenericArguments.Select(a => a.Name + (a.TypeConstraint != null ? " As " + a.TypeConstraint.VBCode : ""))));
+                output.Append(')');
+            }
+
+            output.Append('(');
+
+            if (Parameters != null)
+            {
+                output.Append(String.Join(", ", Parameters.Select(p => p.Name + " As " + p.Type.VBCode)));
+            }
+
+            output.Append(')');
+
+            if (!IsConstructor && (ReturnType.Type == null || ReturnType.Type.FullName != "System.Void"))
+            {
+                output.Append(" As ");
+                output.Append(ReturnType.VBCode);
+            }
+
+            return output.ToString();
+        }
+    }
+
     public override string CSharpCode
     {
         get

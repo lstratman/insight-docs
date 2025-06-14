@@ -172,7 +172,87 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
-    // TODO: VB code
+    public string VBCode
+    {
+        get
+        {
+            StringBuilder code = new StringBuilder();
+
+            if (AccessType == DotNetMemberInfoAccessType.Public)
+            {
+                code.Append("Public ");
+            }
+
+            else if (AccessType == DotNetMemberInfoAccessType.Protected)
+            {
+                code.Append("Protected ");
+            }
+
+            else if (AccessType == DotNetMemberInfoAccessType.Private)
+            {
+                code.Append("Private ");
+            }
+
+            if (IsInternal)
+            {
+                code.Append("Family ");
+            }
+
+            if (TypeName == "Enum")
+            {
+                code.Append("Enum ");
+                code.Append(Name);
+
+                return code.ToString();
+            }
+
+            if (IsAbstract)
+            {
+                code.Append("MustInherit ");
+            }
+
+            if (IsStatic)
+            {
+                code.Append("Shared ");
+            }
+
+            if (IsSealed)
+            {
+                code.Append("NotInheritable ");
+            }
+
+            code.Append(TypeName);
+            code.Append(' ');
+            code.Append(Name);
+
+            if (TypeParameters != null && TypeParameters.Count > 0)
+            {
+                code.Append("(Of ");
+                code.Append(String.Join(", ", TypeParameters.Select(p => p.Name + (p.TypeConstraint != null ? " As " + p.TypeConstraint.VBCode : ""))));
+                code.Append(')');
+            }
+
+            if (BaseType != null && BaseType.CSharpCode != "object")
+            {
+                code.Append("\n    Inherits ");
+                code.Append(BaseType.VBCode);
+            }
+
+            if (ImplementedInterfaces != null && ImplementedInterfaces.Count > 0)
+            {
+                code.Append("\n    Implements ");
+                code.Append(String.Join(", ", ImplementedInterfaces.Select(i => i.VBCode)));
+            }
+
+            if ((BaseType != null && BaseType.CSharpCode != "object") || ImplementedInterfaces != null && ImplementedInterfaces.Count > 0)
+            {
+                code.Append("\nEnd Class");
+            }
+
+            return code.ToString();
+        }
+    }
+
     public string CSharpCode
     {
         get

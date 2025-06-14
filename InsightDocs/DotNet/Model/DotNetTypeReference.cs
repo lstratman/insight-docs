@@ -25,6 +25,11 @@ public class DotNetTypeReference
         { "System.UIntPtr", "nuint" }
     };
 
+    protected static Dictionary<string, string> VBTypeNames = new()
+    {
+        { "System.Int32", "Integer" }
+    };
+
     public DotNetType? Type
     {
         get;
@@ -141,6 +146,33 @@ public class DotNetTypeReference
             }
 
             return output.ToString();
+        }
+    }
+
+    public string VBCode
+    {
+        get
+        {
+            if (!VBTypeNames.TryGetValue(Namespace?.FullName + "." + Name, out string? name))
+            {
+                name = Name;
+            }
+
+            StringBuilder code = new StringBuilder(name);
+
+            if (GenericArguments != null && GenericArguments.Count > 0)
+            {
+                code.Append("(Of ");
+                code.Append(String.Join(", ", GenericArguments.Select(a => a.VBCode)));
+                code.Append(')');
+            }
+
+            if (IsArray)
+            {
+                code.Append("()");
+            }
+
+            return code.ToString();
         }
     }
 

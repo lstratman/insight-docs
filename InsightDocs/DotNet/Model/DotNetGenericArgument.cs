@@ -61,4 +61,20 @@ public class DotNetGenericArgument
             }
         }
     }
+
+    public string VBCode
+    {
+        get
+        {
+            if (Type != null)
+            {
+                return Type.VBCode;
+            }
+
+            else
+            {
+                return TypeParameterName!;
+            }
+        }
+    }
 }

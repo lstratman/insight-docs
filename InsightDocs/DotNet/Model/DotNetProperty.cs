@@ -159,6 +159,79 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
         set;
     }
 
+    public string VBCode
+    {
+        get
+        {
+            StringBuilder code = new StringBuilder();
+            DotNetMethodOverload method = GetMethod ?? SetMethod!;
+
+            if (method.AccessType == DotNetMemberInfoAccessType.Public)
+            {
+                code.Append("Public ");
+            }
+
+            else if (method.AccessType == DotNetMemberInfoAccessType.Protected)
+            {
+                code.Append("Protected ");
+            }
+
+            else if (method.AccessType == DotNetMemberInfoAccessType.Private)
+            {
+                code.Append("Private ");
+            }
+
+            if (method.IsInternal)
+            {
+                code.Append("Family ");
+            }
+
+            if (method.IsAbstract)
+            {
+                code.Append("MustOverride ");
+            }
+
+            if (method.IsStatic)
+            {
+                code.Append("Shared ");
+            }
+
+            if (GetMethod != null && SetMethod == null)
+            {
+                code.Append("ReadOnly ");
+            }
+
+            if (SetMethod != null && GetMethod == null)
+            {
+                code.Append("WriteOnly ");
+            }
+
+            code.Append("Property ");
+
+            if (IsIndexer)
+            {
+                code.Append("Item(");
+
+                if (IndexParameters != null && IndexParameters.Count > 0)
+                {
+                    code.Append(String.Join(", ", IndexParameters.Select(p => p.Name + " As " + p.Type.VBCode)));
+                }
+
+                code.Append(')');
+            }
+
+            else
+            {
+                code.Append(Name);
+            }
+
+            code.Append(" As ");
+            code.Append(PropertyType.VBCode);
+
+            return code.ToString();
+        }
+    }
+
     public string CSharpCode
     {
         get
