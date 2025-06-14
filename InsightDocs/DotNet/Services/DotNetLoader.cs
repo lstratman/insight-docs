@@ -13,6 +13,8 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
     protected readonly Dictionary<string, DotNetAssembly> AssemblyCache = [];
     protected readonly Dictionary<string, DotNetNamespace> NamespaceCache = [];
 
+    protected Func<Type, bool>? _typeFilter = null;
+
     [LoggerMessage(LogLevel.Information, "Loading {assemblyPath}")]
     public static partial void LogAssemblyLoad(ILogger logger, string assemblyPath);
 
@@ -24,6 +26,11 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
     [LoggerMessage(LogLevel.Debug, "Loading type {type}")]
     public static partial void LogLoadingType(ILogger logger, string type);
+
+    protected bool IsTypeExternal(Type type)
+    {
+        return _typeFilter! != null && !_typeFilter(type);
+    }
 
     private static string GetTypeCacheKey(Type type)
     {
@@ -127,7 +134,6 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 LogLoadingType(logger, type.FullName!);
 
                 DotNetType typeMetadata = LoadType(type, index);
-                typeMetadata.IsExternal = false;
 
                 if (typeMetadata.Namespace != null && !namespaces.ContainsKey(typeMetadata.Namespace.FullName))
                 {
@@ -253,7 +259,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 IsSealed = type.IsSealed && !type.IsAbstract,
                 IsAbstract = type.IsAbstract && !type.IsInterface && !type.IsSealed,
                 IsInternal = type.IsNestedAssembly,
-                IsExternal = true,
+                IsExternal = IsTypeExternal(type),
                 TypeName = typeName,
                 DisplayName = typeParameters != null && typeParameters.Length > 0 ? name + "<" + String.Join(", ", typeParameters.Select(a => a.Name)) + ">" : name,
                 Index = index

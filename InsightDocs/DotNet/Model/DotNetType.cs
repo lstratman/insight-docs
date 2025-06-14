@@ -246,7 +246,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
             if ((BaseType != null && BaseType.CSharpCode != "object") || ImplementedInterfaces != null && ImplementedInterfaces.Count > 0)
             {
-                code.Append("\nEnd Class");
+                code.Append("\nEnd " + TypeName);
             }
 
             return code.ToString();
