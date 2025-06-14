@@ -3,14 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class HtmlFilePublisher(HtmlFilePublisherOptions options) : IPublisher
+public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublisher
 {
     protected HashSet<string> PublishedUrls 
     { 
         get; 
     } = new HashSet<string>();
 
-    protected HtmlFilePublisherOptions Options
+    protected StaticFilesPublisherOptions Options
     {
         get;
         set;
@@ -60,7 +60,7 @@ public class HtmlFilePublisher(HtmlFilePublisherOptions options) : IPublisher
     }
 }
 
-public class HtmlFilePublisherOptions(string outputDirectory)
+public class StaticFilesPublisherOptions(string outputDirectory)
 {
     public string OutputDirectory
     {
@@ -75,12 +75,12 @@ public class HtmlFilePublisherOptions(string outputDirectory)
     }
 }
 
-public static class HtmlFilePublisherExtensions
+public static class StaticFilesPublisherExtensions
 {
-    public static InsightDocsBuilder PublishToHtmlFiles(this InsightDocsBuilder builder, HtmlFilePublisherOptions options)
+    public static InsightDocsBuilder PublishToStaticFiles(this InsightDocsBuilder builder, StaticFilesPublisherOptions options)
     {
-        builder.Services.AddSingleton<IPublisher, HtmlFilePublisher>((provider) => {
-            return new HtmlFilePublisher(options);
+        builder.Services.AddSingleton<IPublisher, StaticFilesPublisher>((provider) => {
+            return new StaticFilesPublisher(options);
         });
 
         return builder;
