@@ -1,0 +1,39 @@
+<div class="heading-wrapper" data-heading-level="h@(Level)">
+    <a class="anchor-link docon docon-link" href="#@(LinkId)"></a>
+    @Raw("<h" + Level + " class=\"heading-anchor" + AdditionalCssClasses + "\" id=\"" + LinkId + "\">" + Title + "</h" + Level + ">")
+</div>
+
+@code {
+    public RenderFragment Raw(string html) => __builder =>
+    {
+        __builder.AddMarkupContent(0, html);
+    };
+
+    [Parameter]
+    public int Level
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public string? Title
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public string? LinkId
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public string AdditionalCssClasses
+    {
+        get;
+        set;
+    } = "";
+}

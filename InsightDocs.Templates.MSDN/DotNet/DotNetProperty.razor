@@ -78,10 +78,7 @@
                                 <CodeBlock LanguageId="csharp" LanguageLabel="C#" Code="@Item.CSharpCode"/>
                                 <CodeBlock LanguageId="vb" LanguageLabel="VB" Code="@Item.VBCode"/>
 
-                                <div class="heading-wrapper" data-heading-level="h4">
-                                    <a class="anchor-link docon docon-link" href="#property-value"></a>
-                                    <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>
-                                </div>
+                                <SectionHeader Level="4" LinkId="property-value" Title="Property Value" AdditionalCssClasses="propertyInfoTitle stack"/>
 
                                 <div class="propertyInfo">@GetLink(Item.PropertyType)</div>
 
@@ -92,10 +89,7 @@
 
                                 @if (Item.Examples != null)
                                 {
-                                    <div class="heading-wrapper" data-heading-level="h2">
-                                        <a class="anchor-link docon docon-link" href="#examples"></a>
-                                        <h2 id="examples" class="heading-anchor">Examples</h2>
-                                    </div>
+                                    <SectionHeader Level="2" LinkId="examples" Title="Examples"/>
 
                                     @foreach (Tuple<string, InsightDocs.DotNet.Model.XmlDocHtml> example in Item.Examples)
                                     {
@@ -124,20 +118,13 @@
 
                                 @if (Item.Remarks != null)
                                 {
-                                    <div class="heading-wrapper" data-heading-level="h2">
-                                        <a class="anchor-link docon docon-link" href="#remarks"></a>
-                                        <h2 id="remarks" class="heading-anchor">Remarks</h2>
-                                    </div>
-
+                                    <SectionHeader Level="2" LinkId="remarks" Title="Remarks"/>
                                     @Raw(Item.Remarks.ToHtml(), "p")
                                 }
 
                                 @if (Item.SeeAlso != null)
                                 {
-                                    <div class="heading-wrapper" data-heading-level="h2">
-                                        <a class="anchor-link docon docon-link" href="#see-also"></a>
-                                        <h2 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h2>
-                                    </div>
+                                    <SectionHeader Level="2" LinkId="see-also" Title="See Also"/>
 
                                     <ul>
                                         @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in Item.SeeAlso)

@@ -214,20 +214,13 @@
 
                             @if (Item.Remarks != null)
                             {
-                                <div class="heading-wrapper" data-heading-level="h2">
-                                    <a class="anchor-link docon docon-link" href="#remarks"></a>
-                                    <h2 id="remarks" class="heading-anchor">Remarks</h2>
-                                </div>
-
+                                <SectionHeader Level="2" LinkId="remarks" Title="Remarks"/>
                                 @Raw(Item.Remarks.ToHtml(), "p")
                             }
 
                             @if (Item.SeeAlso != null)
                             {
-                                <div class="heading-wrapper" data-heading-level="h2">
-                                    <a class="anchor-link docon docon-link" href="#see-also"></a>
-                                    <h2 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h2>
-                                </div>
+                                <SectionHeader Level="2" LinkId="see-also" Title="See Also"/>
 
                                 <ul>
                                     @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in Item.SeeAlso)
