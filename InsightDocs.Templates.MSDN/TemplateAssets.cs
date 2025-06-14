@@ -34,6 +34,11 @@ public class TemplateAssets
         get;
     } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "js/site-index.js");
 
+    public static IAsset DotNetScript
+    {
+        get;
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "js/dotnet.js");
+
     public static IAsset SiteIndexCss
     {
         get;

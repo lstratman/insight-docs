@@ -1,3 +1,4 @@
+@using InsightDocs.Templates.MSDN.Components
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetType>
 
 <html>
@@ -7,6 +8,7 @@
         @AddAdditionalCss()
 
         <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.DotNetScript)"></script>
         <script type="text/javascript">hljs.highlightAll();</script>
     </head>
     <body>
@@ -29,6 +31,7 @@
 				                    </ol>
 			                    </nav>
                             </bread-crumbs>
+                            <LanguageDropdown/>
 			            </div>
 		            </div>
 

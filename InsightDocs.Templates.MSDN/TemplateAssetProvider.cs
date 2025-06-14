@@ -14,6 +14,7 @@ public class TemplateAssetProvider : IAssetProvider
             TemplateAssets.SegoeUIRomanVfFont,
             TemplateAssets.HighlightJsScript,
             TemplateAssets.SiteIndexScript,
+            TemplateAssets.DotNetScript,
             TemplateAssets.SiteIndexCss
         ];
     }

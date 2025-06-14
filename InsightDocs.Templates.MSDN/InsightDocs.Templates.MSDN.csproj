@@ -18,8 +18,4 @@
     <ProjectReference Include="..\InsightDocs\InsightDocs.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Markdown\" />
-  </ItemGroup>
-
 </Project>
