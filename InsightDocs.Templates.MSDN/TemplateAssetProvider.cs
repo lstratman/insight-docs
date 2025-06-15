@@ -15,7 +15,8 @@ public class TemplateAssetProvider : IAssetProvider
             TemplateAssets.HighlightJsScript,
             TemplateAssets.SiteIndexScript,
             TemplateAssets.DotNetScript,
-            TemplateAssets.SiteIndexCss
+            TemplateAssets.SiteIndexCss,
+            TemplateAssets.CommonScript
         ];
     }
 }
