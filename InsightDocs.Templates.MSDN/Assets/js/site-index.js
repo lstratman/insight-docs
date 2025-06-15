@@ -209,3 +209,7 @@
         topicContent.src = document.location.hash.substr(1).replace('%23', '#');
     }
 }
+
+function printTopic() {
+    document.getElementById('topicContentIFrame').contentWindow.print();
+}

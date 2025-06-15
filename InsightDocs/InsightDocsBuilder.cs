@@ -9,11 +9,38 @@ using System.Text.Json.Serialization;
 
 namespace InsightDocs;
 
+public class InsightDocsOptions
+{
+    public bool AddSearch
+    {
+        get;
+        set;
+    } = true;
+}
+
 public class InsightDocsBuilder
 {
-    public static InsightDocsBuilder Create()
+    public static InsightDocsBuilder Create(Action<InsightDocsOptions>? optionsFactory = null)
     {
-        return new InsightDocsBuilder();
+        InsightDocsBuilder builder = new InsightDocsBuilder();
+
+        if (optionsFactory != null)
+        {
+            builder.Services.AddSingleton((serviceProvider) =>
+            {
+                InsightDocsOptions options = new();
+                optionsFactory(options);
+
+                return options;
+            });
+        }
+
+        else
+        {
+            builder.Services.AddSingleton(new InsightDocsOptions());
+        }
+
+        return builder;
     }
 
     private InsightDocsBuilder()
