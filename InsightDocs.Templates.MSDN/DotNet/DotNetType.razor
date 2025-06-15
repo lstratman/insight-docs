@@ -358,7 +358,7 @@
                                         </div>
                                     }
 
-                                    @if (Item.Methods != null && Item.Methods.Any())
+                                    @if (Item.Methods != null && Item.Methods.Any(m => m.Overloads != null && m.Overloads.Any()))
                                     {
                                         <h2 id="methods">Methods</h2>
 
