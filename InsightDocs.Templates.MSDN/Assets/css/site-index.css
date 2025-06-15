@@ -21,6 +21,8 @@ body {
     width: 400px;
     overflow: auto;
     padding: 10px;
+    min-width: 300px;
+    max-width: 800px;
 }
 
 #topicContent {
@@ -56,4 +58,26 @@ body {
 .tree-group {
     margin-left: 0 !important;
     padding-left: 1rem;
+}
+
+#navbarResizeBar {
+    cursor: ew-resize;
+    width: 7px;
+    border-left: 1px solid var(--theme-border);
+    position: relative;
+}
+
+#navbarResizeBar:hover {
+    background-color: var(--theme-primary-background);
+}
+
+#navbarResizeBar:after {
+    width: 1px;
+    display: inline-block;
+    content: "";
+    height: 25px;
+    background-color: #a19f9f;
+    position: absolute;
+    top: 49%;
+    left: 2px;
 }

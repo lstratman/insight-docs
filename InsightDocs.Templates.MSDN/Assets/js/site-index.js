@@ -213,3 +213,53 @@
 function printTopic() {
     document.getElementById('topicContentIFrame').contentWindow.print();
 }
+
+/**
+ * @param {MouseEvent} evt2
+ */
+function navbarStartResize(evt2) {
+    if (evt2.button === 0) {
+        let navbar = document.getElementById('navbar');
+        let topicContentIFrame = document.getElementById('topicContentIFrame');
+        let navbarStyle = window.getComputedStyle(navbar);
+        let minWidth = parseFloat(navbarStyle.minWidth || '0');
+        let maxWidth = parseFloat(navbarStyle.maxWidth || document.body.clientWidth.toString());
+        let currentWidth = parseFloat(navbarStyle.width);
+
+        let navbarResizerDrag =
+            /**
+             * @param {MouseEvent} evt
+             */
+            function (evt) {
+                currentWidth += evt.movementX;
+
+                if (currentWidth > maxWidth) {
+                    currentWidth = maxWidth;
+                }
+
+                if (currentWidth < minWidth) {
+                    currentWidth = minWidth;
+                }
+
+                navbar.style.width = currentWidth + 'px';
+            };
+
+        let navbarResizerMouseUp =
+            /**
+             * @param {MouseEvent} evt
+             */
+            function (evt) {
+                if (evt.button === 0) {
+                    document.removeEventListener('mouseup', navbarResizerMouseUp);
+                    document.removeEventListener('mousemove', navbarResizerDrag);
+                    topicContentIFrame.contentWindow.document.removeEventListener('mouseup', navbarResizerMouseUp);
+                    topicContentIFrame.contentWindow.document.removeEventListener('mousemove', navbarResizerDrag);
+                }
+            };
+
+        document.addEventListener('mousemove', navbarResizerDrag);
+        document.addEventListener('mouseup', navbarResizerMouseUp);
+        topicContentIFrame.contentWindow.document.addEventListener('mousemove', navbarResizerDrag);
+        topicContentIFrame.contentWindow.document.addEventListener('mouseup', navbarResizerMouseUp);
+    }
+}
