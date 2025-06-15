@@ -102,6 +102,8 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             Namespaces = []
         };
 
+        _typeFilter = typeFilter;
+
         foreach (string assemblyPath in assemblyPaths)
         {
             LogAssemblyLoad(logger, assemblyPath);
