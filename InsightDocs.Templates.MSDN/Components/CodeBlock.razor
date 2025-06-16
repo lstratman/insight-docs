@@ -1,6 +1,6 @@
 @Raw("<div class=\"codeHeader\"" + (LanguageId == "cs" ? "" : " hidden") + ">")
     <span class="language">@LanguageLabel</span>
-    <button type="button" class="action position-relative display-none-print">
+    <button type="button" class="action position-relative display-none-print" onclick="copyCodeBlock(event)">
         <span class="icon margin-right-xxs" aria-hidden="true">
             <span class="docon docon-edit-copy"></span>
         </span>
