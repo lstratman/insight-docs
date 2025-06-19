@@ -1,5 +1,6 @@
 @using System.Text.RegularExpressions
 @inherits InsightDocs.RazorTemplate<InsightDocs.Markdown.Model.MarkdownFile>
+@inject InsightDocs.Abstractions.ICodeLanguageService CodeLanguageService
 
 <html>
 <head>
@@ -7,6 +8,7 @@
 
     @AddAdditionalCss()
 
+    <script type="text/javascript" src="@GetUrl(TemplateAssets.CommonScript)"></script>
     <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
     <script type="text/javascript">hljs.highlightAll();</script>
 </head>
@@ -18,6 +20,7 @@
                     <div data-chunk-ids="0">
                         @{
                             string html = Item!.Html!.Replace("<table", "<table class=\"table\"").Replace("<code class=\"language-", "<code class=\"lang-");
+
                             html = Regex.Replace(html, @"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", (evaluator) =>
                             {
                                 string id = evaluator.Groups["id"].Value;
@@ -38,6 +41,28 @@
                             html = Regex.Replace(html, @"<a href=""(?<protocol>http\:|https\:)", evaluator =>
                             {
                                 return "<a target=\"_new\" href=\"" + evaluator.Groups["protocol"];
+                            });
+
+                            html = Regex.Replace(html, @"<pre><code class=""lang-(?<languageId>[^\""]+)", match =>
+                            {
+                                string languageId = match.Groups["languageId"].Value;
+                                string languageTitle = CodeLanguageService.GetTitle(languageId);
+
+                                return $@"<div class=""codeHeader"">
+    <span class=""language"">{languageTitle}</span>
+    <button type=""button"" class=""action position-relative display-none-print"" onclick=""copyCodeBlock(event)"">
+        <span class=""icon margin-right-xxs"" aria-hidden=""true"">
+            <span class=""docon docon-edit-copy""></span>
+        </span>
+        <span>Copy</span>
+        <div class=""successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent"" aria-hidden=""true"">
+            <span class=""icon font-size-lg"">
+                <span class=""docon docon-check-mark""></span>
+            </span>
+        </div>
+    </button>
+</div>
+<pre class=""wrap has-inner-focus""><code class=""lang-{languageId}";
                             });
                         }
 
