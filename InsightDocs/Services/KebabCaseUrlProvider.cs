@@ -441,7 +441,7 @@ public class KebabCaseUrlProviderOptions
     {
         get;
         set;
-    } = false;
+    } = true;
 }
 
 public static class KebabCaseUrlProviderExtensions
