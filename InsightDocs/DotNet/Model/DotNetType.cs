@@ -149,9 +149,8 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
 
             if (TypeParameters != null && TypeParameters.Count > 0)
             {
-                key.Append('{');
-                key.Append(String.Join(',', TypeParameters.Select(p => p.Name)));
-                key.Append('}');
+                key.Append('`');
+                key.Append(TypeParameters.Count);
             }
 
             return key.ToString();

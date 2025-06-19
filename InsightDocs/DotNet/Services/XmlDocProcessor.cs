@@ -336,7 +336,7 @@ public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOpt
         {
             if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Warn)
             {
-                LogWarnUnsupportedXmlDocNodeType(_logger, childNode.Name);
+                LogWarnUnsupportedXmlDocNode(_logger, childNode.Name);
             }
 
             else if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Error)
@@ -350,9 +350,25 @@ public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOpt
     {
         XmlDocEntry xmlDocEntry = new XmlDocEntry(memberNode.GetAttribute("name"));
 
-        foreach (XmlElement childNode in memberNode.ChildNodes)
+        foreach (XmlNode childNode in memberNode.ChildNodes)
         {
-            ProcessMemberNodeChild(xmlDocEntry, childNode);
+            if (childNode is XmlElement childElement)
+            {
+                ProcessMemberNodeChild(xmlDocEntry, childElement);
+            }
+
+            else
+            {
+                if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Warn)
+                {
+                    LogWarnUnsupportedXmlDocNodeType(_logger, childNode.NodeType.ToString("G"));
+                }
+
+                else if (dotNetOptions.UnsupportedXmlDocTagBehavior == ErrorBehavior.Error)
+                {
+                    throw new Exception("Unsupported XMLDoc node type: " + childNode.NodeType.ToString("G") + ".");
+                }
+            }
         }
 
         return xmlDocEntry;
