@@ -66,7 +66,7 @@ public class RazorDotNetTemplate<T> : RazorTemplate<T>
     public virtual RenderFragment GetLink(DotNetTypeReference item)
     {
         StringBuilder linkTagBuilder = new();
-        IUrlProvider<DotNetType> urlProvider = ServiceProvider!.GetService<IUrlProvider<DotNetType>>() ?? throw new Exception("No IUrlProvider service registered for DotNetType.");
+        IUrlProvider<DotNetType> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<DotNetType>>();
 
         BuildLinkTag(item, linkTagBuilder, urlProvider);
         string linkTag = linkTagBuilder.ToString();

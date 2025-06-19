@@ -82,10 +82,10 @@ public class InsightDocsBuilder
     {
         using (ServiceProvider serviceProvider = Services.BuildServiceProvider())
         {
-            IPublisher publisher = serviceProvider.GetService<IPublisher>() ?? throw new Exception("No IPublisher service was registered.");
-            IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetService<IUrlProvider<SiteToc>>() ?? throw new Exception("No IUrlProvider service was registered for SiteToc.");
-            IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetService<IUrlProvider<SiteIndex>>() ?? throw new Exception("No IUrlProvider service was registered for SiteIndex.");
-            IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<SiteIndex>>() ?? throw new Exception("No IItemTemplateProvider service was registered for SiteIndex.");
+            IPublisher publisher = serviceProvider.GetRequiredService<IPublisher>();
+            IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteToc>>();
+            IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteIndex>>();
+            IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetRequiredService<IItemTemplateProvider<SiteIndex>>();
             IEnumerable<IAssetProvider> assetProviders = serviceProvider.GetServices<IAssetProvider>();
             SiteIndex siteIndex = new();
 
@@ -101,7 +101,7 @@ public class InsightDocsBuilder
 
             if (assetProviders != null && assetProviders.Any())
             {
-                IUrlProvider<IAsset> assetUrlProvider = serviceProvider.GetService<IUrlProvider<IAsset>>() ?? throw new Exception("No IUrlProvider service was registered for IAsset.");
+                IUrlProvider<IAsset> assetUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<IAsset>>();
 
                 foreach (IAssetProvider assetProvider in assetProviders)
                 {

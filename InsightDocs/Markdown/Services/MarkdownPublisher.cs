@@ -27,9 +27,7 @@ public partial class MarkdownPublisher(
     public static partial void LogPublishingMarkdownFile(ILogger logger, string file);
 
     protected readonly static Regex ImageTagsRegex = new Regex(@"<img\s+(?<otherAttributes>[^>]*)src\s*=\s*[""'](?<url>[^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
     protected readonly static Regex HeaderTagsRegex = new Regex(@"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
     protected Dictionary<string, string> _imageUrls = new Dictionary<string, string>();
 
     public virtual async Task PublishTopics(TocItem tocRoot, List<string> markdownFilePaths)
@@ -43,12 +41,13 @@ public partial class MarkdownPublisher(
             LogPublishingMarkdownFile(logger, markdownFilePath);
 
             MarkdownFile markdownFile = markdownLoader.LoadMarkdownFile(markdownFilePath);
-            string url = markdownFileUrlProvider.GetUrl(markdownFile);
             IItemTemplateProvider<MarkdownFile>? markdownTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<MarkdownFile>>();
 
             markdownFile.Html = await markdownLoader.GetHtml(markdownFile);
-            TocItem markdownFileTocItem = tocRoot.AddTocItem(markdownFile.Title, url);
+            // TODO: get topic title from <h1> tag
 
+            string url = markdownFileUrlProvider.GetUrl(markdownFile);
+            TocItem markdownFileTocItem = tocRoot.AddTocItem(markdownFile.Title, url);
             string parentDirectory = Path.GetDirectoryName(markdownFilePath)!;
             Dictionary<string, MarkdownImage> markdownImagesToPublish = new Dictionary<string, MarkdownImage>();
 
@@ -70,7 +69,7 @@ public partial class MarkdownPublisher(
                 return $"<img src=\"{_imageUrls[imageFilePath]}\" {otherAttributes}";
             });
 
-            foreach (var markdownImage in markdownImagesToPublish)
+            foreach (KeyValuePair<string, MarkdownImage> markdownImage in markdownImagesToPublish)
             {
                 byte[] imageContent = await File.ReadAllBytesAsync(markdownImage.Value.FilePath);
                 await publisher.Publish(markdownImage.Key, imageContent);

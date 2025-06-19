@@ -85,7 +85,7 @@
                                 <div>
                                     @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
                                     {
-                                        string overloadUrl = ServiceProvider!.GetRequiredService<InsightDocs.Abstractions.IUrlProvider<InsightDocs.DotNet.Model.DotNetMethodOverload>>().GetUrl(overload);
+                                        string overloadUrl = ServiceProvider.GetRequiredService<InsightDocs.Abstractions.IUrlProvider<InsightDocs.DotNet.Model.DotNetMethodOverload>>().GetUrl(overload);
 
                                         <div class="heading-wrapper" data-heading-level="h3">
                                             @if (overloadUrl.IndexOf("#") != -1)

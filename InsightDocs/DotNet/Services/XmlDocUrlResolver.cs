@@ -83,7 +83,7 @@ public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILogger
             throw new Exception("XMLDoc target already registered for key: " + key + ".");
         }
 
-        IUrlProvider<T> urlProvider = serviceProvider.GetService<IUrlProvider<T>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(T) + ".");
+        IUrlProvider<T> urlProvider = serviceProvider.GetRequiredService<IUrlProvider<T>>();
         Urls[key] = urlProvider.GetUrl(target);
         LinkTexts[key] = target.LinkText;
     }

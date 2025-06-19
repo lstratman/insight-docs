@@ -7,8 +7,10 @@ namespace InsightDocs;
 
 public class RazorTemplate<T> : ComponentBase
 {
-    [Parameter]
-    public IServiceProvider? ServiceProvider
+    [Inject]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    public IServiceProvider ServiceProvider
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     {
         get;
         set;
@@ -23,13 +25,13 @@ public class RazorTemplate<T> : ComponentBase
 
     public virtual string GetUrl<TItem>(TItem item) where TItem : ILinkTarget
     {
-        IUrlProvider<TItem> urlProvider = ServiceProvider!.GetService<IUrlProvider<TItem>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(TItem).Name + ".");
+        IUrlProvider<TItem> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<TItem>>();
         return urlProvider.GetUrl(item);
     }
 
     public virtual RenderFragment GetLink<TItem>(TItem item) where TItem : ILinkTarget
     {
-        IUrlProvider<TItem> urlProvider = ServiceProvider!.GetService<IUrlProvider<TItem>>() ?? throw new Exception("No IUrlProvider service registered for " + typeof(TItem).Name + ".");
+        IUrlProvider<TItem> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<TItem>>();
         string url = urlProvider.GetUrl(item);
 
         return (builder) =>
@@ -61,7 +63,7 @@ public class RazorTemplate<T> : ComponentBase
 
     public virtual RenderFragment AddAdditionalCss()
     {
-        IEnumerable<IAdditionalCssProvider<T>> additionalCssProviders = ServiceProvider!.GetServices<IAdditionalCssProvider<T>>();
+        IEnumerable<IAdditionalCssProvider<T>> additionalCssProviders = ServiceProvider.GetServices<IAdditionalCssProvider<T>>();
         List<IAsset> additionalCssAssets = new List<IAsset>();
 
         if (additionalCssProviders != null && additionalCssProviders.Any())

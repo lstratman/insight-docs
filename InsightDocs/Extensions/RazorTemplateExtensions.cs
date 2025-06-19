@@ -20,8 +20,7 @@ public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvide
         {
             var dictionary = new Dictionary<string, object?>
             {
-                { "Item", item },
-                { "ServiceProvider", serviceProvider }
+                { "Item", item }
             };
 
             ParameterView parameters = ParameterView.FromDictionary(dictionary);
