@@ -5,13 +5,6 @@ using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace InsightDocs.DotNet;
 
-public enum ErrorBehavior
-{
-    Ignore,
-    Warn,
-    Error
-}
-
 public class DotNetOptions
 {
     public ErrorBehavior UnsupportedXmlDocTagBehavior
@@ -37,6 +30,8 @@ public class DotNetOptions
         get;
         set;
     } = true;
+
+    // TODO: add option to omit protected members for external types
 }
 
 public static class DotNetExtensions

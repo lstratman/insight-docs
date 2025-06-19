@@ -16,6 +16,12 @@ public class InsightDocsOptions
         get;
         set;
     } = true;
+
+    public ErrorBehavior UnknownCodeLanguageBehavior
+    {
+        get;
+        set;
+    } = ErrorBehavior.Error;
 }
 
 public class InsightDocsBuilder
@@ -47,6 +53,7 @@ public class InsightDocsBuilder
     {
         Services = new ServiceCollection();
         Services.AddScoped<IUrlPrefixProvider, UrlPrefixProvider>();
+        Services.AddSingleton<ICodeLanguageService, CodeLanguageService>();
     }
 
     public TocItem TocRoot
