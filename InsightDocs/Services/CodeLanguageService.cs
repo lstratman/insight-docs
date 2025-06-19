@@ -22,9 +22,14 @@ public partial class CodeLanguageService(InsightDocsOptions options, ILoggerFact
             return "Visual Basic";
         }
 
-        else if (languageId == "javascript" || languageId == "js" || languageId == "typescript" || languageId == "ts")
+        else if (languageId == "javascript" || languageId == "js")
         {
-            return "JavaScript/TypeScript";
+            return "JavaScript";
+        }
+
+        else if (languageId == "typescript" || languageId == "ts")
+        {
+            return "TypeScript";
         }
 
         else if (languageId == "xml")
