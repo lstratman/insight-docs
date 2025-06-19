@@ -190,11 +190,12 @@
             document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
         }
 
-        selectNavbarListItem(topicContent.contentDocument.location.pathname);
+        selectNavbarListItem(tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] ? topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash : topicContent.contentDocument.location.pathname);
 
         topicContent.contentWindow.addEventListener('hashchange', () => {
             if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23')) {
                 document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
+                selectNavbarListItem(tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] ? topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash : topicContent.contentDocument.location.pathname);
             }
         });
     });
