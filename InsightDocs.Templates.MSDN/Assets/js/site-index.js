@@ -69,7 +69,7 @@
         }
 
         else if (evt.target.tagName === 'A' && evt.target.classList.contains('tree-item')) {
-            target = evt.target.parentElement.parentElement;
+            target = evt.target.classList.contains('is-leaf') ? evt.target.parentElement : evt.target.parentElement.parentElement;
         }
 
         else if (evt.target.classList.contains('tree-expander') || evt.target.classList.contains('tree-item')) {
@@ -99,7 +99,7 @@
             target.classList.remove('is-collapsed');
         }
 
-        else {
+        else if (evt.target.classList.contains('tree-expander-indicator')) {
             target.classList.remove('is-expanded');
             target.classList.add('is-collapsed');
         }
