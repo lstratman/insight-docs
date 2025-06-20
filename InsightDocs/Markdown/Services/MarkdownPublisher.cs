@@ -14,7 +14,8 @@ public partial class MarkdownPublisher(
     IUrlProvider<MarkdownImage> markdownImageUrlProvider,
     IMarkdownLoader markdownLoader,
     IPublisher publisher,
-    IServiceProvider serviceProvider
+    IServiceProvider serviceProvider,
+    MarkdownOptions markdownOptions
 ) : IMarkdownPublisher
 {
     [LoggerMessage(LogLevel.Information, "Publishing topics")]
@@ -28,6 +29,7 @@ public partial class MarkdownPublisher(
 
     protected readonly static Regex ImageTagsRegex = new Regex(@"<img\s+(?<otherAttributes>[^>]*)src\s*=\s*[""'](?<url>[^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     protected readonly static Regex HeaderTagsRegex = new Regex(@"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    protected readonly static Regex HeaderTitleRegex = new Regex(@"<h1(?<otherAttributes>[^>]*)>(?<title>.*?)</h1>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     protected Dictionary<string, string> _imageUrls = new Dictionary<string, string>();
 
     public virtual async Task PublishTopics(TocItem tocRoot, List<string> markdownFilePaths)
@@ -44,7 +46,16 @@ public partial class MarkdownPublisher(
             IItemTemplateProvider<MarkdownFile>? markdownTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<MarkdownFile>>();
 
             markdownFile.Html = await markdownLoader.GetHtml(markdownFile);
-            // TODO: get topic title from <h1> tag
+
+            if (markdownOptions.GetTitleFromHtml)
+            {
+                Match headerTitleMatch = HeaderTitleRegex.Match(markdownFile.Html);
+
+                if (headerTitleMatch.Success)
+                {
+                    markdownFile.Title = headerTitleMatch.Groups["title"].Value;
+                }
+            }
 
             string url = markdownFileUrlProvider.GetUrl(markdownFile);
             TocItem markdownFileTocItem = tocRoot.AddTocItem(markdownFile.Title, url);

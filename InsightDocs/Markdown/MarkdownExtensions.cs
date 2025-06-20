@@ -1,16 +1,42 @@
-﻿using InsightDocs.Markdown.Abstractions;
+﻿using InsightDocs.DotNet;
+using InsightDocs.Markdown.Abstractions;
 using InsightDocs.Markdown.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace InsightDocs.Markdown;
 
+public class MarkdownOptions
+{
+    public bool GetTitleFromHtml
+    {
+        get;
+        set;
+    } = true;
+}
+
 public static class MarkdownExtensions
 {
-    public static InsightDocsBuilder UseMarkdown(this InsightDocsBuilder builder)
+    public static InsightDocsBuilder UseMarkdown(this InsightDocsBuilder builder, Action<MarkdownOptions>? optionsFactory = null)
     {
         builder.Services.AddScoped<IMarkdownLoader, MarkdownLoader>();
         builder.Services.AddScoped<IMarkdownPublisher, MarkdownPublisher>();
+
+        if (optionsFactory != null)
+        {
+            builder.Services.AddSingleton((serviceProvider) =>
+            {
+                MarkdownOptions options = new();
+                optionsFactory(options);
+
+                return options;
+            });
+        }
+
+        else
+        {
+            builder.Services.AddSingleton(new MarkdownOptions());
+        }
 
         return builder;
     }
