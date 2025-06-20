@@ -87,4 +87,31 @@ public class RazorTemplate<T> : ComponentBase
             builder.AddMarkupContent(0, cssLinks.ToString());
         };
     }
+
+    public virtual RenderFragment AddAdditionalJavaScript()
+    {
+        IEnumerable<IAdditionalJavaScriptProvider<T>> additionalJavaScriptProviders = ServiceProvider.GetServices<IAdditionalJavaScriptProvider<T>>();
+        List<IAsset> additionalJavaScriptAssets = new List<IAsset>();
+
+        if (additionalJavaScriptProviders != null && additionalJavaScriptProviders.Any())
+        {
+            foreach (IAdditionalJavaScriptProvider<T> additionalCssProvider in additionalJavaScriptProviders)
+            {
+                additionalJavaScriptAssets.AddRange(additionalCssProvider.GetAdditionalJavaScriptAssets(Item!));
+            }
+        }
+
+        return (builder) =>
+        {
+            StringBuilder jsLinks = new StringBuilder();
+
+            foreach (IAsset asset in additionalJavaScriptAssets)
+            {
+                string url = GetUrl(asset);
+                jsLinks.AppendLine($@"<script type=""text/javascript"" src=""{url}""></script>");
+            }
+
+            builder.AddMarkupContent(0, jsLinks.ToString());
+        };
+    }
 }

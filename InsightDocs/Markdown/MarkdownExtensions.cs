@@ -45,7 +45,7 @@ public static class MarkdownExtensions
 
 public static class MarkdownTocItemExtensions
 {
-    public static TocItem IncludeMarkdownFile(this TocItem parentTocItem, string markdownFilePath, string title = null)
+    public static TocItem IncludeMarkdownFile(this TocItem parentTocItem, string markdownFilePath, string? title = null)
     {
         TocItem tocItem = parentTocItem.AddTocItem("");
 

@@ -10,7 +10,7 @@ public partial class CodeLanguageService(InsightDocsOptions options, ILoggerFact
     [LoggerMessage(LogLevel.Warning, "Unknown code language: {languageId}")]
     public static partial void LogUnknownCodeLanguage(ILogger logger, string languageId);
 
-    public string GetTitle(string languageId)
+    public virtual string GetTitle(string languageId)
     {
         if (languageId == "csharp" || languageId == "cs" || languageId == "c#")
         {
@@ -32,44 +32,9 @@ public partial class CodeLanguageService(InsightDocsOptions options, ILoggerFact
             return "TypeScript";
         }
 
-        else if (languageId == "xml")
-        {
-            return "XML";
-        }
-
-        else if (languageId == "html")
-        {
-            return "HTML";
-        }
-
         else if (languageId == "json")
         {
             return "JSON";
-        }
-
-        else if (languageId == "ini")
-        {
-            return "Configuration";
-        }
-
-        else if (languageId == "terminal")
-        {
-            return "Terminal";
-        }
-
-        else if (languageId == "sql")
-        {
-            return "SQL";
-        }
-
-        else if (languageId == "yml")
-        {
-            return "YAML";
-        }
-
-        else if (languageId == "dockerfile" || languageId == "docker")
-        {
-            return "Docker";
         }
 
         else
