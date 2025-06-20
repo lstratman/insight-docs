@@ -21,7 +21,7 @@ public class RazorDotNetTemplate<T> : RazorTemplate<T>
 
             else
             {
-                linkTagBuilder.Append($@"<a href=""{url}""{(url.StartsWith("https://") || url.StartsWith("http://") ? " target=\"_blank\"" : "")}>{typeReference.Type.Name}</a>");
+                linkTagBuilder.Append($@"<a href=""{url}""{(url.StartsWith("https://") || url.StartsWith("http://") ? " target=\"_blank\"" : "")}>{typeReference.Type.Name}{(typeReference.IsArray ? "[]" : "")}</a>");
             }
 
             if (typeReference.GenericArguments != null && typeReference.GenericArguments.Count > 0)
