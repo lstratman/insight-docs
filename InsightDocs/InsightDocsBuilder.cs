@@ -2,7 +2,6 @@
 using InsightDocs.Services;
 using InsightDocs.Site.Model;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -16,6 +15,18 @@ public class InsightDocsOptions
         get;
         set;
     } = true;
+
+    public bool EnableParallelism
+    {
+        get;
+        set;
+    } = true;
+
+    public int MaxDegreeOfParallelism
+    {
+        get;
+        set;
+    } = Environment.ProcessorCount;
 
     public ErrorBehavior UnknownCodeLanguageBehavior
     {

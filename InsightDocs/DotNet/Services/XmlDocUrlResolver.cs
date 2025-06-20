@@ -2,13 +2,14 @@ using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 
 namespace InsightDocs.DotNet.Services;
 
 public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, DotNetOptions dotNetOptions) : IXmlDocUrlResolver
 {
-    protected readonly Dictionary<string, string> Urls = [];
-    protected readonly Dictionary<string, string> LinkTexts = [];
+    protected readonly ConcurrentDictionary<string, string> Urls = [];
+    protected readonly ConcurrentDictionary<string, string> LinkTexts = [];
     protected ILogger logger = loggerFactory.CreateLogger<XmlDocUrlResolver>();
 
     [LoggerMessage(LogLevel.Warning, "No XMLDoc target registered for key: {key}")]

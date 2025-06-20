@@ -22,7 +22,8 @@ public partial class DotNetPublisher(
     IUrlProvider<DotNetProperty> dotNetPropertyUrlProvider,
     IUrlProvider<DotNetField> dotNetFieldUrlProvider,
     IUrlProvider<DotNetIndexer> dotNetIndexerUrlProvider,
-    IPublisher publisher) : IDotNetPublisher
+    IPublisher publisher,
+    InsightDocsOptions insightDocsOptions) : IDotNetPublisher
 {
     [LoggerMessage(LogLevel.Information, "Publishing topics")]
     public static partial void LogPublishingTopics(ILogger logger);
@@ -50,99 +51,124 @@ public partial class DotNetPublisher(
 
         await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData), html);
 
-        foreach (DotNetNamespace ns in indexData.Namespaces.OrderBy(n => n.FullName))
+        if (insightDocsOptions.EnableParallelism)
         {
-            LogPublishingNamespace(logger, ns.FullName);
+            List<TocItem> tocItems = new List<TocItem>();
 
-            string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns);
-            TocItem namespaceTocItem = tocRoot.AddTocItem(ns.FullName, namespaceUrl);
-
-            html = await dotNetNamespaceTemplate.GetContent(ns);
-            await publisher.Publish(namespaceUrl, html);
-
-            foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
+            await Parallel.ForEachAsync(indexData.Namespaces, new ParallelOptions { MaxDegreeOfParallelism = insightDocsOptions.MaxDegreeOfParallelism }, async (ns, cancellationToken) =>
             {
-                LogPublishingType(logger, type.FullName);
+                TocItem tocItem = await ProcessNamespace(logger, ns, tocRoot);
+                tocItems.Add(tocItem);
+            });
 
-                string typeUrl = dotNetTypeUrlProvider.GetUrl(type);
-                TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
+            tocItems.Sort((a, b) => String.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase));
+            tocRoot.Children.AddRange(tocItems);
+        }
 
-                html = await dotNetTypeTemplate.GetContent(type);
-                await publisher.Publish(typeUrl, html);
-
-                if (type.TypeName != "Enum")
-                {
-                    if (type.Constructor != null && type.Constructor.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
-                    {
-                        string constructorUrl = dotNetMethodUrlProvider.GetUrl(type.Constructor);
-                        typeTocItem.AddTocItem("Constructors", constructorUrl);
-
-                        html = await dotNetMethodTemplate.GetContent(type.Constructor);
-                        await publisher.Publish(constructorUrl, html);
-                    }
-
-                    if (type.Indexer != null && type.Indexer.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
-                    {
-                        string indexerUrl = dotNetIndexerUrlProvider.GetUrl(type.Indexer);
-                        typeTocItem.AddTocItem("Indexer", indexerUrl);
-
-                        html = await dotNetIndexerTemplate.GetContent(type.Indexer);
-                        await publisher.Publish(indexerUrl, html);
-                    }
-
-                    if (type.Methods != null)
-                    {
-                        TocItem? methodsTocItem = null;
-
-                        foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)).OrderBy(m => m.Name))
-                        {
-                            methodsTocItem ??= typeTocItem.AddTocItem("Methods");
-
-                            string methodUrl = dotNetMethodUrlProvider.GetUrl(method);
-                            methodsTocItem.AddTocItem(method.Name, methodUrl);
-
-                            html = await dotNetMethodTemplate.GetContent(method);
-                            await publisher.Publish(methodUrl, html);
-                        }
-                    }
-
-                    if (type.Properties != null)
-                    {
-                        TocItem? propertiesTocItem = null;
-
-                        foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type).OrderBy(p => p.Name))
-                        {
-                            propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
-
-                            string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property);
-                            propertiesTocItem.AddTocItem(property.Name, propertyUrl);
-
-                            html = await dotNetPropertyTemplate.GetContent(property);
-                            await publisher.Publish(propertyUrl, html);
-                        }
-                    }
-
-                    if (type.Fields != null)
-                    {
-                        TocItem? fieldsTocItem = null;
-
-                        foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type).OrderBy(f => f.Name))
-                        {
-                            fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
-
-                            string fieldUrl = dotNetFieldUrlProvider.GetUrl(field);
-                            fieldsTocItem.AddTocItem(field.Name, fieldUrl);
-
-                            html = await dotNetFieldTemplate.GetContent(field);
-                            await publisher.Publish(fieldUrl, html);
-                        }
-                    }
-                }
+        else
+        {
+            foreach (DotNetNamespace ns in indexData.Namespaces.OrderBy(n => n.FullName))
+            {
+                TocItem tocItem = await ProcessNamespace(logger, ns, tocRoot);
+                tocRoot.Children.Add(tocItem);
             }
-
-            LogFinishedPublishingNamespace(logger, ns.FullName);
         }
 
         LogFinishedPublishingTopics(logger);
+    }
+
+    public virtual async Task<TocItem> ProcessNamespace(ILogger logger, DotNetNamespace ns, TocItem tocRoot)
+    {
+        LogPublishingNamespace(logger, ns.FullName);
+
+        string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns);
+        TocItem namespaceTocItem = new TocItem(ns.FullName, tocRoot, namespaceUrl);
+
+        byte[] html = await dotNetNamespaceTemplate.GetContent(ns);
+        await publisher.Publish(namespaceUrl, html);
+
+        foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
+        {
+            LogPublishingType(logger, type.FullName);
+
+            string typeUrl = dotNetTypeUrlProvider.GetUrl(type);
+            TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
+
+            html = await dotNetTypeTemplate.GetContent(type);
+            await publisher.Publish(typeUrl, html);
+
+            if (type.TypeName != "Enum")
+            {
+                if (type.Constructor != null && type.Constructor.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
+                {
+                    string constructorUrl = dotNetMethodUrlProvider.GetUrl(type.Constructor);
+                    typeTocItem.AddTocItem("Constructors", constructorUrl);
+
+                    html = await dotNetMethodTemplate.GetContent(type.Constructor);
+                    await publisher.Publish(constructorUrl, html);
+                }
+
+                if (type.Indexer != null && type.Indexer.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
+                {
+                    string indexerUrl = dotNetIndexerUrlProvider.GetUrl(type.Indexer);
+                    typeTocItem.AddTocItem("Indexer", indexerUrl);
+
+                    html = await dotNetIndexerTemplate.GetContent(type.Indexer);
+                    await publisher.Publish(indexerUrl, html);
+                }
+
+                if (type.Methods != null)
+                {
+                    TocItem? methodsTocItem = null;
+
+                    foreach (DotNetMethod method in type.Methods.Where(m => m.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type == type)).OrderBy(m => m.Name))
+                    {
+                        methodsTocItem ??= typeTocItem.AddTocItem("Methods");
+
+                        string methodUrl = dotNetMethodUrlProvider.GetUrl(method);
+                        methodsTocItem.AddTocItem(method.Name, methodUrl);
+
+                        html = await dotNetMethodTemplate.GetContent(method);
+                        await publisher.Publish(methodUrl, html);
+                    }
+                }
+
+                if (type.Properties != null)
+                {
+                    TocItem? propertiesTocItem = null;
+
+                    foreach (DotNetProperty property in type.Properties.Where(m => m.DeclaringType != null && m.DeclaringType.Type == type).OrderBy(p => p.Name))
+                    {
+                        propertiesTocItem ??= typeTocItem.AddTocItem("Properties");
+
+                        string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property);
+                        propertiesTocItem.AddTocItem(property.Name, propertyUrl);
+
+                        html = await dotNetPropertyTemplate.GetContent(property);
+                        await publisher.Publish(propertyUrl, html);
+                    }
+                }
+
+                if (type.Fields != null)
+                {
+                    TocItem? fieldsTocItem = null;
+
+                    foreach (DotNetField field in type.Fields.Where(f => f.DeclaringType != null && f.DeclaringType.Type == type).OrderBy(f => f.Name))
+                    {
+                        fieldsTocItem ??= typeTocItem.AddTocItem("Fields");
+
+                        string fieldUrl = dotNetFieldUrlProvider.GetUrl(field);
+                        fieldsTocItem.AddTocItem(field.Name, fieldUrl);
+
+                        html = await dotNetFieldTemplate.GetContent(field);
+                        await publisher.Publish(fieldUrl, html);
+                    }
+                }
+            }
+        }
+
+        LogFinishedPublishingNamespace(logger, ns.FullName);
+
+        return namespaceTocItem;
     }
 }

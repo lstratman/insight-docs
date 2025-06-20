@@ -1,14 +1,15 @@
 using InsightDocs.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 
 namespace InsightDocs.Services;
 
 public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublisher
 {
-    protected HashSet<string> PublishedUrls 
+    protected ConcurrentDictionary<string, bool> PublishedUrls 
     { 
         get; 
-    } = new HashSet<string>();
+    } = new ConcurrentDictionary<string, bool>();
 
     protected StaticFilesPublisherOptions Options
     {
@@ -42,12 +43,12 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
 
     public async Task Publish(string url, byte[] contents)
     {
-        if (PublishedUrls.Contains(url))
+        if (PublishedUrls.ContainsKey(url))
         {
             throw new Exception($"The URL {url} has already been published. Each URL must be unique.");
         }
 
-        PublishedUrls.Add(url);
+        PublishedUrls.AddOrUpdate(url, true, (key, oldValue) => true);
 
         string outputPath = Path.Combine(Options.OutputDirectory, url.StartsWith('/') ? url[1..] : url);
 
