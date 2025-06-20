@@ -112,7 +112,7 @@
             return;
         }
 
-        if (!tocItemLookup[tocItemIndex.toString()]) {
+        if (!tocItemLookup[tocItemIndex.toString()] || (tocItemLookup[tocItemIndex.toString()].lastElementChild.tagName !== 'UL' && tocData.Items[tocItemIndex].c)) {
             let tocItem = tocData.Items[tocItemIndex];
 
             if (!tocItem) {
@@ -151,6 +151,14 @@
                     currentContainer.classList.add('is-expanded');
                     currentContainer.classList.remove('is-collapsed');
                 }
+            }
+
+            else if (i === 1 && tocItemHierarchy.length === 1 && tocItemLookup[tocItemIndex.toString()].lastElementChild.tagName !== 'UL' && tocData.Items[tocItemIndex].c) {
+                let childList = document.createElement('ul');
+                childList.classList.add('tree-group');
+
+                tocItemLookup[tocItemIndex.toString()].appendChild(childList);
+                addTocItemChildren(tocData.Items[tocItemIndex].c, childList);
             }
         }
 
