@@ -32,6 +32,12 @@ public partial class MarkdownPublisher(
     protected readonly static Regex HeaderTitleRegex = new Regex(@"<h1(?<otherAttributes>[^>]*)>(?<title>.*?)</h1>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     protected Dictionary<string, string> _imageUrls = new Dictionary<string, string>();
 
+    public virtual async Task PublishTopic(TocItem tocItem, string markdownFilePath)
+    {
+        ILogger logger = loggerFactory.CreateLogger<MarkdownPublisher>();
+        await ProcessTopic(null, tocItem, markdownFilePath, logger);
+    }
+
     public virtual async Task PublishTopics(TocItem tocRoot, List<string> markdownFilePaths)
     {
         ILogger logger = loggerFactory.CreateLogger<MarkdownPublisher>();
@@ -40,85 +46,106 @@ public partial class MarkdownPublisher(
 
         foreach (string markdownFilePath in markdownFilePaths)
         {
-            LogPublishingMarkdownFile(logger, markdownFilePath);
-
-            MarkdownFile markdownFile = markdownLoader.LoadMarkdownFile(markdownFilePath);
-            IItemTemplateProvider<MarkdownFile>? markdownTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<MarkdownFile>>();
-
-            markdownFile.Html = await markdownLoader.GetHtml(markdownFile);
-
-            if (markdownOptions.GetTitleFromHtml)
-            {
-                Match headerTitleMatch = HeaderTitleRegex.Match(markdownFile.Html);
-
-                if (headerTitleMatch.Success)
-                {
-                    markdownFile.Title = headerTitleMatch.Groups["title"].Value;
-                }
-            }
-
-            string url = markdownFileUrlProvider.GetUrl(markdownFile);
-            TocItem markdownFileTocItem = tocRoot.AddTocItem(markdownFile.Title, url);
-            string parentDirectory = Path.GetDirectoryName(markdownFilePath)!;
-            Dictionary<string, MarkdownImage> markdownImagesToPublish = new Dictionary<string, MarkdownImage>();
-
-            markdownFile.Html = ImageTagsRegex.Replace(markdownFile.Html, match =>
-            {
-                string imageUrl = match.Groups["url"].Value;
-                string otherAttributes = match.Groups["otherAttributes"].Value;
-                string imageFilePath = Path.GetFullPath(Path.Combine(parentDirectory, imageUrl));
-
-                if (!_imageUrls.TryGetValue(imageFilePath, out string? existingUrl))
-                {
-                    MarkdownImage markdownImage = new MarkdownImage(imageFilePath);
-                    existingUrl = markdownImageUrlProvider.GetUrl(markdownImage);
-
-                    markdownImagesToPublish[existingUrl] = markdownImage;
-                    _imageUrls[imageFilePath] = existingUrl;
-                }
-
-                return $"<img src=\"{_imageUrls[imageFilePath]}\" {otherAttributes}";
-            });
-
-            foreach (KeyValuePair<string, MarkdownImage> markdownImage in markdownImagesToPublish)
-            {
-                byte[] imageContent = await File.ReadAllBytesAsync(markdownImage.Value.FilePath);
-                await publisher.Publish(markdownImage.Key, imageContent);
-            }
-
-            Stack<Tuple<int, TocItem>> headerStack = new Stack<Tuple<int, TocItem>>([new Tuple<int, TocItem>(1, markdownFileTocItem)]);
-
-            HeaderTagsRegex.Matches(markdownFile.Html).ToList().ForEach(match =>
-            {
-                string id = match.Groups["id"].Value;
-                string title = match.Groups["title"].Value;
-                int level = int.Parse(match.Groups["level"].Value);
-
-                if (level == 1)
-                {
-                    return;
-                }
-
-                while (headerStack.Peek().Item1 >= level)
-                {
-                    headerStack.Pop();
-                }
-
-                headerStack.Push(new Tuple<int, TocItem>(level, headerStack.Peek().Item2.AddTocItem(title, url + "#" + id)));
-            });
-
-            if (markdownTemplateProvider != null)
-            {
-                byte[] markdownHtml = await markdownTemplateProvider.GetContent(markdownFile);
-                await publisher.Publish(url, markdownHtml);
-            }
-
-            else
-            {
-                await publisher.Publish(url, Encoding.UTF8.GetBytes(markdownFile.Html));
-            }
+            await ProcessTopic(tocRoot, null, markdownFilePath, logger);
         }
 
         LogFinishedPublishingTopics(logger);
+    }
+
+    protected virtual async Task ProcessTopic(TocItem? tocRoot, TocItem? tocItem, string markdownFilePath, ILogger logger)
+    {
+        LogPublishingMarkdownFile(logger, markdownFilePath);
+
+        MarkdownFile markdownFile = markdownLoader.LoadMarkdownFile(markdownFilePath);
+        IItemTemplateProvider<MarkdownFile>? markdownTemplateProvider = serviceProvider.GetService<IItemTemplateProvider<MarkdownFile>>();
+
+        markdownFile.Html = await markdownLoader.GetHtml(markdownFile);
+
+        if (markdownOptions.GetTitleFromHtml)
+        {
+            Match headerTitleMatch = HeaderTitleRegex.Match(markdownFile.Html);
+
+            if (headerTitleMatch.Success)
+            {
+                markdownFile.Title = headerTitleMatch.Groups["title"].Value;
+            }
+        }
+
+        string url = markdownFileUrlProvider.GetUrl(markdownFile);
+
+        if (!url.StartsWith("/"))
+        {
+            url = "/" + url;
+        }
+
+        if (tocItem == null)
+        {
+            tocItem = tocRoot!.AddTocItem(markdownFile.Title, url);
+        }
+
+        else
+        {
+            tocItem.Title = markdownFile.Title;
+            tocItem.Url = url;
+        }
+
+        string parentDirectory = Path.GetDirectoryName(markdownFilePath)!;
+        Dictionary<string, MarkdownImage> markdownImagesToPublish = new Dictionary<string, MarkdownImage>();
+
+        markdownFile.Html = ImageTagsRegex.Replace(markdownFile.Html, match =>
+        {
+            string imageUrl = match.Groups["url"].Value;
+            string otherAttributes = match.Groups["otherAttributes"].Value;
+            string imageFilePath = Path.GetFullPath(Path.Combine(parentDirectory, imageUrl));
+
+            if (!_imageUrls.TryGetValue(imageFilePath, out string? existingUrl))
+            {
+                MarkdownImage markdownImage = new MarkdownImage(imageFilePath);
+                existingUrl = markdownImageUrlProvider.GetUrl(markdownImage);
+
+                markdownImagesToPublish[existingUrl] = markdownImage;
+                _imageUrls[imageFilePath] = existingUrl;
+            }
+
+            return $"<img src=\"{_imageUrls[imageFilePath]}\" {otherAttributes}";
+        });
+
+        foreach (KeyValuePair<string, MarkdownImage> markdownImage in markdownImagesToPublish)
+        {
+            byte[] imageContent = await File.ReadAllBytesAsync(markdownImage.Value.FilePath);
+            await publisher.Publish(markdownImage.Key, imageContent);
+        }
+
+        Stack<Tuple<int, TocItem>> headerStack = new Stack<Tuple<int, TocItem>>([new Tuple<int, TocItem>(1, tocItem)]);
+
+        HeaderTagsRegex.Matches(markdownFile.Html).ToList().ForEach(match =>
+        {
+            string id = match.Groups["id"].Value;
+            string title = match.Groups["title"].Value;
+            int level = int.Parse(match.Groups["level"].Value);
+
+            if (level == 1)
+            {
+                return;
+            }
+
+            while (headerStack.Peek().Item1 >= level)
+            {
+                headerStack.Pop();
+            }
+
+            headerStack.Push(new Tuple<int, TocItem>(level, headerStack.Peek().Item2.AddTocItem(title, url + "#" + id)));
+        });
+
+        if (markdownTemplateProvider != null)
+        {
+            byte[] markdownHtml = await markdownTemplateProvider.GetContent(markdownFile);
+            await publisher.Publish(url, markdownHtml);
+        }
+
+        else
+        {
+            await publisher.Publish(url, Encoding.UTF8.GetBytes(markdownFile.Html));
+        }
     }
 }

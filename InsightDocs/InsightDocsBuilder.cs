@@ -10,6 +10,18 @@ namespace InsightDocs;
 
 public class InsightDocsOptions
 {
+    public string SiteTitle
+    {
+        get;
+        set;
+    } = "";
+
+    public string? InitialUrl
+    {
+        get;
+        set;
+    }
+
     public bool AddSearch
     {
         get;
@@ -97,8 +109,9 @@ public class InsightDocsBuilder
             IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteToc>>();
             IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteIndex>>();
             IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetRequiredService<IItemTemplateProvider<SiteIndex>>();
+            InsightDocsOptions options = serviceProvider.GetRequiredService<InsightDocsOptions>();
             IEnumerable<IAssetProvider> assetProviders = serviceProvider.GetServices<IAssetProvider>();
-            SiteIndex siteIndex = new();
+            SiteIndex siteIndex = new SiteIndex(options.SiteTitle, options.InitialUrl);
 
             await publisher.Initialize();
             await TocRoot.Execute(serviceProvider);

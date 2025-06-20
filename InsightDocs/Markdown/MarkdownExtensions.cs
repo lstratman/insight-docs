@@ -1,4 +1,5 @@
-﻿using InsightDocs.DotNet;
+﻿using InsightDocs.Abstractions;
+using InsightDocs.DotNet;
 using InsightDocs.Markdown.Abstractions;
 using InsightDocs.Markdown.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,13 +45,62 @@ public static class MarkdownExtensions
 
 public static class MarkdownTocItemExtensions
 {
-    public static TocItem IncludeMarkdownTocFile(this TocItem tocItem, string filePath)
+    public static TocItem IncludeMarkdownFile(this TocItem parentTocItem, string markdownFilePath, string title = null)
     {
-        // TODO
-        throw new NotImplementedException();
+        TocItem tocItem = parentTocItem.AddTocItem("");
+
+        tocItem.RegisterExecutor(async (serviceProvider) =>
+        {
+            IServiceScopeFactory serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+
+            using (IServiceScope serviceScope = serviceScopeFactory.CreateScope())
+            {
+                IUrlPrefixProvider prefixProvider = serviceScope.ServiceProvider.GetRequiredService<IUrlPrefixProvider>();
+                prefixProvider.UrlPrefix = tocItem.FullUrlPrefix;
+
+                IMarkdownPublisher markdownPublisher = serviceScope.ServiceProvider.GetRequiredService<IMarkdownPublisher>();
+                await markdownPublisher.PublishTopic(tocItem, markdownFilePath);
+
+                if (!String.IsNullOrEmpty(title))
+                {
+                    tocItem.Title = title;
+                }
+            }
+        });
+
+        return tocItem;
     }
 
-    public static TocItem IncludeMarkdownFiles(this TocItem tocItem, string glob)
+    public static TocItem IncludeMarkdownFilesInDirectory(this TocItem tocItem, string directoryPath)
+    {
+        if (tocItem is not MarkdownTocItem markdownTocItem)
+        {
+            markdownTocItem = new MarkdownTocItem(tocItem);
+        }
+
+        if (!Path.IsPathRooted(directoryPath))
+        {
+            directoryPath = Path.Combine(AppContext.BaseDirectory, directoryPath);
+        }
+
+        markdownTocItem.DirectoryPath = directoryPath;
+
+        string root = Path.GetPathRoot(directoryPath)!;
+
+        markdownTocItem.RootedMarkdownGlobMatchers ??= [];
+
+        if (!markdownTocItem.RootedMarkdownGlobMatchers.TryGetValue(root, out Matcher? matcher))
+        {
+            matcher = new Matcher();
+            markdownTocItem.RootedMarkdownGlobMatchers[root] = matcher;
+        }
+
+        matcher.AddInclude(directoryPath[root.Length..] + Path.DirectorySeparatorChar.ToString() + "*.md");
+
+        return markdownTocItem;
+    }
+
+    public static TocItem ExcludeMarkdownFiles(this TocItem tocItem, string glob)
     {
         if (tocItem is not MarkdownTocItem markdownTocItem)
         {
@@ -72,7 +122,7 @@ public static class MarkdownTocItemExtensions
             markdownTocItem.RootedMarkdownGlobMatchers[root] = matcher;
         }
 
-        matcher.AddInclude(glob[root.Length..]);
+        matcher.AddExclude(glob[root.Length..]);
 
         return markdownTocItem;
     }

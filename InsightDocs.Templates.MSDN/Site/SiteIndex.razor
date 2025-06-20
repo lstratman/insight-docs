@@ -5,14 +5,35 @@
 
 <html>
 <head>
+    <title>@Item!.Title</title>
+
     <script type="text/javascript" src="@GetUrl(TemplateAssets.SiteIndexScript)"></script>
 
     <link rel="stylesheet" href="@GetUrl(TemplateAssets.MsdnCss)" />
     <link rel="stylesheet" href="@GetUrl(TemplateAssets.SiteIndexCss)" />
 
     @AddAdditionalCss()
+
+    @if (!String.IsNullOrEmpty(Item.InitialUrl))
+    {
+        <script type="text/javascript">
+            function loadInitialUrl() {
+                if (!document.location.hash || document.location.hash === '#') {
+                    document.getElementById('topicContentIFrame').src = '@(Item.InitialUrl)';
+                }
+            }
+        </script>
+    }
+
+    else
+    {
+        <script type="text/javascript">
+            function loadInitialUrl() {
+            }
+        </script>
+    }
 </head>
-<body onload="onSiteIndexLoad()">
+<body onload="onSiteIndexLoad(); loadInitialUrl();">
     @{
         ISiteHeaderProvider? headerProvider = ServiceProvider.GetService<ISiteHeaderProvider>();
 

@@ -8,6 +8,7 @@ namespace InsightDocs.Markdown;
 public partial class MarkdownTocItem : TocItem
 {
     protected TocItem _baseTocItem;
+    public string? DirectoryPath;
     public Dictionary<string, Matcher>? RootedMarkdownGlobMatchers;
 
     public MarkdownTocItem(TocItem baseTocItem)
@@ -70,6 +71,8 @@ public partial class MarkdownTocItem : TocItem
 
     protected async Task MarkdownExecutor(IServiceProvider serviceProvider)
     {
+        // TODO: use .order file to determine the order of files
+
         if (RootedMarkdownGlobMatchers != null)
         {
             List<string> markdownFilePaths = [];
