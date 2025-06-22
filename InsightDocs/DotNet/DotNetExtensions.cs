@@ -87,6 +87,7 @@ public static class DotNetTocItemExtensions
         if (!Path.IsPathRooted(glob))
         {
             glob = Path.Combine(AppContext.BaseDirectory, glob);
+            glob = Path.GetFullPath(glob);
         }
 
         string root = Path.GetPathRoot(glob)!;
@@ -114,6 +115,7 @@ public static class DotNetTocItemExtensions
         if (!Path.IsPathRooted(glob))
         {
             glob = Path.Combine(AppContext.BaseDirectory, glob);
+            glob = Path.GetFullPath(glob);
         }
 
         string root = Path.GetPathRoot(glob)!;
@@ -141,6 +143,7 @@ public static class DotNetTocItemExtensions
         if (!Path.IsPathRooted(glob))
         {
             glob = Path.Combine(AppContext.BaseDirectory, glob);
+            glob = Path.GetFullPath(glob);
         }
 
         string root = Path.GetPathRoot(glob)!;
@@ -168,6 +171,7 @@ public static class DotNetTocItemExtensions
         if (!Path.IsPathRooted(glob))
         {
             glob = Path.Combine(AppContext.BaseDirectory, glob);
+            glob = Path.GetFullPath(glob);
         }
 
         string root = Path.GetPathRoot(glob)!;

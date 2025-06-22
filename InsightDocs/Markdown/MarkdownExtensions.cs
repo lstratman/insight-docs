@@ -81,6 +81,7 @@ public static class MarkdownTocItemExtensions
         if (!Path.IsPathRooted(directoryPath))
         {
             directoryPath = Path.Combine(AppContext.BaseDirectory, directoryPath);
+            directoryPath = Path.GetFullPath(directoryPath);
         }
 
         markdownTocItem.DirectoryPath = directoryPath;
@@ -110,6 +111,7 @@ public static class MarkdownTocItemExtensions
         if (!Path.IsPathRooted(glob))
         {
             glob = Path.Combine(AppContext.BaseDirectory, glob);
+            glob = Path.GetFullPath(glob);
         }
 
         string root = Path.GetPathRoot(glob)!;

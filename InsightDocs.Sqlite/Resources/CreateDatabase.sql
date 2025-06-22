@@ -1,0 +1,5 @@
+CREATE TABLE Topics
+(
+	Url TEXT PRIMARY KEY,
+	Data BLOB NOT NULL
+);
