@@ -1,5 +1,6 @@
 ﻿using InsightDocs.Abstractions;
 using InsightDocs.Sqlite.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Sqlite;
@@ -26,6 +27,12 @@ public static class SqliteExtensions
             builder.Services.AddSingleton(new SqlitePublisherOptions());
         }
 
+        return builder;
+    }
+
+    public static IApplicationBuilder UseInsightDocsSqliteMiddleware(this IApplicationBuilder builder)
+    {
+        builder.UseMiddleware<SqliteMiddleware>();
         return builder;
     }
 }
