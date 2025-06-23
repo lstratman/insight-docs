@@ -140,10 +140,18 @@ public class SqlitePublisher : IPublisher, IDisposable
     {
         lock (_connectionLock)
         {
-            using (SqliteCommand command = new SqliteCommand("INSERT INTO Topics VALUES(@url, @data)", Connection, Transaction))
+            using (SqliteCommand command = new SqliteCommand("INSERT INTO Urls VALUES(@url, @mimeType, @dataContentLength, @data)", Connection, Transaction))
             {
+                if (!url.StartsWith('/'))
+                {
+                    url = '/' + url;
+                }
+
                 command.Parameters.AddWithValue("@url", url);
+                command.Parameters.AddWithValue("@mimeType", MimeTypes.GetMimeType(url[(url.LastIndexOf('/') + 1)..]));
+                command.Parameters.AddWithValue("@dataContentLength", contents.Length);
                 command.Parameters.AddWithValue("@data", contents);
+
                 command.ExecuteNonQuery();
             }
 

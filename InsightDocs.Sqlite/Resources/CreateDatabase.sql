@@ -1,5 +1,7 @@
-CREATE TABLE Topics
+CREATE TABLE Urls
 (
 	Url TEXT PRIMARY KEY,
+	MimeType TEXT NOT NULL,
+	DataContentLength INTEGER NOT NULL,
 	Data BLOB NOT NULL
 );
