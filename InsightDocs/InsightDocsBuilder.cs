@@ -117,11 +117,11 @@ public class InsightDocsBuilder
             await TocRoot.Execute(serviceProvider);
 
             string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
-            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex));
+            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex), "text/html");
 
             SiteToc siteTableOfContents = new(TocRoot);
             string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
-            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)));
+            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json");
 
             if (assetProviders != null && assetProviders.Any())
             {
@@ -131,7 +131,7 @@ public class InsightDocsBuilder
                 {
                     foreach (IAsset templateAsset in assetProvider.GetAssets())
                     {
-                        await publisher.Publish(assetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents());
+                        await publisher.Publish(assetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents(), templateAsset.MimeType);
                     }
                 }
             }

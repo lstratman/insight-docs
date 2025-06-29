@@ -12,7 +12,7 @@ public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvide
 {
     protected ILoggerFactory _loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
-    public async Task<byte[]> GetContent(T item)
+    public async Task<string> GetContent(T item)
     {
         using HtmlRenderer htmlRenderer = new(serviceProvider, _loggerFactory);
 
@@ -26,7 +26,7 @@ public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvide
             ParameterView parameters = ParameterView.FromDictionary(dictionary);
             HtmlRootComponent output = await htmlRenderer.RenderComponentAsync<TTemplate>(parameters);
 
-            return Encoding.UTF8.GetBytes(output.ToHtmlString());
+            return output.ToHtmlString();
         });
     }
 }

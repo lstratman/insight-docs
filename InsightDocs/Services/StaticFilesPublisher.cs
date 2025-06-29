@@ -1,6 +1,7 @@
 using InsightDocs.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace InsightDocs.Services;
 
@@ -41,11 +42,24 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
         return Task.CompletedTask;
     }
 
-    public async Task Publish(string url, byte[] contents)
+    public async Task Publish(string url, object contents, string mimeType)
     {
         if (PublishedUrls.ContainsKey(url))
         {
             throw new Exception($"The URL {url} has already been published. Each URL must be unique.");
+        }
+
+        if (contents is not byte[] contentBytes)
+        {
+            if (contents is string contentString)
+            {
+                contentBytes = Encoding.UTF8.GetBytes(contentString);
+            }
+
+            else
+            {
+                throw new ArgumentException("Contents must be a byte array or a string.", nameof(contents));
+            }
         }
 
         PublishedUrls.AddOrUpdate(url, true, (key, oldValue) => true);
@@ -57,7 +71,7 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         }
 
-        await File.WriteAllBytesAsync(outputPath, contents);
+        await File.WriteAllBytesAsync(outputPath, contentBytes);
     }
 }
 

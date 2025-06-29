@@ -21,6 +21,14 @@ public class EmbeddedResourceAsset(Assembly assembly, string containerNamespace,
         }
     }
 
+    public string MimeType
+    {
+        get
+        {
+            return MimeTypes.GetMimeType(filePath);
+        }
+    }
+
     public async Task<byte[]> GetContents()
     {
         string resourceName = assembly.GetName().Name + "." + (String.IsNullOrEmpty(containerNamespace) ? "" : containerNamespace + ".") + filePath.Replace("\\", ".").Replace("/", ".");

@@ -113,7 +113,7 @@ public partial class MarkdownPublisher(
         foreach (KeyValuePair<string, MarkdownImage> markdownImage in markdownImagesToPublish)
         {
             byte[] imageContent = await File.ReadAllBytesAsync(markdownImage.Value.FilePath);
-            await publisher.Publish(markdownImage.Key, imageContent);
+            await publisher.Publish(markdownImage.Key, imageContent, MimeTypes.GetMimeType(markdownImage.Value.FilePath));
         }
 
         Stack<Tuple<int, TocItem>> headerStack = new Stack<Tuple<int, TocItem>>([new Tuple<int, TocItem>(1, tocItem)]);
@@ -139,13 +139,13 @@ public partial class MarkdownPublisher(
 
         if (markdownTemplateProvider != null)
         {
-            byte[] markdownHtml = await markdownTemplateProvider.GetContent(markdownFile);
-            await publisher.Publish(url, markdownHtml);
+            string markdownHtml = await markdownTemplateProvider.GetContent(markdownFile);
+            await publisher.Publish(url, markdownHtml, "text/html");
         }
 
         else
         {
-            await publisher.Publish(url, Encoding.UTF8.GetBytes(markdownFile.Html));
+            await publisher.Publish(url, Encoding.UTF8.GetBytes(markdownFile.Html), "text/html");
         }
     }
 }

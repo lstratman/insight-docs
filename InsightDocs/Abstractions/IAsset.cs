@@ -13,5 +13,10 @@ public interface IAsset : ILinkTarget
         get;
     }
 
+    string MimeType
+    {
+        get;
+    }
+
     Task<byte[]> GetContents();
 }
