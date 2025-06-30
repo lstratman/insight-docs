@@ -22,12 +22,6 @@ public class InsightDocsOptions
         set;
     }
 
-    public bool AddSearch
-    {
-        get;
-        set;
-    } = true;
-
     public bool EnableParallelism
     {
         get;
@@ -117,11 +111,11 @@ public class InsightDocsBuilder
             await TocRoot.Execute(serviceProvider);
 
             string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
-            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex), "text/html");
+            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex), "text/html", siteIndex.Title);
 
             SiteToc siteTableOfContents = new(TocRoot);
             string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
-            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json");
+            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json", null);
 
             if (assetProviders != null && assetProviders.Any())
             {
@@ -131,7 +125,7 @@ public class InsightDocsBuilder
                 {
                     foreach (IAsset templateAsset in assetProvider.GetAssets())
                     {
-                        await publisher.Publish(assetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents(), templateAsset.MimeType);
+                        await publisher.Publish(assetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents(), templateAsset.MimeType, null);
                     }
                 }
             }

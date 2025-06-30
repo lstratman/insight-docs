@@ -49,7 +49,7 @@ public partial class DotNetPublisher(
 
         string html = await dotNetIndexTemplate.GetContent(indexData);
 
-        await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData), html, "text/html");
+        await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData), html, "text/html", indexData.Title);
 
         if (insightDocsOptions.EnableParallelism)
         {
@@ -85,7 +85,7 @@ public partial class DotNetPublisher(
         TocItem namespaceTocItem = new TocItem(ns.FullName, tocRoot, namespaceUrl);
 
         string html = await dotNetNamespaceTemplate.GetContent(ns);
-        await publisher.Publish(namespaceUrl, html, "text/html");
+        await publisher.Publish(namespaceUrl, html, "text/html", ns.Title);
 
         foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
         {
@@ -95,7 +95,7 @@ public partial class DotNetPublisher(
             TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
 
             html = await dotNetTypeTemplate.GetContent(type);
-            await publisher.Publish(typeUrl, html, "text/html");
+            await publisher.Publish(typeUrl, html, "text/html", type.Title);
 
             if (type.TypeName != "Enum")
             {
@@ -105,7 +105,7 @@ public partial class DotNetPublisher(
                     typeTocItem.AddTocItem("Constructors", constructorUrl);
 
                     html = await dotNetMethodTemplate.GetContent(type.Constructor);
-                    await publisher.Publish(constructorUrl, html, "text/html");
+                    await publisher.Publish(constructorUrl, html, "text/html", type.Constructor.Title);
                 }
 
                 if (type.Indexer != null && type.Indexer.Overloads.Any(o => o.DeclaringType != null && o.DeclaringType.Type != null && o.DeclaringType.Type == type))
@@ -114,7 +114,7 @@ public partial class DotNetPublisher(
                     typeTocItem.AddTocItem("Indexer", indexerUrl);
 
                     html = await dotNetIndexerTemplate.GetContent(type.Indexer);
-                    await publisher.Publish(indexerUrl, html, "text/html");
+                    await publisher.Publish(indexerUrl, html, "text/html", type.Indexer.Title);
                 }
 
                 if (type.Methods != null)
@@ -129,7 +129,7 @@ public partial class DotNetPublisher(
                         methodsTocItem.AddTocItem(method.Name, methodUrl);
 
                         html = await dotNetMethodTemplate.GetContent(method);
-                        await publisher.Publish(methodUrl, html, "text/html");
+                        await publisher.Publish(methodUrl, html, "text/html", method.Title);
                     }
                 }
 
@@ -145,7 +145,7 @@ public partial class DotNetPublisher(
                         propertiesTocItem.AddTocItem(property.Name, propertyUrl);
 
                         html = await dotNetPropertyTemplate.GetContent(property);
-                        await publisher.Publish(propertyUrl, html, "text/html");
+                        await publisher.Publish(propertyUrl, html, "text/html", property.Title);
                     }
                 }
 
@@ -161,7 +161,7 @@ public partial class DotNetPublisher(
                         fieldsTocItem.AddTocItem(field.Name, fieldUrl);
 
                         html = await dotNetFieldTemplate.GetContent(field);
-                        await publisher.Publish(fieldUrl, html, "text/html");
+                        await publisher.Publish(fieldUrl, html, "text/html", field.Title);
                     }
                 }
             }

@@ -1,5 +1,7 @@
 ﻿using InsightDocs.Abstractions;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 
@@ -22,7 +24,10 @@ public class SqlitePublisherOptions
 
 public class SqlitePublisher : IPublisher, IDisposable
 {
-    public SqlitePublisher(SqlitePublisherOptions options)
+    protected Dictionary<string, int> _mimeTypes = new Dictionary<string, int>();
+    protected int _mimeTypeCounter = 1;
+
+    public SqlitePublisher(SqlitePublisherOptions options, IServiceProvider serviceProvider)
     {
         string databasePath = options.DatabasePath ?? throw new ArgumentException("DatabasePath must be set in SqlitePublisherOptions.");
 
@@ -38,6 +43,7 @@ public class SqlitePublisher : IPublisher, IDisposable
 
         DatabasePath = databasePath;
         ClearExistingDatabase = options.ClearExistingDatabase;
+        SearchService = serviceProvider.GetService<ISearchService>();
     }
 
     protected bool ClearExistingDatabase
@@ -46,17 +52,31 @@ public class SqlitePublisher : IPublisher, IDisposable
         set;
     }
 
-    protected string DatabasePath
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    internal static string DatabasePath
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+        get;
+        set;
+    }
+
+    protected ISearchService? SearchService
     {
         get;
         set;
     }
 
     protected object _connectionLock = new object();
-    protected SqliteConnection? _connection;
-    protected SqliteTransaction? _transaction;
 
-    protected SqliteTransaction Transaction
+    internal static SqliteConnection? _connection;
+    internal static SqliteTransaction? _transaction;
+
+    protected ConcurrentDictionary<string, bool> PublishedUrls
+    {
+        get;
+    } = new ConcurrentDictionary<string, bool>();
+
+    internal static SqliteTransaction Transaction
     {
         get
         {
@@ -65,7 +85,7 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
-    protected SqliteConnection Connection
+    internal static SqliteConnection Connection
     {
         get
         {
@@ -136,11 +156,44 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
-    public Task Publish(string url, byte[] contents)
+    public async Task Publish(string url, object contents, string mimeType, string? title = null)
     {
+        if (contents is not byte[] contentBytes)
+        {
+            if (contents is string contentString)
+            {
+                contentBytes = Encoding.UTF8.GetBytes(contentString);
+            }
+
+            else
+            {
+                throw new ArgumentException("Contents must be a byte array or a string.", nameof(contents));
+            }
+        }
+
         lock (_connectionLock)
         {
-            using (SqliteCommand command = new SqliteCommand("INSERT INTO Urls VALUES(@url, @mimeType, @dataContentLength, @data)", Connection, Transaction))
+            if (PublishedUrls.ContainsKey(url))
+            {
+                throw new Exception($"The URL {url} has already been published. Each URL must be unique.");
+            }
+
+            PublishedUrls.AddOrUpdate(url, true, (key, oldValue) => true);
+
+            if (!_mimeTypes.TryGetValue(mimeType, out int mimeTypeId))
+            {
+                mimeTypeId = _mimeTypeCounter++;
+                _mimeTypes[mimeType] = mimeTypeId;
+
+                using (SqliteCommand command = new SqliteCommand("INSERT INTO MimeTypes (MimeTypeId, MimeType) VALUES(@id, @mimeType)", Connection, Transaction))
+                {
+                    command.Parameters.AddWithValue("@id", mimeTypeId);
+                    command.Parameters.AddWithValue("@mimeType", mimeType);
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            using (SqliteCommand command = new SqliteCommand("INSERT INTO Urls VALUES(@url, @mimeTypeId, @dataContentLength, @data)", Connection, Transaction))
             {
                 if (!url.StartsWith('/'))
                 {
@@ -148,14 +201,38 @@ public class SqlitePublisher : IPublisher, IDisposable
                 }
 
                 command.Parameters.AddWithValue("@url", url);
-                command.Parameters.AddWithValue("@mimeType", MimeTypes.GetMimeType(url[(url.LastIndexOf('/') + 1)..]));
-                command.Parameters.AddWithValue("@dataContentLength", contents.Length);
-                command.Parameters.AddWithValue("@data", contents);
+                command.Parameters.AddWithValue("@mimeTypeId", mimeTypeId);
+                command.Parameters.AddWithValue("@dataContentLength", contentBytes.Length);
+                command.Parameters.AddWithValue("@data", contentBytes);
 
                 command.ExecuteNonQuery();
             }
 
-            return Task.CompletedTask;
+            if (SearchService != null && SearchService is SqliteSearchService && mimeType == "text/html")
+            {
+                if (contents is string contentString)
+                {
+                    SearchService.IndexContentForSearch(url, contentString, title!);
+                }
+
+                else
+                {
+                    SearchService.IndexContentForSearch(url, Encoding.UTF8.GetString(contentBytes), title!);
+                }
+            }
+        }
+
+        if (SearchService != null && !(SearchService is SqliteSearchService) && mimeType == "text/html")
+        {
+            if (contents is string contentString)
+            {
+                await SearchService.IndexContentForSearch(url, contentString, title!);
+            }
+
+            else
+            {
+                await SearchService.IndexContentForSearch(url, Encoding.UTF8.GetString(contentBytes), title!);
+            }
         }
     }
 }

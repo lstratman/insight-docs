@@ -42,7 +42,7 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
         return Task.CompletedTask;
     }
 
-    public async Task Publish(string url, object contents, string mimeType)
+    public async Task Publish(string url, object contents, string mimeType, string? title = null)
     {
         if (PublishedUrls.ContainsKey(url))
         {

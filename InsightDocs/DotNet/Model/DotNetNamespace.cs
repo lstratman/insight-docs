@@ -48,4 +48,12 @@ public class DotNetNamespace : ILinkTarget
             return FullName;
         }
     }
+
+    public string Title
+    {
+        get
+        {
+            return FullName + " Namespace";
+        }
+    }
 }

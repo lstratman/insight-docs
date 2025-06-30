@@ -7,7 +7,30 @@ namespace InsightDocs.Sqlite;
 
 public static class SqliteExtensions
 {
-    public static InsightDocsBuilder PublishToSqliteDatabase(this InsightDocsBuilder builder, Action<SqlitePublisherOptions> optionsFactory)
+    public static InsightDocsBuilder UseSqliteSearch(this InsightDocsBuilder builder, Action<SqliteSearchServiceOptions>? optionsFactory = null)
+    {
+        builder.Services.AddSingleton<ISearchService, SqliteSearchService>();
+
+        if (optionsFactory != null)
+        {
+            builder.Services.AddSingleton((serviceProvider) =>
+            {
+                SqliteSearchServiceOptions options = new SqliteSearchServiceOptions();
+                optionsFactory(options);
+
+                return options;
+            });
+        }
+
+        else
+        {
+            builder.Services.AddSingleton(new SqliteSearchServiceOptions());
+        }
+
+        return builder;
+    }
+
+    public static InsightDocsBuilder PublishToSqliteDatabase(this InsightDocsBuilder builder, Action<SqlitePublisherOptions>? optionsFactory = null)
     {
         builder.Services.AddSingleton<IPublisher, SqlitePublisher>();
 
