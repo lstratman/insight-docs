@@ -6,6 +6,8 @@ using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
 using InsightDocs.Markdown.Model;
 using InsightDocs.Site.Model;
+using InsightDocs.TypeScript.Model;
+using InsightDocs.TypeScript.Model.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
@@ -23,7 +25,14 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<IAsset>,
       IUrlProvider<DotNetIndexer>,
       IUrlProvider<MarkdownFile>,
-      IUrlProvider<MarkdownImage>
+      IUrlProvider<MarkdownImage>,
+      IUrlProvider<TypeScriptModule>,
+      IUrlProvider<TypeScriptTypeDeclaration>,
+      IUrlProvider<TypeScriptInterface>,
+      IUrlProvider<TypeScriptMethod>,
+      IUrlProvider<TypeScriptProperty>,
+      IUrlProvider<TypeScriptMethodSignature>,
+      IUrlProvider<TypeScriptNamespace>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -433,6 +442,136 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         return url.ToString();
     }
+
+    public string GetUrl(TypeScriptModule item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append(item.Name);
+
+        return url.ToString();
+    }
+
+    public string GetUrl(TypeScriptTypeDeclaration item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append(item.FullName);
+
+        return url.ToString();
+    }
+
+    public string GetUrl(TypeScriptInterface item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append(item.FullName);
+
+        return url.ToString();
+    }
+
+    public string GetUrl(TypeScriptMethod item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        if (item.SourceTypeId != 0)
+        {
+            TypeScriptTypeDeclaration sourceType = ReferenceType.AllTypes[item.SourceTypeId];
+
+            url.Append(sourceType.FullName);
+            url.Append('.');
+        }
+
+        url.Append(item.Name);
+
+        return url.ToString();
+    }
+
+    public string GetUrl(TypeScriptProperty item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        if (item.SourceTypeId != 0)
+        {
+            TypeScriptTypeDeclaration sourceType = ReferenceType.AllTypes[item.SourceTypeId];
+
+            url.Append(sourceType.FullName);
+            url.Append('.');
+        }
+
+        url.Append(item.Name);
+
+        return url.ToString();
+    }
+
+    public string GetUrl(TypeScriptMethodSignature item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        if (item.SourceTypeId != 0)
+        {
+            TypeScriptTypeDeclaration sourceType = ReferenceType.AllTypes[item.SourceTypeId];
+
+            url.Append(sourceType.FullName);
+            url.Append('.');
+        }
+
+        url.Append(item.Name);
+        // TODO: add overload hash
+
+        return url.ToString();
+    }
+
+    public string GetUrl(TypeScriptNamespace item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append(item.Name);
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -466,6 +605,13 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<DotNetIndexer>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<MarkdownFile>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<MarkdownImage>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<TypeScriptModule>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<TypeScriptTypeDeclaration>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<TypeScriptInterface>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<TypeScriptMethod>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<TypeScriptProperty>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<TypeScriptMethodSignature>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<TypeScriptNamespace>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

@@ -3,6 +3,7 @@ using InsightDocs.DotNet.Model;
 using InsightDocs.Extensions;
 using InsightDocs.Markdown.Model;
 using InsightDocs.Site.Model;
+using InsightDocs.TypeScript.Model;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Templates.MSDN;
@@ -20,6 +21,7 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<DotNetField, DotNet.DotNetField>();
         builder.RegisterRazorItemTemplate<DotNetIndexer, DotNet.DotNetIndexer>();
         builder.RegisterRazorItemTemplate<MarkdownFile, Markdown.MarkdownFile>();
+        builder.RegisterRazorItemTemplate<TypeScriptInterface, TypeScript.TypeScriptInterface>();
 
         builder.Services.AddSingleton<IAssetProvider, TemplateAssetProvider>();
 
