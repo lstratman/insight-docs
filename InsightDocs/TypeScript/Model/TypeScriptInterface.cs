@@ -392,7 +392,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
 
                     TypeScriptInterface? actualBaseType = ReferenceType.AllTypes[baseTypeReference.Target] as TypeScriptInterface;
 
-                    if (actualBaseType == null && ReferenceType.AllTypes[baseTypeReference.Target] is TypeAlias typeAliasBaseType)
+                    if (actualBaseType == null && ReferenceType.AllTypes[baseTypeReference.Target] is TypeScriptTypeAlias typeAliasBaseType)
                     {
                         if (typeAliasBaseType.Type is ReferenceType referenceType)
                         {

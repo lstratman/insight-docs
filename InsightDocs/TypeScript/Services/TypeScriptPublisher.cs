@@ -9,6 +9,8 @@ public class TypeScriptPublisher(
     ILoggerFactory loggerFactory,
     ITypeScriptLoader typeScriptLoader,
     IItemTemplateProvider<TypeScriptInterface> interfaceTemplate,
+    IItemTemplateProvider<TypeScriptEnum> enumTemplate,
+    IItemTemplateProvider<TypeScriptTypeAlias> typeAliasTemplate,
     IUrlProvider<TypeScriptModule> moduleUrlProvider,
     IUrlProvider<TypeScriptTypeDeclaration> typeUrlProvider,
     IPublisher publisher
@@ -75,6 +77,23 @@ public class TypeScriptPublisher(
         {
             string html = await interfaceTemplate.GetContent(typeScriptInterface);
             await publisher.Publish(url, html, "text/html", type.Title);
+        }
+
+        else if (type is TypeScriptEnum typeScriptEnum)
+        {
+            string html = await enumTemplate.GetContent(typeScriptEnum);
+            await publisher.Publish(url, html, "text/html", type.Title);
+        }
+
+        else if (type is TypeScriptTypeAlias typeScriptTypeAlias)
+        {
+            string html = await typeAliasTemplate.GetContent(typeScriptTypeAlias);
+            await publisher.Publish(url, html, "text/html", type.Title);
+        }
+
+        else
+        {
+            throw new Exception("Unsupported TypeScript type declaration type: " + type.GetType().FullName + ".");
         }
     }
 

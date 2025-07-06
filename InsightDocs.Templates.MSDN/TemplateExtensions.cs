@@ -22,6 +22,8 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<DotNetIndexer, DotNet.DotNetIndexer>();
         builder.RegisterRazorItemTemplate<MarkdownFile, Markdown.MarkdownFile>();
         builder.RegisterRazorItemTemplate<TypeScriptInterface, TypeScript.TypeScriptInterface>();
+        builder.RegisterRazorItemTemplate<TypeScriptEnum, TypeScript.TypeScriptEnum>();
+        builder.RegisterRazorItemTemplate<TypeScriptTypeAlias, TypeScript.TypeScriptTypeAlias>();
 
         builder.Services.AddSingleton<IAssetProvider, TemplateAssetProvider>();
 

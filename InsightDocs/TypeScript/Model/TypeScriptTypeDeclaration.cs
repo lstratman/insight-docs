@@ -26,7 +26,7 @@ public class TypeScriptTypeDeclarationConverter : JsonConverter
         TypeScriptTypeDeclaration typeDeclarationObject = jsonObject["kind"]!.Value<string>() switch
         {
             "interface" => new TypeScriptInterface(),
-            "alias" => new TypeAlias(),
+            "alias" => new TypeScriptTypeAlias(),
             "enum" => new TypeScriptEnum(),
             "variable" => new TypeScriptVariable(),
             _ => throw new Exception("Unrecognized TypeScript type declaration type: " + jsonObject["kind"]!.Value<string>() + "."),

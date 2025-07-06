@@ -26,7 +26,7 @@ public class TypeScriptLoader : ITypeScriptLoader
 
                 type.Project = api;
 
-                if (type is TypeScriptInterface typeScriptInterface && type.FullName.Contains('.'))
+                if (type is TypeScriptNamespacedTypeDeclaration typeScriptNamespacedType && type.FullName.Contains('.'))
                 {
                     api.Namespaces ??= new Dictionary<string, TypeScriptNamespace>();
 
@@ -41,7 +41,7 @@ public class TypeScriptLoader : ITypeScriptLoader
                     }
 
                     ns.Types.Add(type);
-                    typeScriptInterface.Namespace = ns;
+                    typeScriptNamespacedType.Namespace = ns;
                 }
             }
 

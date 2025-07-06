@@ -32,4 +32,11 @@ public class EnumValue
         get;
         set;
     }
+
+    [JsonProperty("comment")]
+    public Comment? Comment
+    {
+        get;
+        set;
+    }
 }
