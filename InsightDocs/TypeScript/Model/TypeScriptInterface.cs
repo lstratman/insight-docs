@@ -337,6 +337,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
                 foreach (TypeScriptMethodSignature signature in method.Value.Signatures)
                 {
                     signature.SourceTypeId = id;
+                    signature.MethodCollection = method.Value;
                     //signature.Url = GetMDNUrl(signature);
 
                     //if (string.IsNullOrEmpty(signature.Url) && !BuiltIn)

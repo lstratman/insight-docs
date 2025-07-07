@@ -29,6 +29,12 @@ public class TypeScriptMethodSignature : TypeScriptTypeMember
         }
     }
 
+    public TypeScriptMethod? MethodCollection
+    {
+        get;
+        set;
+    }
+
     protected List<TypeParameter>? _typeParameters;
 
     [JsonProperty("typeParameters")]

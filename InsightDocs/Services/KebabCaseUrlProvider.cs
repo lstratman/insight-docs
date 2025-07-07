@@ -582,7 +582,21 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         }
 
         url.Append(item.Name);
-        // TODO: add overload hash
+
+        if (item.MethodCollection != null && item.MethodCollection.Signatures.Count > 1)
+        {
+            url.Append('#');
+
+            url.Append(item.Name.ToLower().Replace(".", "-"));
+            url.Append('(');
+
+            if (item.Parameters != null && item.Parameters.Count > 0)
+            {
+                url.Append(String.Join('-', item.Parameters.Select(p => Regex.Replace(p.Type.ToString().ToLower(), "[^a-zA-Z0-9_]", "-"))));
+            }
+
+            url.Append(')');
+        }
 
         return url.ToString();
     }
