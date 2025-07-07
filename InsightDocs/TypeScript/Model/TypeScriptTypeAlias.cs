@@ -27,4 +27,9 @@ public class TypeScriptTypeAlias : TypeScriptNamespacedTypeDeclaration
             return Name + " Type";
         }
     }
+
+    public override string ToString()
+    {
+        return $"type {Name} = {Type}";
+    }
 }

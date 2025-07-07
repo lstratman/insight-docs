@@ -9,6 +9,31 @@ namespace InsightDocs.TypeScript;
 
 public class RazorTypeScriptTemplate<T> : RazorTemplate<T>
 {
+    public virtual RenderFragment GetLink<TItem>(TItem item, bool simple) where TItem : ILinkTarget
+    {
+        IUrlProvider<TItem> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<TItem>>();
+        string url = urlProvider.GetUrl(item);
+        string linkText = item.LinkText.Replace("<", "&lt;").Replace(">", "&gt;");
+
+        if (simple && linkText.Contains('.'))
+        {
+            linkText = linkText[(linkText.IndexOf('.') + 1)..];
+        }
+
+        return (builder) =>
+        {
+            if (String.IsNullOrEmpty(url))
+            {
+                builder.AddMarkupContent(0, linkText);
+            }
+
+            else
+            {
+                builder.AddMarkupContent(0, $@"<a href=""{url}""{(url.StartsWith("https://") || url.StartsWith("http://") ? " target=\"_blank\"" : "")}>{linkText}</a>");
+            }
+        };
+    }
+
     public void BuildLinkTag(TypeScriptType item, StringBuilder linkTagBuilder)
     {
         foreach (TypeToStringComponent component in item.GetToStringComponents())

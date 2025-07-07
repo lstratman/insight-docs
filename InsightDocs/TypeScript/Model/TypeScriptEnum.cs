@@ -20,6 +20,11 @@ public class TypeScriptEnum : TypeScriptNamespacedTypeDeclaration
         get;
         set;
     }
+
+    public override string ToString()
+    {
+        return $"enum {Name}";
+    }
 }
 
 public class EnumValue
