@@ -1,4 +1,5 @@
-﻿namespace InsightDocs.TypeScript.Model.Types
+﻿
+namespace InsightDocs.TypeScript.Model.Types
 {
     public class ImportType : TypeScriptType
     {
@@ -10,9 +11,12 @@
             set;
         }
 
-        public override string ToString()
+        public override List<TypeToStringComponent> GetToStringComponents()
         {
-            return $"import('{Argument}')";
+            return
+            [
+                new TypeToStringTextComponent($"import('{Argument}')")
+            ];
         }
     }
 }

@@ -13,8 +13,20 @@ public class UnionType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return string.Join(" | ", Types.Select(t => t.ToString()));
+        List<TypeToStringComponent> components = [];
+
+        foreach (TypeScriptType type in Types)
+        {
+            if (components.Count > 0)
+            {
+                components.Add(new TypeToStringTextComponent(" | "));
+            }
+
+            components.Add(new TypeToStringTypeComponent(type));
+        }
+
+        return components;
     }
 }

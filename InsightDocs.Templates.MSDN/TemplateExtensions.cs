@@ -24,6 +24,7 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<TypeScriptInterface, TypeScript.TypeScriptInterface>();
         builder.RegisterRazorItemTemplate<TypeScriptEnum, TypeScript.TypeScriptEnum>();
         builder.RegisterRazorItemTemplate<TypeScriptTypeAlias, TypeScript.TypeScriptTypeAlias>();
+        builder.RegisterRazorItemTemplate<TypeScriptMethod, TypeScript.TypeScriptMethod>();
 
         builder.Services.AddSingleton<IAssetProvider, TemplateAssetProvider>();
 

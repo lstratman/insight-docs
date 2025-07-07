@@ -130,6 +130,68 @@ public class TypeScriptTypeConverter : JsonConverter
     }
 }
 
+public abstract class TypeToStringComponent
+{
+    public abstract override string ToString();
+}
+
+public class TypeToStringReferenceTypeComponent : TypeToStringComponent
+{
+    public TypeToStringReferenceTypeComponent(int id)
+    {
+        Id = id;
+    }
+
+    public int Id
+    {
+        get;
+        set;
+    }
+
+    public override string ToString()
+    {
+        return ReferenceType.AllTypes[Id].Name;
+    }
+}
+
+public class TypeToStringTypeComponent : TypeToStringComponent
+{
+    public TypeToStringTypeComponent(TypeScriptType type)
+    {
+        Type = type;
+    }
+
+    public TypeScriptType Type
+    {
+        get;
+        set;
+    }
+
+    public override string ToString()
+    {
+        return Type.ToString();
+    }
+}
+
+public class TypeToStringTextComponent : TypeToStringComponent
+{
+    public TypeToStringTextComponent(string text)
+    {
+        Text = text;
+    }
+
+    public string Text
+    {
+        get;
+        set;
+    }
+
+    public override string ToString()
+    {
+        return Text;
+    }
+}
+
 [JsonConverter(typeof(TypeScriptTypeConverter))]
 public abstract class TypeScriptType
 {
@@ -139,6 +201,20 @@ public abstract class TypeScriptType
     {
         get;
         set;
+    }
+
+    public abstract List<TypeToStringComponent> GetToStringComponents();
+
+    override public string ToString()
+    {
+        StringBuilder output = new StringBuilder();
+
+        foreach (TypeToStringComponent component in GetToStringComponents())
+        {
+            output.Append(component.ToString());
+        }
+        
+        return output.ToString();
     }
 
     public static TypeScriptType GetTypeScriptType(string type)

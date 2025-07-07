@@ -22,9 +22,16 @@ namespace InsightDocs.TypeScript.Model.Types
             set;
         }
 
-        public override string ToString()
+        public override List<TypeToStringComponent> GetToStringComponents()
         {
-            return $"{{ [{Parameter.Name} in {Parameter.Constraint}]: {TemplateType} }}";
+            return
+            [
+                new TypeToStringTextComponent($"{{ [{Parameter.Name} in "),
+                new TypeToStringTypeComponent(Parameter.Constraint!),
+                new TypeToStringTextComponent($"]: "),
+                new TypeToStringTypeComponent(TemplateType),
+                new TypeToStringTextComponent(" }")
+            ];
         }
     }
 }

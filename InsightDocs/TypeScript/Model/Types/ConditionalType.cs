@@ -40,8 +40,17 @@ public class ConditionalType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return $"{CheckType} extends {ExtendsType} ? {TrueType} : {FalseType}";
+        return
+        [
+            new TypeToStringTypeComponent(CheckType),
+            new TypeToStringTextComponent(" extends "),
+            new TypeToStringTypeComponent(ExtendsType),
+            new TypeToStringTextComponent(" ? "),
+            new TypeToStringTypeComponent(TrueType),
+            new TypeToStringTextComponent(" : "),
+            new TypeToStringTypeComponent(FalseType)
+        ];
     }
 }

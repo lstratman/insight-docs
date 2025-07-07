@@ -22,8 +22,12 @@ public class TypeOperatorType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return Operator + " " + Target.ToString();
+        return new List<TypeToStringComponent>
+        {
+            new TypeToStringTextComponent(Operator + " "),
+            new TypeToStringTypeComponent(Target)
+        };
     }
 }

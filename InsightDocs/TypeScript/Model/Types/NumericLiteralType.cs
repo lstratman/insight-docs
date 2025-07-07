@@ -13,8 +13,11 @@ public class NumericLiteralType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return Value.ToString();
+        return
+        [
+            new TypeToStringTextComponent(Value)
+        ];
     }
 }

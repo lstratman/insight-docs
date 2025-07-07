@@ -1,0 +1,198 @@
+@inherits InsightDocs.TypeScript.RazorTypeScriptTemplate<InsightDocs.TypeScript.Model.TypeScriptMethod>
+@using InsightDocs.Templates.MSDN.Components
+@using Microsoft.Extensions.DependencyInjection
+
+<html>
+    <head>
+        <link rel="stylesheet" href="@GetUrl(TemplateAssets.MsdnCss)"/>
+
+        @AddAdditionalCss()
+
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.CommonScript)"></script>
+
+        @AddAdditionalJavaScript()
+
+        <script type="text/javascript">hljs.highlightAll();</script>
+    </head>
+    <body>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    @{
+                        InsightDocs.TypeScript.Model.TypeScriptInterface? sourceType = Item!.SourceTypeId != 0 ? (InsightDocs.TypeScript.Model.TypeScriptInterface)InsightDocs.TypeScript.Model.Types.ReferenceType.AllTypes[Item.SourceTypeId] : null;
+                    }
+
+                    @if (sourceType != null)
+                    {
+                        <div id="article-header" class="background-color-body margin-bottom-xs display-none-print">
+			                <div class="display-flex align-items-center justify-content-space-between">
+		                        <bread-crumbs id="article-header-breadcrumbs" class="overflow-hidden flex-grow-1 margin-right-sm margin-right-md-tablet margin-right-lg-desktop margin-left-negative-xxs padding-left-xxs" style="display: block; white-space: nowrap; overflow: hidden;">
+			                        <nav>
+				                        <ol class="breadcrumbs">
+                                            @if (sourceType.Namespace != null)
+                                            {
+                                                <li class="breadcrumbs-item">
+                                                    @GetLink(sourceType.Namespace)
+                                                </li>
+                                            }
+
+                                            <li class="breadcrumbs-item">
+                                                @GetLink(sourceType)
+                                            </li>
+				                        </ol>
+			                        </nav>
+                                </bread-crumbs>
+			                </div>
+		                </div>
+                    }
+
+                    <div class="content">
+                        <div data-chunk-ids="0">
+                            <h1>@Item!.Title</h1>
+
+                            <div class="margin-block-xxs">
+	                            <ul class="metadata page-metadata align-items-center">
+		                            <li>Reference</li>
+	                            </ul>
+                            </div>
+
+                            <h2>Definition</h2>
+
+                            <div class="metadata">
+                                @if (sourceType != null && sourceType.Namespace != null)
+                                {
+                                    <dl class="attributeList">
+                                        <dt>Namespace:</dt>
+                                        <dd>@GetLink(sourceType.Namespace)</dd>
+                                    </dl>
+                                }
+                            </div>
+
+                            @if (Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1)
+                            {
+                                <h2 id="overloads">Overloads</h2>
+                            }
+
+                            @{
+                                bool reduceHeaderSize = Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1;
+                            }
+
+                            @foreach (InsightDocs.TypeScript.Model.TypeScriptMethodSignature overload in Item.Signatures.Where(o => o.SourceTypeId == Item.SourceTypeId))
+                            {
+                                <div>
+                                    @if (Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1)
+                                    {
+                                        string overloadUrl = ServiceProvider.GetRequiredService<InsightDocs.Abstractions.IUrlProvider<InsightDocs.TypeScript.Model.TypeScriptMethodSignature>>().GetUrl(overload);
+
+                                        <div class="heading-wrapper" data-heading-level="h3">
+                                            @if (overloadUrl.IndexOf("#") != -1)
+                                            {
+                                                <a class="anchor-link docon docon-link" href="#@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)"></a>
+                                                <h3 id="@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)" class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
+                                            }
+
+                                            else
+                                            {
+                                                <h3 class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
+                                            }
+                                        </div>
+
+                                        @Raw("<div class=\"memberInfo\">")
+                                    }
+
+                                    @if (!String.IsNullOrEmpty(overload.Comment?.SummaryHtml))
+                                    {
+                                        <div class="summaryHolder">@Raw(overload.Comment.SummaryHtml)</div>
+                                    }
+
+                                    <CodeBlock LanguageId="typescript" LanguageLabel="TypeScript" Code="@overload.ToString()"/>
+
+                                    @if (overload.TypeParameters != null && overload.TypeParameters.Count > 0)
+                                    {
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack">Generic Arguments</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack">Generic Arguments</h3>
+                                        }
+
+                                        @foreach (InsightDocs.TypeScript.Model.TypeParameter genericArgument in overload.TypeParameters)
+                                        {
+                                            <div class="propertyInfo">
+                                                <dl class="parameterList">
+                                                    <dt>
+                                                        @genericArgument.Name
+                                                    </dt>
+                                                    <dd></dd>
+                                                </dl>
+                                            </div>
+                                        }
+                                    }
+
+                                    @if (overload.Parameters != null)
+                                    {
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h3>
+                                        }
+
+                                        @for (int i = 0; i < overload.Parameters.Count; i++)
+                                        {
+                                            <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
+                                                <dl class="parameterList">
+                                                    <dt>@overload.Parameters[i].Name</dt>
+                                                    <dd>@GetLink(overload.Parameters[i].Type)</dd>
+                                                </dl>
+
+                                                @if (!String.IsNullOrEmpty(overload.Parameters[i].Comment?.SummaryHtml))
+                                                {
+                                                    @Raw(overload.Parameters[i].Comment!.SummaryHtml!)
+                                                }
+                                            </div>
+                                        }
+                                    }
+
+                                    @if (overload.Name != "constructor")
+                                    {
+                                        if (reduceHeaderSize)
+                                        {
+                                            <h4 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h4>
+                                        }
+
+                                        else
+                                        {
+                                            <h3 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h3>
+                                        }
+
+                                        <div class="propertyInfo">@GetLink(overload.ReturnType)</div>
+
+                                        @if (!String.IsNullOrEmpty(overload.Comment?.ReturnsHtml))
+                                        {
+                                            @Raw(overload.Comment.ReturnsHtml)
+                                        }
+                                    }
+
+                                    <!-- TODO: support example JSDoc tag -->
+
+                                    @if (Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1)
+                                    {
+                                        @Raw("</div>")
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

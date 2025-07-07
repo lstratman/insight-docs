@@ -23,20 +23,87 @@ public class ReflectionType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        List<string> members = [];
+        List<TypeToStringComponent> components = [new TypeToStringTextComponent("{ ")];
 
-        if (IndexSignature != null)
+        if (IndexSignature != null && IndexSignature.Parameters != null)
         {
-            members.Add("[" + (IndexSignature.Parameters == null ? "" : String.Join(", ", IndexSignature.Parameters.Select(p => p.Type.ToString()))) + "]: " + (IndexSignature.Type == null ? "any" : IndexSignature.Type.ToString()));
+            components.Add(new TypeToStringTextComponent("["));
+            
+            bool first = true;
+
+            foreach (TypeScriptParameter param in IndexSignature.Parameters)
+            {
+                if (!first)
+                {
+                    components.Add(new TypeToStringTextComponent(", "));
+                }
+
+                first = false;
+
+                components.Add(new TypeToStringTextComponent(param.Name + ": "));
+                components.Add(new TypeToStringTypeComponent(param.Type));
+            }
+
+            components.Add(new TypeToStringTextComponent("]: "));
+            components.Add(new TypeToStringTypeComponent(IndexSignature.Type));
         }
 
         if (Members != null)
         {
-            members.AddRange(Members.Select(m => m.Type == null ? "any" : m.Type.ToString()).Cast<string>());
+            if (IndexSignature != null && IndexSignature.Parameters != null)
+            {
+                components.Add(new TypeToStringTextComponent(", "));
+            }
+
+            bool first = true;
+
+            foreach (TypeScriptCodeElement member in Members)
+            {
+                if (!first)
+                {
+                    components.Add(new TypeToStringTextComponent(", "));
+                }
+
+                first = false;
+
+                if (member is TypeScriptProperty property)
+                {
+                    components.Add(new TypeToStringTextComponent(property.Name + ": "));
+                    components.Add(new TypeToStringTypeComponent(property.Type));
+                }
+
+                else if (member is TypeScriptMethod method)
+                {
+                    components.Add(new TypeToStringTextComponent(method.Name + ": ("));
+
+                    if (method.Signatures[0].Parameters != null)
+                    {
+                        bool firstParam = true;
+
+                        foreach (TypeScriptParameter param in method.Signatures[0].Parameters!)
+                        {
+                            if (!firstParam)
+                            {
+                                components.Add(new TypeToStringTextComponent(", "));
+                            }
+
+                            firstParam = false;
+
+                            components.Add(new TypeToStringTextComponent(param.Name + ": "));
+                            components.Add(new TypeToStringTypeComponent(param.Type));
+                        }
+                    }
+
+                    components.Add(new TypeToStringTextComponent(") => "));
+                    components.Add(new TypeToStringTypeComponent(method.Signatures[0].ReturnType));
+                }
+            }
         }
 
-        return "{ " + string.Join(", ", members) + " }";
+        components.Add(new TypeToStringTextComponent(" }"));
+
+        return components;
     }
 }

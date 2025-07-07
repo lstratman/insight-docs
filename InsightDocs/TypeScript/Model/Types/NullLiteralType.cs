@@ -1,9 +1,13 @@
-﻿namespace InsightDocs.TypeScript.Model.Types;
+﻿
+namespace InsightDocs.TypeScript.Model.Types;
 
 public class NullLiteralType: TypeScriptType
 {
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return "null";
+        return
+        [
+            new TypeToStringTextComponent("null")
+        ];
     }
 }

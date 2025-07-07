@@ -13,8 +13,12 @@ public class QueryType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return "typeof " + Type.ToString();
+        return
+        [
+            new TypeToStringTextComponent("typeof "),
+            new TypeToStringTypeComponent(Type)
+        ];
     }
 }

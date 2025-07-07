@@ -21,15 +21,30 @@ public class ReferenceType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        string output = AllTypes[Target].Name;
+        List<TypeToStringComponent> components = [new TypeToStringReferenceTypeComponent(Target)];
 
-        if (Arguments != null)
+        if (Arguments != null && Arguments.Count > 0)
         {
-            output += "<" + string.Join(", ", Arguments.Select(a => a.ToString())) + ">";
+            components.Add(new TypeToStringTextComponent("<"));
+
+            bool first = true;
+
+            foreach (TypeScriptType arg in Arguments)
+            {
+                if (!first)
+                {
+                    components.Add(new TypeToStringTextComponent(", "));
+                }
+
+                first = false;
+                components.Add(new TypeToStringTypeComponent(arg));
+            }
+
+            components.Add(new TypeToStringTextComponent(">"));
         }
 
-        return output;
+        return components;
     }
 }

@@ -20,8 +20,16 @@ public class TypeParameterType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return Name + (Constraint == null ? "" : " extends " + Constraint.ToString());
+        List<TypeToStringComponent> components = [new TypeToStringTextComponent(Name)];
+
+        if (Constraint != null)
+        {
+            components.Add(new TypeToStringTextComponent(" extends "));
+            components.Add(new TypeToStringTypeComponent(Constraint));
+        }
+
+        return components;
     }
 }

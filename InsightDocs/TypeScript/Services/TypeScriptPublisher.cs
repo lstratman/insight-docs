@@ -11,8 +11,10 @@ public class TypeScriptPublisher(
     IItemTemplateProvider<TypeScriptInterface> interfaceTemplate,
     IItemTemplateProvider<TypeScriptEnum> enumTemplate,
     IItemTemplateProvider<TypeScriptTypeAlias> typeAliasTemplate,
+    IItemTemplateProvider<TypeScriptMethod> methodTemplate,
     IUrlProvider<TypeScriptModule> moduleUrlProvider,
     IUrlProvider<TypeScriptTypeDeclaration> typeUrlProvider,
+    IUrlProvider<TypeScriptMethod> methodUrlProvider,
     IPublisher publisher
 ) : ITypeScriptPublisher
 {
@@ -49,6 +51,11 @@ public class TypeScriptPublisher(
 
             foreach (TypeScriptTypeDeclaration type in types.Where(t => !t.BuiltIn).OrderBy(t => t.FullName))
             {
+                if (type is TypeScriptInterface typeScriptInterface && typeScriptInterface.ExportedFromModule != null)
+                {
+                    continue;
+                }
+
                 TocItem? parentTocItem = typesRoot;
 
                 if (type.FullName.Contains('.'))
@@ -76,19 +83,33 @@ public class TypeScriptPublisher(
         if (type is TypeScriptInterface typeScriptInterface)
         {
             string html = await interfaceTemplate.GetContent(typeScriptInterface);
-            await publisher.Publish(url, html, "text/html", type.Title);
+            await publisher.Publish(url, html, "text/html", type.Name);
+
+            if (typeScriptInterface.Methods != null && typeScriptInterface.Methods.Any(m => m.Value.SourceTypeId == typeScriptInterface.Id))
+            {
+                TocItem methodsRootTocItem = tocItem.AddTocItem("Methods");
+
+                foreach (TypeScriptMethod method in typeScriptInterface.Methods.Values.Where(m => m.SourceTypeId == typeScriptInterface.Id))
+                {
+                    string methodUrl = methodUrlProvider.GetUrl(method);
+                    TocItem methodTocItem = methodsRootTocItem.AddTocItem(method.Name, methodUrl);
+
+                    string methodHtml = await methodTemplate.GetContent(method);
+                    await publisher.Publish(methodUrl, methodHtml, "text/html", method.Name);
+                }
+            }
         }
 
         else if (type is TypeScriptEnum typeScriptEnum)
         {
             string html = await enumTemplate.GetContent(typeScriptEnum);
-            await publisher.Publish(url, html, "text/html", type.Title);
+            await publisher.Publish(url, html, "text/html", type.Name);
         }
 
         else if (type is TypeScriptTypeAlias typeScriptTypeAlias)
         {
             string html = await typeAliasTemplate.GetContent(typeScriptTypeAlias);
-            await publisher.Publish(url, html, "text/html", type.Title);
+            await publisher.Publish(url, html, "text/html", type.Name);
         }
 
         else

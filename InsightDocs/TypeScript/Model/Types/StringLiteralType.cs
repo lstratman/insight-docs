@@ -2,7 +2,7 @@
 
 namespace InsightDocs.TypeScript.Model.Types;
 
-public class StringLiteralType: TypeScriptType
+public class StringLiteralType : TypeScriptType
 {
     [JsonProperty("literalValue")]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -13,8 +13,13 @@ public class StringLiteralType: TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return "'" + Value + "'";
+        return new List<TypeToStringComponent>
+        {
+            new TypeToStringTextComponent("'"),
+            new TypeToStringTextComponent(Value),
+            new TypeToStringTextComponent("'")
+        };
     }
 }

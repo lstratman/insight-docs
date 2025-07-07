@@ -22,8 +22,12 @@ public class PredicateType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return Name + " is " + TargetType.ToString();
+        return
+        [
+            new TypeToStringTextComponent($"{Name} is "),
+            new TypeToStringTypeComponent(TargetType)
+        ];
     }
 }

@@ -22,9 +22,15 @@ namespace InsightDocs.TypeScript.Model.Types
             set;
         }
 
-        public override string ToString()
+        public override List<TypeToStringComponent> GetToStringComponents()
         {
-            return ObjectType.ToString() + "[" + IndexType.ToString() + "]";
+            return
+            [
+                new TypeToStringTypeComponent(ObjectType),
+                new TypeToStringTextComponent("["),
+                new TypeToStringTypeComponent(IndexType),
+                new TypeToStringTextComponent("]"),
+            ];
         }
     }
 }

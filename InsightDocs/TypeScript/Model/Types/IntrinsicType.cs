@@ -13,9 +13,13 @@ namespace InsightDocs.TypeScript.Model.Types
             set;
         }
 
-        public override string ToString()
+        public override List<TypeToStringComponent> GetToStringComponents()
         {
-            return Name;
+            return
+            [
+                // TODO
+                new TypeToStringTextComponent(Name)
+            ];
         }
     }
 }

@@ -13,9 +13,31 @@ public class TupleType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return "[" + string.Join(", ", Elements.Select(e => e.ToString())) + "]";
+        List<TypeToStringComponent> components = [new TypeToStringTextComponent("[")];
+
+        bool first = true;
+
+        foreach (TupleTypeElement element in Elements)
+        {
+            if (!first)
+            {
+                components.Add(new TypeToStringTextComponent(", "));
+            }
+
+            first = false;
+
+            if (!String.IsNullOrEmpty(element.Name))
+            {
+                components.Add(new TypeToStringTextComponent(element.Name + ": "));
+            }
+
+            components.Add(new TypeToStringTypeComponent(element.Type));
+        }
+
+        components.Add(new TypeToStringTextComponent("]"));
+        return components;
     }
 }
 
@@ -35,10 +57,5 @@ public class TupleTypeElement
     {
         get;
         set;
-    }
-
-    public override string ToString()
-    {
-        return (string.IsNullOrEmpty(Name) ? Name + ": " : "") + Type.ToString();
     }
 }

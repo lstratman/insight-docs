@@ -13,8 +13,11 @@ public class BooleanLiteralType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return Value.ToString().ToLower();
+        return
+        [
+            new TypeToStringTextComponent(Value.ToString().ToLower())
+        ];
     }
 }

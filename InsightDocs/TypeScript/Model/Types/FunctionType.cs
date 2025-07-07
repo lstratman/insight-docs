@@ -29,25 +29,29 @@ public class FunctionType : TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        string displayName = "";
+        List<TypeToStringComponent> components = [];
+        components.Add(new TypeToStringTextComponent("("));
 
         if (Parameters != null && Parameters.Count > 0)
         {
-            if (Parameters[0].Type is StringLiteralType)
+            
+            foreach (TypeScriptParameter parameter in Parameters)
             {
-                displayName += "(" + string.Join(", ", Parameters.Select(p => p.Type is StringLiteralType ? p.Type.ToString() : p.Name)) + ")";
-            }
+                if (components.Count > 1)
+                {
+                    components.Add(new TypeToStringTextComponent(", "));
+                }
 
-            else
-            {
-                displayName += "(" + string.Join(", ", Parameters.Select(p => p.Type.ToString())) + ")";
+                components.Add(new TypeToStringTypeComponent(parameter.Type));
+                components.Add(new TypeToStringTextComponent(" " + parameter.Name));
             }
         }
 
-        displayName += " => " + ReturnType.ToString();
+        components.Add(new TypeToStringTextComponent(") => "));
+        components.Add(new TypeToStringTypeComponent(ReturnType));
 
-        return displayName;
+        return components;
     }
 }

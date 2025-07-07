@@ -13,8 +13,12 @@ public class ArrayType: TypeScriptType
         set;
     }
 
-    public override string ToString()
+    public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return ElementType.ToString() + "[]";
+        return
+        [
+            new TypeToStringTypeComponent(ElementType),
+            new TypeToStringTextComponent("[]")
+        ];
     }
 }
