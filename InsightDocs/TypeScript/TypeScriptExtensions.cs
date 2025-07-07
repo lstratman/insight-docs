@@ -5,12 +5,37 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.TypeScript;
 
+public class TypeScriptOptions
+{
+    public bool ResolveMDNUrls
+    {
+        get;
+        set;
+    } = true;
+}
+
 public static class TypeScriptExtensions
 {
-    public static InsightDocsBuilder UseTypeScript(this InsightDocsBuilder builder)
+    public static InsightDocsBuilder UseTypeScript(this InsightDocsBuilder builder, Action<TypeScriptOptions>? optionsFactory = null)
     {
         builder.Services.AddScoped<ITypeScriptLoader, TypeScriptLoader>();
         builder.Services.AddScoped<ITypeScriptPublisher, TypeScriptPublisher>();
+
+        if (optionsFactory != null)
+        {
+            builder.Services.AddSingleton((serviceProvider) =>
+            {
+                TypeScriptOptions options = new();
+                optionsFactory(options);
+
+                return options;
+            });
+        }
+
+        else
+        {
+            builder.Services.AddSingleton(new TypeScriptOptions());
+        }
 
         return builder;
     }

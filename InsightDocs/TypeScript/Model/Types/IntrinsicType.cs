@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using InsightDocs.Abstractions;
+using Newtonsoft.Json;
 
 namespace InsightDocs.TypeScript.Model.Types
 {
-    public class IntrinsicType : TypeScriptType
+    public class IntrinsicType : TypeScriptType, ILinkTarget
     {
         [JsonProperty("name")]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -13,12 +14,19 @@ namespace InsightDocs.TypeScript.Model.Types
             set;
         }
 
+        public string LinkText
+        {
+            get
+            {
+                return Name;
+            }
+        }
+
         public override List<TypeToStringComponent> GetToStringComponents()
         {
             return
             [
-                // TODO
-                new TypeToStringTextComponent(Name)
+                new TypeToStringIntrinsicTypeComponent(this)
             ];
         }
     }

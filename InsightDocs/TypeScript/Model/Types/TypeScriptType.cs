@@ -154,6 +154,25 @@ public class TypeToStringReferenceTypeComponent : TypeToStringComponent
     }
 }
 
+public class TypeToStringIntrinsicTypeComponent : TypeToStringComponent
+{
+    public TypeToStringIntrinsicTypeComponent(IntrinsicType type)
+    {
+        Type = type;
+    }
+
+    public IntrinsicType Type
+    {
+        get;
+        set;
+    }
+
+    public override string ToString()
+    {
+        return Type.Name;
+    }
+}
+
 public class TypeToStringTypeComponent : TypeToStringComponent
 {
     public TypeToStringTypeComponent(TypeScriptType type)

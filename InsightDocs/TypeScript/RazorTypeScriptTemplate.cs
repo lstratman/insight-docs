@@ -21,20 +21,43 @@ public class RazorTypeScriptTemplate<T> : RazorTemplate<T>
                     IUrlProvider<TypeScriptTypeDeclaration> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<TypeScriptTypeDeclaration>>();
                     string url = urlProvider.GetUrl(typeDeclaration);
 
+                    string shortName = typeDeclaration.Name;
+
+                    if (shortName.Contains('<'))
+                    {
+                        shortName = shortName[..shortName.IndexOf('<')];
+                    }
+
                     if (String.IsNullOrEmpty(url))
                     {
-                        linkTagBuilder.Append(typeDeclaration.LinkText.Replace("<", "&lt;").Replace(">", "&gt;"));
+                        linkTagBuilder.Append(shortName);
                     }
 
                     else
                     {
-                        linkTagBuilder.Append($@"<a href=""{url}""{(url.StartsWith("https://") || url.StartsWith("http://") ? " target=\"_blank\"" : "")}>{typeDeclaration.Name}</a>");
+                        linkTagBuilder.Append($@"<a href=""{url}""{(url.StartsWith("https://") || url.StartsWith("http://") ? " target=\"_blank\"" : "")}>{shortName}</a>");
                     }
                 }
 
                 else
                 {
                     throw new Exception($"Type declaration for reference type with ID {referenceTypeComponent.Id} not found.");
+                }
+            }
+
+            else if (component is TypeToStringIntrinsicTypeComponent intrinsicTypeComponent)
+            {
+                IUrlProvider<IntrinsicType> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<IntrinsicType>>();
+                string url = urlProvider.GetUrl(intrinsicTypeComponent.Type);
+
+                if (String.IsNullOrEmpty(url))
+                {
+                    linkTagBuilder.Append(intrinsicTypeComponent.Type.Name);
+                }
+
+                else
+                {
+                    linkTagBuilder.Append($@"<a href=""{url}""{(url.StartsWith("https://") || url.StartsWith("http://") ? " target=\"_blank\"" : "")}>{intrinsicTypeComponent.Type.Name}</a>");
                 }
             }
 

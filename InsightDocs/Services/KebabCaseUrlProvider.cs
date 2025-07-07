@@ -6,13 +6,14 @@ using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
 using InsightDocs.Markdown.Model;
 using InsightDocs.Site.Model;
+using InsightDocs.TypeScript;
 using InsightDocs.TypeScript.Model;
 using InsightDocs.TypeScript.Model.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, DotNetOptions dotNetOptions) 
+public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, DotNetOptions dotNetOptions, TypeScriptOptions typeScriptOptions) 
     : IUrlProvider<DotNetType>,
       IUrlProvider<DotNetIndex>,
       IUrlProvider<DotNetNamespace>,
@@ -32,7 +33,8 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<TypeScriptMethod>,
       IUrlProvider<TypeScriptProperty>,
       IUrlProvider<TypeScriptMethodSignature>,
-      IUrlProvider<TypeScriptNamespace>
+      IUrlProvider<TypeScriptNamespace>,
+      IUrlProvider<IntrinsicType>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -460,6 +462,33 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(TypeScriptTypeDeclaration item)
     {
+        if (item.BuiltIn)
+        {
+            if (!typeScriptOptions.ResolveMDNUrls)
+            {
+                return "";
+            }
+
+            string typeName = item.Name;
+
+            if (typeName.Contains('<'))
+            {
+                typeName = typeName[..typeName.IndexOf('<')];
+            }
+
+            if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
+            {
+                return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}";
+            }
+
+            else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
+            {
+                return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
+            }
+
+            return "";
+        }
+
         StringBuilder url = new();
 
         if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
@@ -572,6 +601,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         return url.ToString();
     }
+
+    public string GetUrl(IntrinsicType item)
+    {
+        return typeScriptOptions.ResolveMDNUrls ? item.Name == "void" ? "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void" : $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{item.Name}" : "";
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -612,6 +646,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<TypeScriptProperty>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<TypeScriptMethodSignature>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<TypeScriptNamespace>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<IntrinsicType>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {
