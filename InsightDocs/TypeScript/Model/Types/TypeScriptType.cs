@@ -135,37 +135,34 @@ public abstract class TypeToStringComponent
     public abstract override string ToString();
 }
 
-public class TypeToStringReferenceTypeComponent : TypeToStringComponent
+public class TypeToStringReferenceTypeComponent(int id) : TypeToStringComponent
 {
-    public TypeToStringReferenceTypeComponent(int id)
-    {
-        Id = id;
-    }
-
     public int Id
     {
         get;
         set;
-    }
+    } = id;
 
     public override string ToString()
     {
-        return ReferenceType.AllTypes[Id].Name;
+        string typeName = ReferenceType.AllTypes[Id].Name;
+
+        if (typeName.Contains('<'))
+        {
+            typeName = typeName[..typeName.IndexOf('<')];
+        }
+
+        return typeName;
     }
 }
 
-public class TypeToStringIntrinsicTypeComponent : TypeToStringComponent
+public class TypeToStringIntrinsicTypeComponent(IntrinsicType type) : TypeToStringComponent
 {
-    public TypeToStringIntrinsicTypeComponent(IntrinsicType type)
-    {
-        Type = type;
-    }
-
     public IntrinsicType Type
     {
         get;
         set;
-    }
+    } = type;
 
     public override string ToString()
     {
@@ -173,18 +170,13 @@ public class TypeToStringIntrinsicTypeComponent : TypeToStringComponent
     }
 }
 
-public class TypeToStringTypeComponent : TypeToStringComponent
+public class TypeToStringTypeComponent(TypeScriptType type) : TypeToStringComponent
 {
-    public TypeToStringTypeComponent(TypeScriptType type)
-    {
-        Type = type;
-    }
-
     public TypeScriptType Type
     {
         get;
         set;
-    }
+    } = type;
 
     public override string ToString()
     {
@@ -192,18 +184,13 @@ public class TypeToStringTypeComponent : TypeToStringComponent
     }
 }
 
-public class TypeToStringTextComponent : TypeToStringComponent
+public class TypeToStringTextComponent(string text) : TypeToStringComponent
 {
-    public TypeToStringTextComponent(string text)
-    {
-        Text = text;
-    }
-
     public string Text
     {
         get;
         set;
-    }
+    } = text;
 
     public override string ToString()
     {

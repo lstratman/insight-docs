@@ -28,4 +28,9 @@ public class TypeScriptProperty: TypeScriptTypeMember
             }
         }
     }
+
+    public override string ToString()
+    {
+        return $"{Name}: {Type}";
+    }
 }

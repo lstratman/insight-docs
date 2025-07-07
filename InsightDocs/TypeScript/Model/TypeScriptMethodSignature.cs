@@ -81,43 +81,41 @@ public class TypeScriptMethodSignature : TypeScriptTypeMember
 
     public override string ToString()
     {
-        string displayName = "";
+        StringBuilder output = new StringBuilder(Name);
 
         if (TypeParameters != null && TypeParameters.Count > 0)
         {
-            displayName += "&lt;";
+            output.Append("&lt;");
 
             for (int i = 0; i < TypeParameters.Count; i++)
             {
                 if (i > 0)
                 {
-                    displayName += ", ";
+                    output.Append(", ");
                 }
 
-                displayName += TypeParameters[i].Name;
+                output.Append(TypeParameters[i].Name);
 
                 if (TypeParameters[i].Constraint != null)
                 {
-                    displayName += " extends " + TypeParameters[i].Constraint!.ToString();
+                    output.Append(" extends " + TypeParameters[i].Constraint!.ToString());
                 }
             }
 
-            displayName += "&gt;";
+            output.Append("&gt;");
         }
             
         if (Parameters != null && Parameters.Count > 0)
         {
-            if (Parameters[0].Type is StringLiteralType)
-            {
-                displayName += "(" + string.Join(", ", Parameters.Select(p => p.Type is StringLiteralType ? p.Type.ToString() : p.Name)) + ")";
-            }
-
-            else
-            {
-                displayName += "(" + string.Join(", ", Parameters.Select(p => p.Type.ToString())) + ")";
-            }
+            output.Append("(" + string.Join(", ", Parameters.Select(p => p.Name + ": " + p.Type.ToString())) + ")");
         }
 
-        return displayName;
+        if (Name != "constructor")
+        {
+            output.Append(": ");
+            output.Append(ReturnType.ToString());
+        }
+
+        return output.ToString();
     }
 }

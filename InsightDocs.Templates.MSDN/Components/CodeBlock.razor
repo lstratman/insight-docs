@@ -1,4 +1,4 @@
-@Raw("<div class=\"codeHeader\"" + (LanguageId == "csharp" ? "" : " hidden") + ">")
+@Raw("<div class=\"codeHeader\"" + (LanguageId == "csharp" || LanguageId == "typescript" ? "" : " hidden") + ">")
     <span class="language">@LanguageLabel</span>
     <button type="button" class="action position-relative display-none-print" onclick="copyCodeBlock(event)">
         <span class="icon margin-right-xxs" aria-hidden="true">
@@ -12,7 +12,7 @@
         </div>
     </button>
 @Raw("</div>")
-@Raw("<pre class=\"wrap has-inner-focus\"" + (LanguageId == "csharp" ? "" : " hidden") + ">")<code class="@LanguageId language-@LanguageId" dir="ltr">@Code</code>@Raw("</pre>")
+@Raw("<pre class=\"wrap has-inner-focus\"" + (LanguageId == "csharp" || LanguageId == "typescript" ? "" : " hidden") + ">")<code class="@LanguageId language-@LanguageId" dir="ltr">@Code</code>@Raw("</pre>")
 
 @code {
     public RenderFragment Raw(string html) => __builder =>

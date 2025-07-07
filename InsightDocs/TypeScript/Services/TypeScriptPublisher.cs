@@ -12,9 +12,11 @@ public class TypeScriptPublisher(
     IItemTemplateProvider<TypeScriptEnum> enumTemplate,
     IItemTemplateProvider<TypeScriptTypeAlias> typeAliasTemplate,
     IItemTemplateProvider<TypeScriptMethod> methodTemplate,
+    IItemTemplateProvider<TypeScriptProperty> propertyTemplate,
     IUrlProvider<TypeScriptModule> moduleUrlProvider,
     IUrlProvider<TypeScriptTypeDeclaration> typeUrlProvider,
     IUrlProvider<TypeScriptMethod> methodUrlProvider,
+    IUrlProvider<TypeScriptProperty> propertyUrlProvider,
     IPublisher publisher
 ) : ITypeScriptPublisher
 {
@@ -96,6 +98,20 @@ public class TypeScriptPublisher(
 
                     string methodHtml = await methodTemplate.GetContent(method);
                     await publisher.Publish(methodUrl, methodHtml, "text/html", method.Name);
+                }
+            }
+
+            if (typeScriptInterface.Properties != null && typeScriptInterface.Properties.Any(p => p.SourceTypeId == typeScriptInterface.Id))
+            {
+                TocItem methodsRootTocItem = tocItem.AddTocItem("Properties");
+
+                foreach (TypeScriptProperty property in typeScriptInterface.Properties.Where(m => m.SourceTypeId == typeScriptInterface.Id))
+                {
+                    string propertyUrl = propertyUrlProvider.GetUrl(property);
+                    TocItem methodTocItem = methodsRootTocItem.AddTocItem(property.Name, propertyUrl);
+
+                    string propertyHtml = await propertyTemplate.GetContent(property);
+                    await publisher.Publish(propertyUrl, propertyHtml, "text/html", property.Name);
                 }
             }
         }
