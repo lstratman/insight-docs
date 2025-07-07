@@ -1,3 +1,4 @@
+@using InsightDocs.DotNet.Model
 @using InsightDocs.Templates.MSDN.Components
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetProperty>
 
@@ -95,7 +96,7 @@
                                 {
                                     <SectionHeader Level="2" LinkId="examples" Title="Examples"/>
 
-                                    @foreach (Tuple<string, InsightDocs.DotNet.Model.XmlDocHtml> example in Item.Examples)
+                                    @foreach (Tuple<string, XmlDocHtml> example in Item.Examples)
                                     {
                                         if (!String.IsNullOrEmpty(example.Item1))
                                         {
@@ -131,7 +132,7 @@
                                     <SectionHeader Level="2" LinkId="see-also" Title="See Also"/>
 
                                     <ul>
-                                        @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in Item.SeeAlso)
+                                        @foreach (XmlDocHtml seeAlso in Item.SeeAlso)
                                         {
                                             <li>@Raw(seeAlso.ToHtml())</li>
                                         }

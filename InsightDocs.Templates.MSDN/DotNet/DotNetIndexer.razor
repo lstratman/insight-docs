@@ -1,3 +1,4 @@
+@using InsightDocs.DotNet.Model
 @using InsightDocs.Templates.MSDN.Components
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetIndexer>
 
@@ -115,7 +116,7 @@
                                             <h2 id="examples" class="heading-anchor">Examples</h2>
                                         </div>
 
-                                        @foreach (Tuple<string, InsightDocs.DotNet.Model.XmlDocHtml> example in overload.Examples)
+                                        @foreach (Tuple<string, XmlDocHtml> example in overload.Examples)
                                         {
                                             if (!String.IsNullOrEmpty(example.Item1))
                                             {
@@ -156,7 +157,7 @@
                                         </div>
 
                                         <ul>
-                                            @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in overload.SeeAlso)
+                                            @foreach (XmlDocHtml seeAlso in overload.SeeAlso)
                                             {
                                                 <li>@Raw(seeAlso.ToHtml())</li>
                                             }

@@ -1,4 +1,6 @@
 @using InsightDocs.Templates.MSDN.Components
+@using InsightDocs.TypeScript.Model
+@using InsightDocs.TypeScript.Model.Types
 @inherits InsightDocs.TypeScript.RazorTypeScriptTemplate<InsightDocs.TypeScript.Model.TypeScriptInterface>
 
 <html>
@@ -72,7 +74,7 @@
                             {
                                 <h4 class="propertyInfoTitle stack">Type Parameters</h4>
 
-                                @foreach (InsightDocs.TypeScript.Model.TypeParameter typeParameter in Item.TypeParameters)
+                                @foreach (TypeParameter typeParameter in Item.TypeParameters)
                                 {
                                     <div class="propertyInfo">
                                         <dl class="parameterList">
@@ -95,9 +97,9 @@
                                             {
                                                 <span class="@(i == Item.Extends.Count - 1 ? "cdl cdlLastVisible" : "cdl")">
                                                     <span class="break-text">
-                                                        @if (Item.Extends[i] is InsightDocs.TypeScript.Model.Types.ReferenceType referenceType)
+                                                        @if (Item.Extends[i] is ReferenceType referenceType)
                                                         {
-                                                            @GetLink((InsightDocs.TypeScript.Model.TypeScriptInterface)InsightDocs.TypeScript.Model.Types.ReferenceType.AllTypes[referenceType.Target])
+                                                            @GetLink((InsightDocs.TypeScript.Model.TypeScriptInterface)ReferenceType.AllTypes[referenceType.Target])
                                                         }
 
                                                         else
@@ -122,7 +124,7 @@
                                     <div class="has-inner-focus">
                                         <table class="table table-sm margin-top-none" aria-label="Methods">
         	                                <tbody>
-                                                @foreach (InsightDocs.TypeScript.Model.TypeScriptMethodSignature methodOverload in Item.Constructor.Signatures.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                                @foreach (TypeScriptMethodSignature methodOverload in Item.Constructor.Signatures.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
                                                 {
                                                     <tr>
                                                         <td>
@@ -136,7 +138,7 @@
 
                                                             @if (methodOverload.SourceTypeId != 0 && methodOverload.SourceTypeId != Item.Id)
                                                             {
-                                                                <div>(Inherited from @GetLink(InsightDocs.TypeScript.Model.Types.ReferenceType.AllTypes[methodOverload.SourceTypeId]))</div>
+                                                                <div>(Inherited from @GetLink(ReferenceType.AllTypes[methodOverload.SourceTypeId]))</div>
                                                             }
                                                         </td>
                                                     </tr>
@@ -167,7 +169,7 @@
 
                                                             @if (property.SourceTypeId != 0 && property.SourceTypeId != Item.Id)
                                                             {
-                                                                <div>(Inherited from @GetLink(InsightDocs.TypeScript.Model.Types.ReferenceType.AllTypes[property.SourceTypeId]))</div>
+                                                                <div>(Inherited from @GetLink(ReferenceType.AllTypes[property.SourceTypeId]))</div>
                                                             }
                                                         </td>
                                                     </tr>
@@ -186,7 +188,7 @@
         	                                <tbody>
                                                 @foreach (KeyValuePair<string, InsightDocs.TypeScript.Model.TypeScriptMethod> method in Item.Methods.OrderBy(m => m.Key))
                                                 {
-                                                    @foreach (InsightDocs.TypeScript.Model.TypeScriptMethodSignature methodOverload in method.Value.Signatures.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                                    @foreach (TypeScriptMethodSignature methodOverload in method.Value.Signatures.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
                                                     {
                                                         <tr>
                                                             <td>
@@ -200,7 +202,7 @@
 
                                                                 @if (methodOverload.SourceTypeId != 0 && methodOverload.SourceTypeId != Item.Id)
                                                                 {
-                                                                    <div>(Inherited from @GetLink(InsightDocs.TypeScript.Model.Types.ReferenceType.AllTypes[methodOverload.SourceTypeId]))</div>
+                                                                    <div>(Inherited from @GetLink(ReferenceType.AllTypes[methodOverload.SourceTypeId]))</div>
                                                                 }
                                                             </td>
                                                         </tr>

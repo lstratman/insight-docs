@@ -1,4 +1,5 @@
 @using InsightDocs.Templates.MSDN.Components
+@using InsightDocs.TypeScript.Model.Types
 @inherits InsightDocs.TypeScript.RazorTypeScriptTemplate<InsightDocs.TypeScript.Model.TypeScriptProperty>
 
 <html>
@@ -19,7 +20,7 @@
             <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
 				<div>
                     @{
-                        InsightDocs.TypeScript.Model.TypeScriptInterface? sourceType = Item!.SourceTypeId != 0 ? (InsightDocs.TypeScript.Model.TypeScriptInterface)InsightDocs.TypeScript.Model.Types.ReferenceType.AllTypes[Item.SourceTypeId] : null;
+                        InsightDocs.TypeScript.Model.TypeScriptInterface? sourceType = Item!.SourceTypeId != 0 ? (InsightDocs.TypeScript.Model.TypeScriptInterface)ReferenceType.AllTypes[Item.SourceTypeId] : null;
                     }
 
                     @if (sourceType != null)

@@ -1,4 +1,6 @@
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetMethod>
+@using InsightDocs.Abstractions
+@using InsightDocs.DotNet.Model
 @using InsightDocs.Templates.MSDN.Components
 @using Microsoft.Extensions.DependencyInjection
 
@@ -83,12 +85,12 @@
                                 bool reduceHeaderSize = Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1;
                             }
 
-                            @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
+                            @foreach (DotNetMethodOverload overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
                             {
                                 <div>
                                     @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
                                     {
-                                        string overloadUrl = ServiceProvider.GetRequiredService<InsightDocs.Abstractions.IUrlProvider<InsightDocs.DotNet.Model.DotNetMethodOverload>>().GetUrl(overload);
+                                        string overloadUrl = ServiceProvider.GetRequiredService<IUrlProvider<DotNetMethodOverload>>().GetUrl(overload);
 
                                         <div class="heading-wrapper" data-heading-level="h3">
                                             @if (overloadUrl.IndexOf("#") != -1)
@@ -126,7 +128,7 @@
                                             <h3 class="propertyInfoTitle stack">Generic Arguments</h3>
                                         }
 
-                                        @foreach (InsightDocs.DotNet.Model.DotNetTypeParameter genericArgument in overload.GenericArguments)
+                                        @foreach (DotNetTypeParameter genericArgument in overload.GenericArguments)
                                         {
                                             <div class="propertyInfo">
                                                 <dl class="parameterList">
@@ -206,7 +208,7 @@
 
                                         for (int i = 0; i < overload.Exceptions.Count; i++)
                                         {
-                                            Tuple<InsightDocs.DotNet.Model.XmlDocHtml, InsightDocs.DotNet.Model.XmlDocHtml?> exception = overload.Exceptions[i];
+                                            Tuple<XmlDocHtml, XmlDocHtml?> exception = overload.Exceptions[i];
 
                                             <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
                                                 <div class="subtle">
@@ -233,7 +235,7 @@
                                             <h3 id="examples" class="heading-anchor">Examples</h3>
                                         }
 
-                                        @foreach (Tuple<string, InsightDocs.DotNet.Model.XmlDocHtml> example in overload.Examples)
+                                        @foreach (Tuple<string, XmlDocHtml> example in overload.Examples)
                                         {
                                             if (!String.IsNullOrEmpty(example.Item1))
                                             {
@@ -286,7 +288,7 @@
                                         }
 
                                         <ul>
-                                            @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in overload.SeeAlso)
+                                            @foreach (XmlDocHtml seeAlso in overload.SeeAlso)
                                             {
                                                 <li>@Raw(seeAlso.ToHtml())</li>
                                             }

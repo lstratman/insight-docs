@@ -1,3 +1,4 @@
+@using InsightDocs.DotNet.Model
 @using InsightDocs.Templates.MSDN.Components
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetType>
 
@@ -85,7 +86,7 @@
                             {
                                 <h4 class="propertyInfoTitle stack">Type Parameters</h4>
 
-                                @foreach (InsightDocs.DotNet.Model.DotNetTypeParameter typeParameter in Item.TypeParameters)
+                                @foreach (DotNetTypeParameter typeParameter in Item.TypeParameters)
                                 {
                                     <div class="propertyInfo">
                                         <dl class="parameterList">
@@ -105,8 +106,8 @@
 
                             @if (Item.BaseType != null)
                             {
-                                List<InsightDocs.DotNet.Model.DotNetTypeReference> baseTypes = [];
-                                InsightDocs.DotNet.Model.DotNetTypeReference? currentBaseType = Item.BaseType;
+                                List<DotNetTypeReference> baseTypes = [];
+                                DotNetTypeReference? currentBaseType = Item.BaseType;
 
                                 while (currentBaseType != null)
                                 {
@@ -120,7 +121,7 @@
                                     <dt>Inheritance</dt>
                                     <dd>
                                         <div class="pdlHolder">
-                                            @foreach (InsightDocs.DotNet.Model.DotNetTypeReference baseType in baseTypes)
+                                            @foreach (DotNetTypeReference baseType in baseTypes)
                                             {
                                                 <div class="pdl">@GetLink(baseType)</div> 
                                             }
@@ -191,7 +192,7 @@
                                     <h2 id="examples" class="heading-anchor">Examples</h2>
                                 </div>
 
-                                @foreach (Tuple<string, InsightDocs.DotNet.Model.XmlDocHtml> example in Item.Examples)
+                                @foreach (Tuple<string, XmlDocHtml> example in Item.Examples)
                                 {
                                     if (!String.IsNullOrEmpty(example.Item1))
                                     {
@@ -227,7 +228,7 @@
                                 <SectionHeader Level="2" LinkId="see-also" Title="See Also"/>
 
                                 <ul>
-                                    @foreach (InsightDocs.DotNet.Model.XmlDocHtml seeAlso in Item.SeeAlso)
+                                    @foreach (XmlDocHtml seeAlso in Item.SeeAlso)
                                     {
                                         <li>@Raw(seeAlso.ToHtml())</li>
                                     }
@@ -244,7 +245,7 @@
                                         <div class="has-inner-focus">
                                             <table class="table table-sm margin-top-none" aria-label="Methods">
         	                                    <tbody>
-                                                    @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload methodOverload in Item.Constructor.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                                    @foreach (DotNetMethodOverload methodOverload in Item.Constructor.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
                                                     {
                                                         <tr>
                                                             <td>
@@ -370,7 +371,7 @@
         	                                    <tbody>
                                                     @foreach (InsightDocs.DotNet.Model.DotNetMethod method in Item.Methods.OrderBy(m => m.Name))
                                                     {
-                                                        @foreach (InsightDocs.DotNet.Model.DotNetMethodOverload methodOverload in method.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                                        @foreach (DotNetMethodOverload methodOverload in method.Overloads.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
                                                         {
                                                             <tr>
                                                                 <td>
