@@ -1,7 +1,5 @@
-﻿using InsightDocs.Abstractions;
-using InsightDocs.TypeScript.Model.Types;
+﻿using InsightDocs.TypeScript.Model.Types;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Text;
 
 namespace InsightDocs.TypeScript.Model;
@@ -91,7 +89,7 @@ public class TypeScriptMethodSignature : TypeScriptTypeMember
 
         if (TypeParameters != null && TypeParameters.Count > 0)
         {
-            output.Append("&lt;");
+            output.Append('<');
 
             for (int i = 0; i < TypeParameters.Count; i++)
             {
@@ -108,7 +106,7 @@ public class TypeScriptMethodSignature : TypeScriptTypeMember
                 }
             }
 
-            output.Append("&gt;");
+            output.Append('>');
         }
 
         output.Append('(');

@@ -22,7 +22,7 @@ public class TypeScriptMethod: TypeScriptTypeMember
 
             if (Signatures.Count == 1 && Signatures[0].TypeParameters != null && Signatures[0].TypeParameters!.Count > 0)
             {
-                displayName += "&lt;";
+                displayName += '<';
 
                 for (int i = 0; i < Signatures[0].TypeParameters!.Count; i++)
                 {
@@ -34,7 +34,7 @@ public class TypeScriptMethod: TypeScriptTypeMember
                     displayName += Signatures[0].TypeParameters![i].Name;
                 }
 
-                displayName += "&gt;";
+                displayName += '>';
             }
 
             return displayName + (Name == "constructor" ? " Constructor" : " Method");
