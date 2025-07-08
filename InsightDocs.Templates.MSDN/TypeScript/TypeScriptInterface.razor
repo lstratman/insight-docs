@@ -99,7 +99,7 @@
                                                     <span class="break-text">
                                                         @if (Item.Extends[i] is ReferenceType referenceType)
                                                         {
-                                                            @GetLink((InsightDocs.TypeScript.Model.TypeScriptInterface)ReferenceType.AllTypes[referenceType.Target])
+                                                            @GetLink(ReferenceType.AllTypes[referenceType.Target])
                                                         }
 
                                                         else

@@ -14,6 +14,7 @@ public partial class MarkdownPublisher(
     IUrlProvider<MarkdownImage> markdownImageUrlProvider,
     IMarkdownLoader markdownLoader,
     IPublisher publisher,
+    IUrlPrefixProvider urlPrefixProvider,
     IServiceProvider serviceProvider,
     MarkdownOptions markdownOptions
 ) : IMarkdownPublisher
@@ -23,6 +24,12 @@ public partial class MarkdownPublisher(
 
     [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
     public static partial void LogFinishedPublishingTopics(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Publishing topics for {prefix}")]
+    public static partial void LogPublishingTopicsForPrefix(ILogger logger, string prefix);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics for {prefix}")]
+    public static partial void LogFinishedPublishingTopicsForPrefix(ILogger logger, string prefix);
 
     [LoggerMessage(LogLevel.Debug, "Publishing topic for Markdown file {file}")]
     public static partial void LogPublishingMarkdownFile(ILogger logger, string file);
@@ -42,14 +49,30 @@ public partial class MarkdownPublisher(
     {
         ILogger logger = loggerFactory.CreateLogger<MarkdownPublisher>();
 
-        LogPublishingTopics(logger);
+        if (urlPrefixProvider.UrlPrefix != null)
+        {
+            LogPublishingTopicsForPrefix(logger, urlPrefixProvider.UrlPrefix);
+        }
+
+        else
+        {
+            LogPublishingTopics(logger);
+        }
 
         foreach (string markdownFilePath in markdownFilePaths)
         {
             await ProcessTopic(tocRoot, null, markdownFilePath, logger);
         }
 
-        LogFinishedPublishingTopics(logger);
+        if (urlPrefixProvider.UrlPrefix != null)
+        {
+            LogFinishedPublishingTopicsForPrefix(logger, urlPrefixProvider.UrlPrefix);
+        }
+
+        else
+        {
+            LogFinishedPublishingTopics(logger);
+        }
     }
 
     protected virtual async Task ProcessTopic(TocItem? tocRoot, TocItem? tocItem, string markdownFilePath, ILogger logger)

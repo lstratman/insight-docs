@@ -4,5 +4,5 @@ namespace InsightDocs.TypeScript.Abstractions;
 
 public interface ITypeScriptLoader
 {
-    Task<TypeScriptProject> LoadApiJson(string filename, Func<TypeScriptTypeDeclaration, bool>? typeFilter, Func<TypeScriptModule, bool>? moduleFilter);
+    Task<TypeScriptProject> LoadApiJson(string filename);
 }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace InsightDocs.TypeScript.Services;
 
-public class TypeScriptPublisher(
+public partial class TypeScriptPublisher(
     ILoggerFactory loggerFactory,
     ITypeScriptLoader typeScriptLoader,
     IItemTemplateProvider<TypeScriptInterface> interfaceTemplate,
@@ -17,12 +17,55 @@ public class TypeScriptPublisher(
     IUrlProvider<TypeScriptTypeDeclaration> typeUrlProvider,
     IUrlProvider<TypeScriptMethod> methodUrlProvider,
     IUrlProvider<TypeScriptProperty> propertyUrlProvider,
-    IPublisher publisher
+    IPublisher publisher,
+    IUrlPrefixProvider urlPrefixProvider
 ) : ITypeScriptPublisher
 {
+    [LoggerMessage(LogLevel.Information, "Publishing topics")]
+    public static partial void LogPublishingTopics(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
+    public static partial void LogFinishedPublishingTopics(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Publishing topics for {prefix}")]
+    public static partial void LogPublishingTopicsForPrefix(ILogger logger, string prefix);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics for {prefix}")]
+    public static partial void LogFinishedPublishingTopicsForPrefix(ILogger logger, string prefix);
+
+    [LoggerMessage(LogLevel.Information, "Publishing topics for namespace {ns}")]
+    public static partial void LogPublishingNamespace(ILogger logger, string ns);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics for namespace {ns}")]
+    public static partial void LogFinishedPublishingNamespace(ILogger logger, string ns);
+
+    [LoggerMessage(LogLevel.Debug, "Publishing topic for type {type}")]
+    public static partial void LogPublishingType(ILogger logger, string type);
+
+    [LoggerMessage(LogLevel.Debug, "Publishing topic for type {module}")]
+    public static partial void LogPublishingModule(ILogger logger, string module);
+
+    [LoggerMessage(LogLevel.Debug, "Skipping type {type}")]
+    public static partial void LogSkippingLoadingType(ILogger logger, string type);
+
+    [LoggerMessage(LogLevel.Debug, "Skipping type {module}")]
+    public static partial void LogSkippingLoadingModule(ILogger logger, string module);
+
     public virtual async Task PublishTopics(TocItem tocRoot, string typeScriptApiJsonFilePath, Func<TypeScriptTypeDeclaration, bool>? typeFilter, Func<TypeScriptModule, bool>? moduleFilter)
     {
-        TypeScriptProject api = await typeScriptLoader.LoadApiJson(typeScriptApiJsonFilePath, typeFilter, moduleFilter);
+        ILogger logger = loggerFactory.CreateLogger<TypeScriptPublisher>();
+        TypeScriptProject api = await typeScriptLoader.LoadApiJson(typeScriptApiJsonFilePath);
+
+        if (urlPrefixProvider.UrlPrefix != null)
+        {
+            LogPublishingTopicsForPrefix(logger, urlPrefixProvider.UrlPrefix);
+        }
+
+        else
+        {
+            LogPublishingTopics(logger);
+        }
+
         List<TypeScriptTypeDeclaration> types = api.Types?.Values.ToList() ?? [];
 
         if (api.Modules != null && api.Modules.Count > 0)
@@ -30,8 +73,14 @@ public class TypeScriptPublisher(
             TocItem modulesRoot = tocRoot.AddTocItem("Modules");
             Dictionary<string, TocItem> modulePathFolders = [];
 
-            foreach (TypeScriptModule module in api.Modules.Values.Where(m => m.Exports != null).OrderBy(m => m.Name))
+            foreach (TypeScriptModule module in api.Modules.Values.Where(m => m.Exports != null))
             {
+                if (moduleFilter != null && !moduleFilter(module))
+                {
+                    LogSkippingLoadingModule(logger, module.FullName);
+                    continue;
+                }
+
                 TocItem parentTocItem = GetOrAddModulePathFolders(modulesRoot, modulePathFolders, module.FullName);
 
                 string moduleUrl = moduleUrlProvider.GetUrl(module);
@@ -42,17 +91,43 @@ public class TypeScriptPublisher(
                     types.Remove(module.Exports);
                 }
 
+                LogPublishingModule(logger, module.FullName);
                 await ProcessType(module.Exports!, moduleUrl, tocItem);
             }
+
+            modulesRoot.SortChildren((a, b) =>
+            {
+                if (a.Title.EndsWith('/') && !b.Title.EndsWith('/'))
+                {
+                    return -1;
+                }
+
+                else if (!a.Title.EndsWith('/') && b.Title.EndsWith('/'))
+                {
+                    return 1;
+                }
+
+                else
+                {
+                    return a.Title.CompareTo(b.Title);
+                }
+            }, true);
         }
 
         if (types.Count > 0)
         {
             TocItem typesRoot = tocRoot.AddTocItem("Types");
             Dictionary<string, TocItem> namespaceFolders = [];
+            string? previousNamespace = null;
 
             foreach (TypeScriptTypeDeclaration type in types.Where(t => !t.BuiltIn).OrderBy(t => t.FullName))
             {
+                if (typeFilter != null && !typeFilter(type))
+                {
+                    LogSkippingLoadingType(logger, type.FullName);
+                    continue;
+                }
+
                 if (type is TypeScriptInterface typeScriptInterface && typeScriptInterface.ExportedFromModule != null)
                 {
                     continue;
@@ -69,14 +144,44 @@ public class TypeScriptPublisher(
                     {
                         parentTocItem = typesRoot.AddTocItem(ns);
                         namespaceFolders[ns] = parentTocItem;
+
+                        if (previousNamespace != null)
+                        {
+                            LogFinishedPublishingNamespace(logger, previousNamespace);
+                        }
+
+                        LogPublishingNamespace(logger, ns);
+                        previousNamespace = ns;
                     }
+                }
+
+                else if (previousNamespace != null)
+                {
+                    LogFinishedPublishingNamespace(logger, previousNamespace);
+                    previousNamespace = null;
                 }
 
                 string typeUrl = typeUrlProvider.GetUrl(type);
                 TocItem tocItem = parentTocItem.AddTocItem(type.Name, typeUrl);
 
+                LogPublishingType(logger, type.FullName);
                 await ProcessType(type, typeUrl, tocItem);
             }
+
+            if (previousNamespace != null)
+            {
+                LogFinishedPublishingNamespace(logger, previousNamespace);
+            }
+        }
+
+        if (urlPrefixProvider.UrlPrefix != null)
+        {
+            LogFinishedPublishingTopicsForPrefix(logger, urlPrefixProvider.UrlPrefix);
+        }
+
+        else
+        {
+            LogFinishedPublishingTopics(logger);
         }
     }
 
@@ -86,6 +191,8 @@ public class TypeScriptPublisher(
         {
             string html = await interfaceTemplate.GetContent(typeScriptInterface);
             await publisher.Publish(url, html, "text/html", type.Name);
+
+            // TODO: constructor
 
             if (typeScriptInterface.Methods != null && typeScriptInterface.Methods.Any(m => m.Value.SourceTypeId == typeScriptInterface.Id))
             {
@@ -114,6 +221,8 @@ public class TypeScriptPublisher(
                     await publisher.Publish(propertyUrl, propertyHtml, "text/html", property.Name);
                 }
             }
+
+            // TODO: indexer
         }
 
         else if (type is TypeScriptEnum typeScriptEnum)
@@ -126,6 +235,11 @@ public class TypeScriptPublisher(
         {
             string html = await typeAliasTemplate.GetContent(typeScriptTypeAlias);
             await publisher.Publish(url, html, "text/html", type.Name);
+        }
+
+        else if (type is TypeScriptVariable typeScriptVariable)
+        {
+            // TODO
         }
 
         else
@@ -153,7 +267,7 @@ public class TypeScriptPublisher(
             {
                 if (tocItem.Children.All(c => c.Title != component + (String.IsNullOrEmpty(currentPath) ? "" : "/")))
                 {
-                    tocItem = tocItem.AddTocItem(component);
+                    tocItem = tocItem.AddTocItem(component + (String.IsNullOrEmpty(currentPath) ? "" : "/"));
                 }
 
                 else

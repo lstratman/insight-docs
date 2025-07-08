@@ -73,6 +73,19 @@ public class TocItem
         private set;
     }
 
+    public virtual void SortChildren(Comparison<TocItem> comparison, bool recursive = false)
+    {
+        Children.Sort(comparison);
+
+        if (recursive)
+        {
+            foreach (TocItem child in Children.Where(c => c.Children.Count > 0))
+            {
+                child.SortChildren(comparison, recursive);
+            }
+        }
+    }
+
     public virtual async Task Execute(IServiceProvider serviceProvider)
     {
         if (Executors != null)

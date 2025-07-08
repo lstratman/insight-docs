@@ -110,11 +110,15 @@ public class TypeScriptMethodSignature : TypeScriptTypeMember
 
             output.Append("&gt;");
         }
-            
+
+        output.Append('(');
+
         if (Parameters != null && Parameters.Count > 0)
         {
-            output.Append("(" + string.Join(", ", Parameters.Select(p => p.Name + ": " + p.Type.ToString())) + ")");
+            output.Append(String.Join(", ", Parameters.Select(p => p.Name + ": " + p.Type.ToString())));
         }
+
+        output.Append(')');
 
         if (Name != "constructor")
         {

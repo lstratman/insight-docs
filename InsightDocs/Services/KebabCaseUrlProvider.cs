@@ -447,6 +447,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(TypeScriptModule item)
     {
+        if (item.Exports != null)
+        {
+            return GetUrl(item.Exports);
+        }
+
         StringBuilder url = new();
 
         if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))

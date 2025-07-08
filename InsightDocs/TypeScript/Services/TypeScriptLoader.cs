@@ -1,24 +1,30 @@
 ﻿using InsightDocs.TypeScript.Abstractions;
 using InsightDocs.TypeScript.Model;
 using InsightDocs.TypeScript.Model.Types;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace InsightDocs.TypeScript.Services;
 
-public class TypeScriptLoader : ITypeScriptLoader
+public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScriptLoader
 {
-    public async Task<TypeScriptProject> LoadApiJson(string filename, Func<TypeScriptTypeDeclaration, bool>? typeFilter, Func<TypeScriptModule, bool>? moduleFilter)
+    [LoggerMessage(LogLevel.Information, "Loading {jsonFile}")]
+    public static partial void LogJsonLoad(ILogger logger, string jsonFile);
+
+    [LoggerMessage(LogLevel.Information, "Finished loading {jsonFile}")]
+    public static partial void LogFinishedJsonLoad(ILogger logger, string jsonFile);
+
+    public async Task<TypeScriptProject> LoadApiJson(string filename)
     {
+        ILogger logger = loggerFactory.CreateLogger<TypeScriptLoader>();
+
+        LogJsonLoad(logger, filename);
+
         string fileText = await File.ReadAllTextAsync(filename);
         TypeScriptProject api = JsonConvert.DeserializeObject<TypeScriptProject>(fileText) ?? throw new Exception($"Failed to deserialize TypeScript project from {filename}.");
 
         if (api.Types != null)
         {
-            if (typeFilter != null)
-            {
-                api.Types = api.Types.Values.Where(typeFilter).ToDictionary(t => t.FullName);
-            }
-
             foreach (TypeScriptTypeDeclaration type in api.Types.Values)
             {
                 ReferenceType.AllTypes[type.Id] = type;
@@ -28,7 +34,7 @@ public class TypeScriptLoader : ITypeScriptLoader
 
                 if (type is TypeScriptNamespacedTypeDeclaration typeScriptNamespacedType && type.FullName.Contains('.'))
                 {
-                    api.Namespaces ??= new Dictionary<string, TypeScriptNamespace>();
+                    api.Namespaces ??= [];
 
                     if (!api.Namespaces.TryGetValue(type.FullName[..type.FullName.LastIndexOf('.')], out TypeScriptNamespace? ns))
                     {
@@ -53,11 +59,6 @@ public class TypeScriptLoader : ITypeScriptLoader
 
         if (api.Modules != null)
         {
-            if (moduleFilter != null)
-            {
-                api.Modules = api.Modules.Values.Where(moduleFilter).ToDictionary(m => m.Name);
-            }
-
             foreach (TypeScriptModule module in api.Modules.Values)
             {
                 if (module.ExportType != null && module.ExportType is ReferenceType exportTypeReference)
@@ -72,6 +73,8 @@ public class TypeScriptLoader : ITypeScriptLoader
                 }
             }
         }
+
+        LogFinishedJsonLoad(logger, filename);
 
         return api;
     }

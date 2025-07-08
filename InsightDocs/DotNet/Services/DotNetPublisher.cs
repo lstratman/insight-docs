@@ -23,6 +23,7 @@ public partial class DotNetPublisher(
     IUrlProvider<DotNetField> dotNetFieldUrlProvider,
     IUrlProvider<DotNetIndexer> dotNetIndexerUrlProvider,
     IPublisher publisher,
+    IUrlPrefixProvider urlPrefixProvider,
     InsightDocsOptions insightDocsOptions) : IDotNetPublisher
 {
     [LoggerMessage(LogLevel.Information, "Publishing topics")]
@@ -30,6 +31,12 @@ public partial class DotNetPublisher(
 
     [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
     public static partial void LogFinishedPublishingTopics(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Publishing topics for {prefix}")]
+    public static partial void LogPublishingTopicsForPrefix(ILogger logger, string prefix);
+
+    [LoggerMessage(LogLevel.Information, "Finished publishing topics for {prefix}")]
+    public static partial void LogFinishedPublishingTopicsForPrefix(ILogger logger, string prefix);
 
     [LoggerMessage(LogLevel.Information, "Publishing topics for namespace {ns}")]
     public static partial void LogPublishingNamespace(ILogger logger, string ns);
@@ -45,7 +52,14 @@ public partial class DotNetPublisher(
         ILogger logger = loggerFactory.CreateLogger<DotNetPublisher>();
         DotNetIndex indexData = dotNetLoader.LoadAssemblies(assemblyPaths, runtimeAssemblyPaths, typeFilter);
 
-        LogPublishingTopics(logger);
+        if (urlPrefixProvider.UrlPrefix != null)
+        {
+            LogPublishingTopicsForPrefix(logger, urlPrefixProvider.UrlPrefix);
+        }
+        else
+        {
+            LogPublishingTopics(logger);
+        }
 
         string html = await dotNetIndexTemplate.GetContent(indexData);
 
@@ -74,7 +88,15 @@ public partial class DotNetPublisher(
             }
         }
 
-        LogFinishedPublishingTopics(logger);
+        if (urlPrefixProvider.UrlPrefix != null)
+        {
+            LogFinishedPublishingTopicsForPrefix(logger, urlPrefixProvider.UrlPrefix);
+        }
+
+        else
+        {
+            LogFinishedPublishingTopics(logger);
+        }
     }
 
     public virtual async Task<TocItem> ProcessNamespace(ILogger logger, DotNetNamespace ns, TocItem tocRoot)
