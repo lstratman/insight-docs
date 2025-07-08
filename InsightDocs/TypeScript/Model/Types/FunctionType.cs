@@ -44,8 +44,8 @@ public class FunctionType : TypeScriptType
                     components.Add(new TypeToStringTextComponent(", "));
                 }
 
+                components.Add(new TypeToStringTextComponent(parameter.Name + ": "));
                 components.Add(new TypeToStringTypeComponent(parameter.Type));
-                components.Add(new TypeToStringTextComponent(" " + parameter.Name));
             }
         }
 
