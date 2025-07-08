@@ -71,6 +71,7 @@ public class InsightDocsBuilder
         Services = new ServiceCollection();
         Services.AddScoped<IUrlPrefixProvider, UrlPrefixProvider>();
         Services.AddSingleton<ICodeLanguageService, CodeLanguageService>();
+        Services.AddSingleton<IUrlChecker, UrlChecker>();
     }
 
     public TocItem TocRoot
@@ -99,6 +100,7 @@ public class InsightDocsBuilder
     {
         using (ServiceProvider serviceProvider = Services.BuildServiceProvider())
         {
+            IUrlChecker urlChecker = serviceProvider.GetRequiredService<IUrlChecker>();
             IPublisher publisher = serviceProvider.GetRequiredService<IPublisher>();
             IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteToc>>();
             IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteIndex>>();
@@ -111,7 +113,7 @@ public class InsightDocsBuilder
             await TocRoot.Execute(serviceProvider);
 
             string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
-            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex), "text/html", siteIndex.Title);
+            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex, siteIndexUrl), "text/html", siteIndex.Title);
 
             SiteToc siteTableOfContents = new(TocRoot);
             string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
@@ -129,6 +131,8 @@ public class InsightDocsBuilder
                     }
                 }
             }
+
+            await urlChecker.CheckUrls();
         }
     }
 }

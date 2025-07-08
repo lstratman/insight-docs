@@ -49,6 +49,8 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
                     ns.Types.Add(type);
                     typeScriptNamespacedType.Namespace = ns;
                 }
+
+                // TODO: remove prototype property
             }
 
             foreach (TypeScriptTypeDeclaration type in api.Types.Values)

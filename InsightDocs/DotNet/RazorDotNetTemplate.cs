@@ -14,6 +14,8 @@ public class RazorDotNetTemplate<T> : RazorTemplate<T>
         {
             string url = urlProvider.GetUrl(typeReference.Type);
 
+            UrlChecker.RegisterUrl(url, Url);
+
             if (String.IsNullOrEmpty(url))
             {
                 linkTagBuilder.Append(typeReference.Type.LinkText.Replace("<", "&lt;").Replace(">", "&gt;"));

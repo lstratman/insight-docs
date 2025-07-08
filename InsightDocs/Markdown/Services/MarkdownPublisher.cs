@@ -16,7 +16,8 @@ public partial class MarkdownPublisher(
     IPublisher publisher,
     IUrlPrefixProvider urlPrefixProvider,
     IServiceProvider serviceProvider,
-    MarkdownOptions markdownOptions
+    MarkdownOptions markdownOptions,
+    IUrlChecker urlChecker
 ) : IMarkdownPublisher
 {
     [LoggerMessage(LogLevel.Information, "Publishing topics")]
@@ -37,6 +38,7 @@ public partial class MarkdownPublisher(
     protected readonly static Regex ImageTagsRegex = new Regex(@"<img\s+(?<otherAttributes>[^>]*)src\s*=\s*[""'](?<url>[^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     protected readonly static Regex HeaderTagsRegex = new Regex(@"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     protected readonly static Regex HeaderTitleRegex = new Regex(@"<h1(?<otherAttributes>[^>]*)>(?<title>.*?)</h1>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    protected readonly static Regex LinkMatcher = new Regex(@"<a href\s*=\s*(['""])(?<url>.*?)\1");
     protected Dictionary<string, string> _imageUrls = new Dictionary<string, string>();
 
     public virtual async Task PublishTopic(TocItem tocItem, string markdownFilePath)
@@ -160,9 +162,14 @@ public partial class MarkdownPublisher(
             headerStack.Push(new Tuple<int, TocItem>(level, headerStack.Peek().Item2.AddTocItem(title, url + "#" + id)));
         });
 
+        LinkMatcher.Matches(markdownFile.Html).ToList().ForEach(match =>
+        {
+            urlChecker.RegisterUrl(match.Groups["url"].Value, url);
+        });
+
         if (markdownTemplateProvider != null)
         {
-            string markdownHtml = await markdownTemplateProvider.GetContent(markdownFile);
+            string markdownHtml = await markdownTemplateProvider.GetContent(markdownFile, url);
             await publisher.Publish(url, markdownHtml, "text/html", markdownFile.Title);
         }
 

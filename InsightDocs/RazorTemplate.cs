@@ -16,6 +16,15 @@ public class RazorTemplate<T> : ComponentBase
         set;
     }
 
+    [Inject]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    public IUrlChecker UrlChecker
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+        get;
+        set;
+    }
+
     [Parameter]
     public T? Item 
     { 
@@ -23,16 +32,31 @@ public class RazorTemplate<T> : ComponentBase
         set; 
     }
 
+    [Parameter]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    public string Url
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+        get;
+        set;
+    }
+
     public virtual string GetUrl<TItem>(TItem item) where TItem : ILinkTarget
     {
         IUrlProvider<TItem> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<TItem>>();
-        return urlProvider.GetUrl(item);
+        string url = urlProvider.GetUrl(item);
+
+        UrlChecker.RegisterUrl(url, Url);
+
+        return url;
     }
 
     public virtual RenderFragment GetLink<TItem>(TItem item) where TItem : ILinkTarget
     {
         IUrlProvider<TItem> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<TItem>>();
         string url = urlProvider.GetUrl(item);
+
+        UrlChecker.RegisterUrl(url, Url);
 
         return (builder) =>
         {

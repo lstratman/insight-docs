@@ -8,13 +8,13 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
 {
     protected bool _normalized = false;
 
-    public static string[] NonElements =
+    public static readonly string[] NonElements =
     [
         "DialogWithValue",
         "BuiltWebComponentToolbar"
     ];
 
-    public static string[] HTMLElementTypes =
+    public static readonly string[] HTMLElementTypes =
     [
         "ARIAMixin",
         "Slottable",
@@ -26,13 +26,13 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
         "Animatable"
     ];
 
-    public static string[] NodeTypes =
+    public static readonly string[] NodeTypes =
     [
         "ParentNode",
         "ChildNode"
     ];
 
-    public static string[] BuiltInTypes =
+    public static readonly string[] BuiltInTypes =
     [
         "_File",
         "_RequestInit",
@@ -48,20 +48,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
         "Pick",
         "Window"
     ];
-
-    public bool Referenced
-    {
-        get;
-        set;
-    }
-
-    public string ClassName
-    {
-        get
-        {
-            return Name;
-        }
-    }
 
     public override string Name
     {
@@ -272,11 +258,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
             id = ReferenceType.AllTypes.Values.First(a => a.Name == "Node").Id;
         }
 
-        //if (string.IsNullOrEmpty(Url) && !BuiltIn)
-        //{
-        //    Url = $"/topic.aspx/JavaScript_{topicId}_T_{FileIdComponent}";
-        //}
-
         if (Properties != null)
         {
             foreach (TypeScriptProperty property in Properties)
@@ -287,12 +268,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
                 }
 
                 property.SourceTypeId = id;
-                //property.Url = GetMDNUrl(property);
-
-                //if (string.IsNullOrEmpty(property.Url) && !BuiltIn)
-                //{
-                //    property.Url = $"/topic.aspx/JavaScript_{topicId}_P_{FileIdComponent}_{property.FileIdComponent}";
-                //}
             }
         }
 
@@ -327,7 +302,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
             foreach (KeyValuePair<string, TypeScriptMethod> method in Methods)
             {
                 method.Value.SourceTypeId = id;
-                //method.Value.Url = GetMDNUrl(method.Value);
 
                 if (method.Value.Signatures.Count > 1)
                 {
@@ -338,12 +312,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
                 {
                     signature.SourceTypeId = id;
                     signature.MethodCollection = method.Value;
-                    //signature.Url = GetMDNUrl(signature);
-
-                    //if (string.IsNullOrEmpty(signature.Url) && !BuiltIn)
-                    //{
-                    //    signature.Url = $"/topic.aspx/JavaScript_{topicId}_M_{FileIdComponent}_{method.Value.FileIdComponent}{(method.Value.Signatures.Count > 1 ? signature.FileIdComponent : "")}";
-                    //}
                 }
             }
         }
@@ -356,8 +324,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
             {
                 signature.SourceTypeId = id;
             }
-
-            //Constructor.Url = GetMDNUrl(Constructor);
         }
 
         if (IndexSignatures != null)
@@ -365,7 +331,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
             foreach (TypeScriptMethodSignature indexSignature in IndexSignatures)
             {
                 indexSignature.SourceTypeId = id;
-                //indexSignature.Url = GetMDNUrl(indexSignature);
             }
         }
 
@@ -374,7 +339,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
             foreach (TypeScriptMethodSignature functionSignature in FunctionSignatures)
             {
                 functionSignature.SourceTypeId = id;
-                //functionSignature.Url = GetMDNUrl(functionSignature);
             }
         }
 
@@ -388,7 +352,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
                 {
                     if (!ReferenceType.AllTypes.ContainsKey(baseTypeReference.Target))
                     {
-                        throw new Exception($"In TypeScriptInterface for \"{FullName}\", the AllTypes Dictionary does't contain an Extends Target id ({baseTypeReference.Target}).");
+                        throw new Exception($"In TypeScriptInterface for \"{FullName}\", the AllTypes Dictionary doesn't contain an extends target ID ({baseTypeReference.Target}).");
                     }
 
                     TypeScriptInterface? actualBaseType = ReferenceType.AllTypes[baseTypeReference.Target] as TypeScriptInterface;

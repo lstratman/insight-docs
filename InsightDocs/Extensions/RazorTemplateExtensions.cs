@@ -12,7 +12,7 @@ public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvide
 {
     protected ILoggerFactory _loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
-    public async Task<string> GetContent(T item)
+    public async Task<string> GetContent(T item, string url)
     {
         using HtmlRenderer htmlRenderer = new(serviceProvider, _loggerFactory);
 
@@ -20,7 +20,8 @@ public class RazorTemplateRenderer<T, TTemplate>(IServiceProvider serviceProvide
         {
             var dictionary = new Dictionary<string, object?>
             {
-                { "Item", item }
+                { "Item", item },
+                { "Url", url }
             };
 
             ParameterView parameters = ParameterView.FromDictionary(dictionary);

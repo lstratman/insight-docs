@@ -13,10 +13,12 @@ public partial class TypeScriptPublisher(
     IItemTemplateProvider<TypeScriptTypeAlias> typeAliasTemplate,
     IItemTemplateProvider<TypeScriptMethod> methodTemplate,
     IItemTemplateProvider<TypeScriptProperty> propertyTemplate,
+    IItemTemplateProvider<TypeScriptNamespace> namespaceTemplate,
     IUrlProvider<TypeScriptModule> moduleUrlProvider,
     IUrlProvider<TypeScriptTypeDeclaration> typeUrlProvider,
     IUrlProvider<TypeScriptMethod> methodUrlProvider,
     IUrlProvider<TypeScriptProperty> propertyUrlProvider,
+    IUrlProvider<TypeScriptNamespace> namespaceUrlProvider,
     IPublisher publisher,
     IUrlPrefixProvider urlPrefixProvider
 ) : ITypeScriptPublisher
@@ -142,7 +144,9 @@ public partial class TypeScriptPublisher(
 
                     if (!namespaceFolders.TryGetValue(ns, out parentTocItem))
                     {
-                        parentTocItem = typesRoot.AddTocItem(ns);
+                        string namespaceUrl = namespaceUrlProvider.GetUrl(api.Namespaces![ns]);
+
+                        parentTocItem = typesRoot.AddTocItem(ns, namespaceUrl);
                         namespaceFolders[ns] = parentTocItem;
 
                         if (previousNamespace != null)
@@ -151,6 +155,10 @@ public partial class TypeScriptPublisher(
                         }
 
                         LogPublishingNamespace(logger, ns);
+
+                        string namespaceHtml = await namespaceTemplate.GetContent(api.Namespaces[ns], namespaceUrl);
+                        await publisher.Publish(namespaceUrl, namespaceHtml, "text/html", api.Namespaces![ns].Title);
+
                         previousNamespace = ns;
                     }
                 }
@@ -189,7 +197,7 @@ public partial class TypeScriptPublisher(
     {
         if (type is TypeScriptInterface typeScriptInterface)
         {
-            string html = await interfaceTemplate.GetContent(typeScriptInterface);
+            string html = await interfaceTemplate.GetContent(typeScriptInterface, url);
             await publisher.Publish(url, html, "text/html", type.Name);
 
             // TODO: constructor
@@ -203,7 +211,7 @@ public partial class TypeScriptPublisher(
                     string methodUrl = methodUrlProvider.GetUrl(method);
                     TocItem methodTocItem = methodsRootTocItem.AddTocItem(method.Name, methodUrl);
 
-                    string methodHtml = await methodTemplate.GetContent(method);
+                    string methodHtml = await methodTemplate.GetContent(method, methodUrl);
                     await publisher.Publish(methodUrl, methodHtml, "text/html", method.Name);
                 }
             }
@@ -217,7 +225,7 @@ public partial class TypeScriptPublisher(
                     string propertyUrl = propertyUrlProvider.GetUrl(property);
                     TocItem methodTocItem = methodsRootTocItem.AddTocItem(property.Name, propertyUrl);
 
-                    string propertyHtml = await propertyTemplate.GetContent(property);
+                    string propertyHtml = await propertyTemplate.GetContent(property, propertyUrl);
                     await publisher.Publish(propertyUrl, propertyHtml, "text/html", property.Name);
                 }
             }
@@ -227,13 +235,13 @@ public partial class TypeScriptPublisher(
 
         else if (type is TypeScriptEnum typeScriptEnum)
         {
-            string html = await enumTemplate.GetContent(typeScriptEnum);
+            string html = await enumTemplate.GetContent(typeScriptEnum, url);
             await publisher.Publish(url, html, "text/html", type.Name);
         }
 
         else if (type is TypeScriptTypeAlias typeScriptTypeAlias)
         {
-            string html = await typeAliasTemplate.GetContent(typeScriptTypeAlias);
+            string html = await typeAliasTemplate.GetContent(typeScriptTypeAlias, url);
             await publisher.Publish(url, html, "text/html", type.Name);
         }
 

@@ -20,6 +20,8 @@ public class RazorTypeScriptTemplate<T> : RazorTemplate<T>
             linkText = linkText[(linkText.IndexOf('.') + 1)..];
         }
 
+        UrlChecker.RegisterUrl(url, Url);
+
         return (builder) =>
         {
             if (String.IsNullOrEmpty(url))
@@ -45,8 +47,9 @@ public class RazorTypeScriptTemplate<T> : RazorTemplate<T>
                     // If we have a type declaration, we can use it to build the link.
                     IUrlProvider<TypeScriptTypeDeclaration> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<TypeScriptTypeDeclaration>>();
                     string url = urlProvider.GetUrl(typeDeclaration);
-
                     string shortName = typeDeclaration.Name;
+
+                    UrlChecker.RegisterUrl(url, Url);
 
                     if (shortName.Contains('<'))
                     {
@@ -74,6 +77,8 @@ public class RazorTypeScriptTemplate<T> : RazorTemplate<T>
             {
                 IUrlProvider<IntrinsicType> urlProvider = ServiceProvider.GetRequiredService<IUrlProvider<IntrinsicType>>();
                 string url = urlProvider.GetUrl(intrinsicTypeComponent.Type);
+
+                UrlChecker.RegisterUrl(url, Url);
 
                 if (String.IsNullOrEmpty(url))
                 {

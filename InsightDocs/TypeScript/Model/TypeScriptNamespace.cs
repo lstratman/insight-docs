@@ -18,6 +18,14 @@ public class TypeScriptNamespace : ILinkTarget
         }
     }
 
+    public string Title
+    {
+        get
+        {
+            return Name + " Namespace";
+        }
+    }
+
     public List<TypeScriptTypeDeclaration> Types
     {
         get;

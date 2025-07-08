@@ -235,4 +235,9 @@ public class SqlitePublisher : IPublisher, IDisposable
             }
         }
     }
+
+    public Task<bool> UrlWasPublished(string url)
+    {
+        return Task.FromResult(PublishedUrls.ContainsKey(url));
+    }
 }

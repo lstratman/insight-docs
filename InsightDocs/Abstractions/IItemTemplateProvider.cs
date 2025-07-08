@@ -2,5 +2,5 @@ namespace InsightDocs.Abstractions;
 
 public interface IItemTemplateProvider<T>
 {
-    Task<string> GetContent(T item);
+    Task<string> GetContent(T item, string url);
 }

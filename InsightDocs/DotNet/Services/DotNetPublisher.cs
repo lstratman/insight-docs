@@ -61,9 +61,10 @@ public partial class DotNetPublisher(
             LogPublishingTopics(logger);
         }
 
-        string html = await dotNetIndexTemplate.GetContent(indexData);
+        string url = dotNetIndexUrlProvider.GetUrl(indexData);
+        string html = await dotNetIndexTemplate.GetContent(indexData, url);
 
-        await publisher.Publish(dotNetIndexUrlProvider.GetUrl(indexData), html, "text/html", indexData.Title);
+        await publisher.Publish(url, html, "text/html", indexData.Title);
 
         if (insightDocsOptions.EnableParallelism)
         {
@@ -106,7 +107,7 @@ public partial class DotNetPublisher(
         string namespaceUrl = dotNetNamespaceUrlProvider.GetUrl(ns);
         TocItem namespaceTocItem = new TocItem(ns.FullName, tocRoot, namespaceUrl);
 
-        string html = await dotNetNamespaceTemplate.GetContent(ns);
+        string html = await dotNetNamespaceTemplate.GetContent(ns, namespaceUrl);
         await publisher.Publish(namespaceUrl, html, "text/html", ns.Title);
 
         foreach (DotNetType type in ns.Types.OrderBy(t => t.Name))
@@ -116,7 +117,7 @@ public partial class DotNetPublisher(
             string typeUrl = dotNetTypeUrlProvider.GetUrl(type);
             TocItem typeTocItem = namespaceTocItem.AddTocItem(type.DisplayName, typeUrl);
 
-            html = await dotNetTypeTemplate.GetContent(type);
+            html = await dotNetTypeTemplate.GetContent(type, typeUrl);
             await publisher.Publish(typeUrl, html, "text/html", type.Title);
 
             if (type.TypeName != "Enum")
@@ -126,7 +127,7 @@ public partial class DotNetPublisher(
                     string constructorUrl = dotNetMethodUrlProvider.GetUrl(type.Constructor);
                     typeTocItem.AddTocItem("Constructors", constructorUrl);
 
-                    html = await dotNetMethodTemplate.GetContent(type.Constructor);
+                    html = await dotNetMethodTemplate.GetContent(type.Constructor, constructorUrl);
                     await publisher.Publish(constructorUrl, html, "text/html", type.Constructor.Title);
                 }
 
@@ -135,7 +136,7 @@ public partial class DotNetPublisher(
                     string indexerUrl = dotNetIndexerUrlProvider.GetUrl(type.Indexer);
                     typeTocItem.AddTocItem("Indexer", indexerUrl);
 
-                    html = await dotNetIndexerTemplate.GetContent(type.Indexer);
+                    html = await dotNetIndexerTemplate.GetContent(type.Indexer, indexerUrl);
                     await publisher.Publish(indexerUrl, html, "text/html", type.Indexer.Title);
                 }
 
@@ -150,7 +151,7 @@ public partial class DotNetPublisher(
                         string methodUrl = dotNetMethodUrlProvider.GetUrl(method);
                         methodsTocItem.AddTocItem(method.Name, methodUrl);
 
-                        html = await dotNetMethodTemplate.GetContent(method);
+                        html = await dotNetMethodTemplate.GetContent(method, methodUrl);
                         await publisher.Publish(methodUrl, html, "text/html", method.Title);
                     }
                 }
@@ -166,7 +167,7 @@ public partial class DotNetPublisher(
                         string propertyUrl = dotNetPropertyUrlProvider.GetUrl(property);
                         propertiesTocItem.AddTocItem(property.Name, propertyUrl);
 
-                        html = await dotNetPropertyTemplate.GetContent(property);
+                        html = await dotNetPropertyTemplate.GetContent(property, propertyUrl);
                         await publisher.Publish(propertyUrl, html, "text/html", property.Title);
                     }
                 }
@@ -182,7 +183,7 @@ public partial class DotNetPublisher(
                         string fieldUrl = dotNetFieldUrlProvider.GetUrl(field);
                         fieldsTocItem.AddTocItem(field.Name, fieldUrl);
 
-                        html = await dotNetFieldTemplate.GetContent(field);
+                        html = await dotNetFieldTemplate.GetContent(field, fieldUrl);
                         await publisher.Publish(fieldUrl, html, "text/html", field.Title);
                     }
                 }
