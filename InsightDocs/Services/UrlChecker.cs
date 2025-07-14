@@ -9,12 +9,20 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
 {
     protected readonly ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> _urlSources = [];
 
+    [LoggerMessage(LogLevel.Information, "Checking URLs")]
+    public static partial void LogCheckingUrls(ILogger logger);
+
+    [LoggerMessage(LogLevel.Information, "Finished checking URLs")]
+    public static partial void LogFinishedCheckingUrls(ILogger logger);
+
     [LoggerMessage(LogLevel.Warning, "Topic for URL {url} does not exist, referenced by {sourceUrls}")]
     public static partial void LogWarningTopicUrlDoesNotExist(ILogger logger, string url, string sourceUrls);
 
     public async Task CheckUrls()
     {
         ILogger logger = loggerFactory.CreateLogger<UrlChecker>();
+
+        LogCheckingUrls(logger);
 
         foreach (KeyValuePair<string, ConcurrentDictionary<string, bool>> urlSource in _urlSources)
         {
@@ -51,6 +59,8 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
                 }
             }
         }
+
+        LogFinishedCheckingUrls(logger);
     }
 
     public void RegisterUrl(string url, string sourceUrl)
@@ -60,7 +70,7 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
             return;
         }
 
-        if (url.StartsWith("#"))
+        if (url.StartsWith('#'))
         {
             url = sourceUrl + url;
         }
