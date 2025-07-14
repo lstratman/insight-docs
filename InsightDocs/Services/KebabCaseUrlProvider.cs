@@ -462,6 +462,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         url.Append(item.Name);
 
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
         return url.ToString();
     }
 
@@ -505,6 +510,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         url.Append(item.FullName);
 
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
         return url.ToString();
     }
 
@@ -547,6 +557,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         }
 
         url.Append(item.FullName);
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
 
         return url.ToString();
     }
@@ -604,6 +619,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         url.Append(item.Name);
 
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
         return url.ToString();
     }
 
@@ -659,6 +679,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         }
 
         url.Append(item.Name);
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
 
         return url.ToString();
     }
@@ -716,6 +741,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         url.Append(item.Name);
 
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
         if (item.MethodCollection != null && item.MethodCollection.Signatures.Count > 1)
         {
             url.Append('#');
@@ -745,6 +775,11 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         }
 
         url.Append(item.Name);
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
 
         return url.ToString();
     }
