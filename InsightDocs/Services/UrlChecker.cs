@@ -1,10 +1,11 @@
 ﻿using InsightDocs.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 namespace InsightDocs.Services;
 
-public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFactory) : IUrlChecker
+public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFactory, UrlCheckerOptions options) : IUrlChecker
 {
     protected readonly ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> _urlSources = [];
 
@@ -20,9 +21,19 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
             string url = urlSource.Key;
             ConcurrentDictionary<string, bool> sources = urlSource.Value;
 
-            if (url.StartsWith("http://") || url.StartsWith("https://"))
+            if (options.IgnoreUrls != null && options.IgnoreUrls(url))
+            {
+                continue;
+            }
+            
+            else if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
                 // TODO
+                continue;
+            }
+
+            else if (url.StartsWith("mailto:"))
+            {
                 continue;
             }
 
@@ -56,5 +67,40 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
 
         ConcurrentDictionary<string, bool> sources = _urlSources.GetOrAdd(url, _ => new ConcurrentDictionary<string, bool>());
         sources.GetOrAdd(sourceUrl, true);
+    }
+}
+
+public class UrlCheckerOptions
+{
+    public Func<string, bool>? IgnoreUrls
+    {
+        get;
+        set;
+    } = null;
+}
+
+public static class UrlCheckerExtensions
+{
+    public static InsightDocsBuilder CheckUrls(this InsightDocsBuilder builder, Action<UrlCheckerOptions> optionsFactory)
+    {
+        builder.Services.AddSingleton<IUrlChecker, UrlChecker>();
+
+        if (optionsFactory != null)
+        {
+            builder.Services.AddSingleton((serviceProvider) =>
+            {
+                UrlCheckerOptions options = new();
+                optionsFactory(options);
+
+                return options;
+            });
+        }
+
+        else
+        {
+            builder.Services.AddSingleton(new UrlCheckerOptions());
+        }
+
+        return builder;
     }
 }
