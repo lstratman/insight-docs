@@ -200,7 +200,14 @@ public partial class TypeScriptPublisher(
             string html = await interfaceTemplate.GetContent(typeScriptInterface, url);
             await publisher.Publish(url, html, "text/html", type.Name);
 
-            // TODO: constructor
+            if (typeScriptInterface.Constructor != null && typeScriptInterface.Constructor.SourceTypeId == typeScriptInterface.Id)
+            {
+                string constructorUrl = methodUrlProvider.GetUrl(typeScriptInterface.Constructor);
+                TocItem constructorTocItem = tocItem.AddTocItem("Constructor", constructorUrl);
+
+                string constructorHtml = await methodTemplate.GetContent(typeScriptInterface.Constructor, constructorUrl);
+                await publisher.Publish(constructorUrl, constructorHtml, "text/html", typeScriptInterface.Constructor.Name);
+            }
 
             if (typeScriptInterface.Methods != null && typeScriptInterface.Methods.Any(m => m.Value.SourceTypeId == typeScriptInterface.Id))
             {

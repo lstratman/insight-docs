@@ -81,39 +81,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
         }
     }
 
-    [JsonProperty("fullName")]
-    public override string FullName
-    {
-        get
-        {
-            string displayName = base.FullName;
-
-            if (TypeParameters != null && TypeParameters.Count > 0)
-            {
-                displayName += "<";
-
-                for (int i = 0; i < TypeParameters.Count; i++)
-                {
-                    if (i > 0)
-                    {
-                        displayName += ", ";
-                    }
-
-                    displayName += TypeParameters[i].Name;
-                }
-
-                displayName += ">";
-            }
-
-            return displayName;
-        }
-
-        set
-        {
-            base.FullName = value;
-        }
-    }
-
     [JsonProperty("properties")]
     public List<TypeScriptProperty>? Properties
     {

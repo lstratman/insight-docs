@@ -20,6 +20,12 @@ public class TypeScriptMethod: TypeScriptTypeMember
         {
             string displayName = Name;
 
+            if (Name == "constructor" && SourceTypeId != 0)
+            {
+                TypeScriptInterface sourceType = (TypeScriptInterface)ReferenceType.AllTypes[SourceTypeId];
+                displayName = sourceType.Name;
+            }
+
             if (Signatures.Count == 1 && Signatures[0].TypeParameters != null && Signatures[0].TypeParameters!.Count > 0)
             {
                 displayName += '<';
