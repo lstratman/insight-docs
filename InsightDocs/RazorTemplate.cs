@@ -98,6 +98,16 @@ public class RazorTemplate<T> : ComponentBase
             }
         }
 
+        IEnumerable<IAdditionalCssProvider> additionalCommonCssProviders = ServiceProvider.GetServices<IAdditionalCssProvider>();
+
+        if (additionalCommonCssProviders != null && additionalCommonCssProviders.Any())
+        {
+            foreach (IAdditionalCssProvider additionalCssProvider in additionalCommonCssProviders)
+            {
+                additionalCssAssets.AddRange(additionalCssProvider.GetAdditionalCssAssets());
+            }
+        }
+
         return (builder) =>
         {
             StringBuilder cssLinks = new StringBuilder();
@@ -122,6 +132,16 @@ public class RazorTemplate<T> : ComponentBase
             foreach (IAdditionalJavaScriptProvider<T> additionalCssProvider in additionalJavaScriptProviders)
             {
                 additionalJavaScriptAssets.AddRange(additionalCssProvider.GetAdditionalJavaScriptAssets(Item!));
+            }
+        }
+
+        IEnumerable<IAdditionalJavaScriptProvider> additionalCommonJavaScriptProviders = ServiceProvider.GetServices<IAdditionalJavaScriptProvider>();
+
+        if (additionalCommonJavaScriptProviders != null && additionalCommonJavaScriptProviders.Any())
+        {
+            foreach (IAdditionalJavaScriptProvider additionalJavaScriptProvider in additionalCommonJavaScriptProviders)
+            {
+                additionalJavaScriptAssets.AddRange(additionalJavaScriptProvider.GetAdditionalJavaScriptAssets());
             }
         }
 
