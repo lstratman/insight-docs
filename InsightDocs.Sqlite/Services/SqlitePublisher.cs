@@ -121,8 +121,9 @@ public class SqlitePublisher : IPublisher, IDisposable
             _connection = null;
         }
 
-        using (new SqliteConnection($"Data Source={DatabasePath}"))
+        using (SqliteConnection connection = new SqliteConnection($"Data Source={DatabasePath}"))
         {
+            connection.Open();
         }
     }
 
