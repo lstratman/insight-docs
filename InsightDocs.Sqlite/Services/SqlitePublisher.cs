@@ -120,6 +120,10 @@ public class SqlitePublisher : IPublisher, IDisposable
             _connection.Dispose();
             _connection = null;
         }
+
+        using (new SqliteConnection($"Data Source={DatabasePath}"))
+        {
+        }
     }
 
     public async Task Initialize()
