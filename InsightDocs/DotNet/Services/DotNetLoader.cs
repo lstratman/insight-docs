@@ -437,7 +437,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 {
                     ParameterInfo[] indexParameters = property.GetIndexParameters();
 
-                    if (indexParameters != null && indexParameters.Length > 0)
+                    if (property.Name == "Item" && indexParameters != null && indexParameters.Length > 0)
                     {
                         typeMetadata.Indexer ??= new DotNetIndexer
                         {
