@@ -6,11 +6,11 @@ using InsightDocs.Site.Model;
 using InsightDocs.TypeScript.Model;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace InsightDocs.Templates.MSDN;
+namespace InsightDocs.Templates.MicrosoftLearn;
 
 public static class TemplateExtensions
 {
-    public static InsightDocsBuilder UseMSDNTemplate(this InsightDocsBuilder builder)
+    public static InsightDocsBuilder UseMicrosoftLearnTemplate(this InsightDocsBuilder builder)
     {
         builder.RegisterRazorItemTemplate<SiteIndex, Site.SiteIndex>();
         builder.RegisterRazorItemTemplate<DotNetIndex, DotNet.DotNetIndex>();

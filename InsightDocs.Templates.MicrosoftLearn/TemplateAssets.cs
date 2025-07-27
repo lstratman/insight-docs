@@ -1,13 +1,13 @@
 ﻿using InsightDocs.Abstractions;
 
-namespace InsightDocs.Templates.MSDN;
+namespace InsightDocs.Templates.MicrosoftLearn;
 
 public class TemplateAssets
 {
-    public static IAsset MsdnCss 
+    public static IAsset MicrosoftLearnCss 
     { 
         get; 
-    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/msdn.css");
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/microsoft-learn.css");
 
     public static IAsset DoconsFont
     {

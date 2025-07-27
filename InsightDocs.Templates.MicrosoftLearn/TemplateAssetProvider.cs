@@ -1,6 +1,6 @@
 using InsightDocs.Abstractions;
 
-namespace InsightDocs.Templates.MSDN;
+namespace InsightDocs.Templates.MicrosoftLearn;
 
 public class TemplateAssetProvider : IAssetProvider
 {
@@ -8,7 +8,7 @@ public class TemplateAssetProvider : IAssetProvider
     {
         return
         [
-            TemplateAssets.MsdnCss,
+            TemplateAssets.MicrosoftLearnCss,
             TemplateAssets.DoconsFont,
             TemplateAssets.SegoeUIFont,
             TemplateAssets.SegoeUIRomanVfFont,
