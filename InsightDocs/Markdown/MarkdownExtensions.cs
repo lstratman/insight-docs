@@ -86,18 +86,6 @@ public static class MarkdownTocItemExtensions
 
         markdownTocItem.DirectoryPath = directoryPath;
 
-        string root = Path.GetPathRoot(directoryPath)!;
-
-        markdownTocItem.RootedMarkdownGlobMatchers ??= [];
-
-        if (!markdownTocItem.RootedMarkdownGlobMatchers.TryGetValue(root, out Matcher? matcher))
-        {
-            matcher = new Matcher();
-            markdownTocItem.RootedMarkdownGlobMatchers[root] = matcher;
-        }
-
-        matcher.AddInclude(directoryPath[root.Length..] + Path.DirectorySeparatorChar.ToString() + "*.md");
-
         return markdownTocItem;
     }
 
@@ -108,23 +96,8 @@ public static class MarkdownTocItemExtensions
             markdownTocItem = new MarkdownTocItem(tocItem);
         }
 
-        if (!Path.IsPathRooted(glob))
-        {
-            glob = Path.Combine(AppContext.BaseDirectory, glob);
-            glob = Path.GetFullPath(glob);
-        }
-
-        string root = Path.GetPathRoot(glob)!;
-
-        markdownTocItem.RootedMarkdownGlobMatchers ??= [];
-
-        if (!markdownTocItem.RootedMarkdownGlobMatchers.TryGetValue(root, out Matcher? matcher))
-        {
-            matcher = new Matcher();
-            markdownTocItem.RootedMarkdownGlobMatchers[root] = matcher;
-        }
-
-        matcher.AddExclude(glob[root.Length..]);
+        markdownTocItem.ExclusionGlobs ??= [];
+        markdownTocItem.ExclusionGlobs.Add(glob);
 
         return markdownTocItem;
     }

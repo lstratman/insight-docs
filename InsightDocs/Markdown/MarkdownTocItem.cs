@@ -9,11 +9,11 @@ public partial class MarkdownTocItem : TocItem
 {
     protected TocItem _baseTocItem;
     public string? DirectoryPath;
-    public Dictionary<string, Matcher>? RootedMarkdownGlobMatchers;
 
     public MarkdownTocItem(TocItem baseTocItem)
     {
         _baseTocItem = baseTocItem;
+        ExclusionGlobs = null;
         RegisterExecutor(MarkdownExecutor);
     }
 
@@ -64,6 +64,12 @@ public partial class MarkdownTocItem : TocItem
         }
     }
 
+    public List<string>? ExclusionGlobs
+    {
+        get;
+        set;
+    }
+
     public override void RegisterExecutor(Func<IServiceProvider, Task> executor)
     {
         _baseTocItem.RegisterExecutor(executor);
@@ -71,17 +77,8 @@ public partial class MarkdownTocItem : TocItem
 
     protected async Task MarkdownExecutor(IServiceProvider serviceProvider)
     {
-        // TODO: use .order file to determine the order of files
-
-        if (RootedMarkdownGlobMatchers != null)
+        if (!String.IsNullOrEmpty(DirectoryPath))
         {
-            List<string> markdownFilePaths = [];
-
-            foreach (KeyValuePair<string, Matcher> matcherAndRoot in RootedMarkdownGlobMatchers)
-            {
-                markdownFilePaths.AddRange(matcherAndRoot.Value.GetResultsInFullPath(matcherAndRoot.Key));
-            }
-
             IServiceScopeFactory serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             using (IServiceScope serviceScope = serviceScopeFactory.CreateScope())
@@ -90,7 +87,7 @@ public partial class MarkdownTocItem : TocItem
                 prefixProvider.UrlPrefix = FullUrlPrefix;
 
                 IMarkdownPublisher markdownPublisher = serviceScope.ServiceProvider.GetRequiredService<IMarkdownPublisher>();
-                await markdownPublisher.PublishTopics(this, markdownFilePaths);
+                await markdownPublisher.PublishTopics(this, DirectoryPath, ExclusionGlobs);
             }
         }
     }

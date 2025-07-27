@@ -2,6 +2,7 @@
 using InsightDocs.Markdown.Abstractions;
 using InsightDocs.Markdown.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -47,7 +48,7 @@ public partial class MarkdownPublisher(
         await ProcessTopic(null, tocItem, markdownFilePath, logger);
     }
 
-    public virtual async Task PublishTopics(TocItem tocRoot, List<string> markdownFilePaths)
+    public virtual async Task PublishTopics(TocItem tocRoot, string rootDirectoryPath, IEnumerable<string>? exclusionGlobs = null)
     {
         ILogger logger = loggerFactory.CreateLogger<MarkdownPublisher>();
 
@@ -59,6 +60,47 @@ public partial class MarkdownPublisher(
         else
         {
             LogPublishingTopics(logger);
+        }
+
+        List<string> markdownFilePaths = [];
+
+        if (!File.Exists(Path.Join(rootDirectoryPath, ".order")))
+        {
+            Matcher matcher = new Matcher();
+
+            matcher.AddInclude("*.md");
+
+            if (exclusionGlobs != null)
+            {
+                foreach (string exclusionGlob in exclusionGlobs)
+                {
+                    matcher.AddExclude(exclusionGlob);
+                }
+            }
+
+            markdownFilePaths.AddRange(matcher.GetResultsInFullPath(rootDirectoryPath));
+        }
+
+        else
+        {
+            string[] orderFileLines = await File.ReadAllLinesAsync(Path.Join(rootDirectoryPath, ".order"));
+
+            foreach (string line in orderFileLines)
+            {
+                string trimmedLine = line.Trim();
+
+                if (!trimmedLine.EndsWith(".md"))
+                {
+                    trimmedLine += ".md";
+                }
+
+                if (String.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith('#'))
+                {
+                    continue;
+                }
+                
+                markdownFilePaths.Add(Path.GetFullPath(Path.Combine(rootDirectoryPath, trimmedLine)));
+            }
         }
 
         foreach (string markdownFilePath in markdownFilePaths)
@@ -98,7 +140,7 @@ public partial class MarkdownPublisher(
 
         string url = markdownFileUrlProvider.GetUrl(markdownFile);
 
-        if (!url.StartsWith("/"))
+        if (!url.StartsWith('/'))
         {
             url = "/" + url;
         }
@@ -115,7 +157,7 @@ public partial class MarkdownPublisher(
         }
 
         string parentDirectory = Path.GetDirectoryName(markdownFilePath)!;
-        Dictionary<string, MarkdownImage> markdownImagesToPublish = new Dictionary<string, MarkdownImage>();
+        Dictionary<string, MarkdownImage> markdownImagesToPublish = [];
 
         markdownFile.Html = ImageTagsRegex.Replace(markdownFile.Html, match =>
         {

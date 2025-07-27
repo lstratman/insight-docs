@@ -3,5 +3,5 @@
 public interface IMarkdownPublisher
 {
     Task PublishTopic(TocItem tocItem, string markdownFilePath);
-    Task PublishTopics(TocItem tocRoot, List<string> markdownFilePaths);
+    Task PublishTopics(TocItem tocRoot, string rootDirectoryPath, IEnumerable<string>? exclusionGlobs = null);
 }
