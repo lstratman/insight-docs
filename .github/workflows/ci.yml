@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build assemblies
+      run: dotnet build -c Release -p:BuildNumber=${{github.run_number}} --no-restore
+    - name: Build packages
+      run: dotnet pack -c Release -p:BuildNumber=${{github.run_number}} --no-build
