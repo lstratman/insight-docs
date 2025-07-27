@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightDocs", "InsightDocs\InsightDocs.csproj", "{6E898E65-BDB2-3132-AED8-377DBF95644B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightDocs.Templates.MSDN", "InsightDocs.Templates.MSDN\InsightDocs.Templates.MSDN.csproj", "{B28E4ED0-3F6F-4CF2-B4CD-AB2DEE9B37B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightDocs.Templates.MicrosoftLearn", "InsightDocs.Templates.MicrosoftLearn\InsightDocs.Templates.MicrosoftLearn.csproj", "{B28E4ED0-3F6F-4CF2-B4CD-AB2DEE9B37B8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightDocs.Sqlite", "InsightDocs.Sqlite\InsightDocs.Sqlite.csproj", "{A77AD310-8B47-4F4C-B783-2B33C6DC334B}"
 EndProject
