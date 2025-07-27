@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RepositoryUrl>https://github.com/lstratman/insight-docs</RepositoryUrl>
+    <PackageDescription>Template for InsightDocs that mimics the appearance of the Microsoft Learning site</PackageDescription>
+    <Version>0.9.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

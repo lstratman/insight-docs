@@ -6,6 +6,9 @@
     <RootNamespace>InsightDocs</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RepositoryUrl>https://github.com/lstratman/insight-docs</RepositoryUrl>
+    <PackageDescription>Core library for InsightDocs</PackageDescription>
+    <Version>0.9.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

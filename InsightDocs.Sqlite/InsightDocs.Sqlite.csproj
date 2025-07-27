@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RepositoryUrl>https://github.com/lstratman/insight-docs</RepositoryUrl>
+    <PackageDescription>Provides the ability for InsightDocs to publish to and serve topics from a SQLite database</PackageDescription>
+    <Version>0.9.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
