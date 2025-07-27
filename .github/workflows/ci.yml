@@ -5,8 +5,7 @@ on:
     branches: [ "develop" ]
 
 jobs:
-  build:
-
+  Build:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,3 +20,9 @@ jobs:
       run: dotnet build -c Release -p:BuildNumber=${{github.run_number}} --no-restore
     - name: Build packages
       run: dotnet pack -c Release -p:BuildNumber=${{github.run_number}} --no-build
+    - name: Add GitHub Packages source
+      run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+    - name: Publish packages
+      run: dotnet nuget push "**/*.nupkg" --source "github" --api-key "${{ secrets.GITHUB_TOKEN }}" --skip-duplicate
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
