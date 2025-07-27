@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <RepositoryUrl>https://github.com/lstratman/insight-docs</RepositoryUrl>
+    <BaseVersion>0.9</BaseVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(BuildNumber)' == ''">
+    <Version>$(BaseVersion).0</Version>
+    <PackageVersion>$(BaseVersion).0</PackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(BuildNumber)' != ''">
+    <Version>$(BaseVersion).$(BuildNumber)</Version>
+    <PackageVersion>$(BaseVersion).$(BuildNumber)</PackageVersion>
+  </PropertyGroup>
+</Project>
