@@ -1,8 +1,8 @@
-﻿using Microsoft.OpenApi;
+﻿using InsightDocs.OpenApi.Model;
 
 namespace InsightDocs.OpenApi.Abstractions;
 
 public interface IOpenApiLoader
 {
-    Task<OpenApiDocument> LoadOpenApiSpecFile(string openApiSpecFilePath);
+    Task<OpenApiSpec> LoadOpenApiSpecFile(string openApiSpecFilePath);
 }
