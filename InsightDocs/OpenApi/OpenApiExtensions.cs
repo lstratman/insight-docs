@@ -18,10 +18,8 @@ public static class OpenApiExtensions
 
 public static class OpenApiTocItemExtensions
 {
-    public static TocItem IncludeOpenApiSpecFile(this TocItem parentTocItem, string openApiSpecFilePath, string? title = null)
+    public static TocItem IncludeOpenApiSpecFile(this TocItem tocItem, string openApiSpecFilePath, string? title = null)
     {
-        TocItem tocItem = parentTocItem.AddTocItem("");
-
         tocItem.RegisterExecutor(async (serviceProvider) =>
         {
             IServiceScopeFactory serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();

@@ -5,6 +5,7 @@ using InsightDocs.DotNet;
 using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
 using InsightDocs.Markdown.Model;
+using InsightDocs.OpenApi.Model;
 using InsightDocs.Site.Model;
 using InsightDocs.TypeScript;
 using InsightDocs.TypeScript.Model;
@@ -34,7 +35,8 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<TypeScriptProperty>,
       IUrlProvider<TypeScriptMethodSignature>,
       IUrlProvider<TypeScriptNamespace>,
-      IUrlProvider<IntrinsicType>
+      IUrlProvider<IntrinsicType>,
+      IUrlProvider<OpenApiOperation>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -788,6 +790,22 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
     {
         return typeScriptOptions.ResolveMDNUrls ? item.Name == "void" ? "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void" : $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{item.Name}" : "";
     }
+
+    public string GetUrl(OpenApiOperation item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append(item.Url.StartsWith("/") ? item.Url[1..] : item.Url);
+        url.Append($"/{item.Method.ToLowerInvariant()}");
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -829,6 +847,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<TypeScriptMethodSignature>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<TypeScriptNamespace>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<IntrinsicType>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<OpenApiOperation>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

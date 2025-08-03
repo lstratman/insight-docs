@@ -2,6 +2,7 @@ using InsightDocs.Abstractions;
 using InsightDocs.DotNet.Model;
 using InsightDocs.Extensions;
 using InsightDocs.Markdown.Model;
+using InsightDocs.OpenApi.Model;
 using InsightDocs.Site.Model;
 using InsightDocs.TypeScript.Model;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,7 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<TypeScriptMethod, TypeScript.TypeScriptMethod>();
         builder.RegisterRazorItemTemplate<TypeScriptProperty, TypeScript.TypeScriptProperty>();
         builder.RegisterRazorItemTemplate<TypeScriptNamespace, TypeScript.TypeScriptNamespace>();
+        builder.RegisterRazorItemTemplate<OpenApiOperation, OpenApi.OpenApiOperation>();
 
         builder.Services.AddSingleton<IAssetProvider, TemplateAssetProvider>();
 

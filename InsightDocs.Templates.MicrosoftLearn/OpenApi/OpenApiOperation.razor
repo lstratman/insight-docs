@@ -1,0 +1,99 @@
+@inherits InsightDocs.RazorTemplate<InsightDocs.OpenApi.Model.OpenApiOperation>
+@using InsightDocs.Abstractions
+@using InsightDocs.DotNet.Model
+@using InsightDocs.Templates.MicrosoftLearn.Components
+@using Microsoft.Extensions.DependencyInjection
+
+<html>
+    <head>
+        <link rel="stylesheet" href="@GetUrl(TemplateAssets.MicrosoftLearnCss)"/>
+
+        @AddAdditionalCss()
+
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.CommonScript)"></script>
+
+        @AddAdditionalJavaScript()
+    </head>
+    <body>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    <div class="content">
+                        <div data-chunk-ids="0">
+                            <h1>@Item!.Method @Item.Url</h1>
+
+                            <div class="margin-block-xxs">
+	                            <ul class="metadata page-metadata align-items-center">
+		                            <li>Reference</li>
+	                            </ul>
+                            </div>
+
+                            <h2>Definition</h2>
+
+                            @if (Item!.Description != null)
+                            {
+                                <div class="summaryHolder">@Raw(Item.Description)</div>
+                            }
+
+                            @if (Item.Parameters != null)
+                            {
+                                var requiredParameters = Item.Parameters.Where(p => p.IsRequired).OrderBy(p => p.Name).ToList();
+                                var optionalParameters = Item.Parameters.Where(p => !p.IsRequired).OrderBy(p => p.Name).ToList();
+
+                                if (requiredParameters.Count > 0)
+                                {
+                                    <h3 class="propertyInfoTitle stack heading-anchor" id="required-parameters">Required Parameters</h3>
+
+                                    @for (int i = 0; i < requiredParameters.Count; i++)
+                                    {
+                                        <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
+                                            <dl class="parameterList">
+                                                <dt>@requiredParameters[i].Name</dt>
+                                                <dd>@requiredParameters[i].Type</dd>
+                                            </dl>
+
+                                            <p>
+                                                <b>Location:</b> @requiredParameters[i].Location.ToString("G")<br/>
+                                                <b>Required:</b> @requiredParameters[i].IsRequired.ToString().ToLowerInvariant()
+                                            </p>
+
+                                            @if (requiredParameters[i].Description != null)
+                                            {
+                                                <p>@Raw(requiredParameters[i].Description!)</p>
+                                            }
+                                        </div>
+                                    }
+                                }
+
+                                if (optionalParameters.Count > 0)
+                                {
+                                    <h3 class="propertyInfoTitle stack heading-anchor" id="required-parameters">Optional Parameters</h3>
+
+                                    @for (int i = 0; i < optionalParameters.Count; i++)
+                                    {
+                                        <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
+                                            <dl class="parameterList">
+                                                <dt>@optionalParameters[i].Name</dt>
+                                                <dd>@optionalParameters[i].Type</dd>
+                                            </dl>
+
+                                            <p>
+                                                <b>Location:</b> @optionalParameters[i].Location.ToString("G")<br />
+                                                <b>Required:</b> @optionalParameters[i].IsRequired.ToString().ToLowerInvariant()
+                                            </p>
+
+                                            @if (optionalParameters[i].Description != null)
+                                            {
+                                                <p>@Raw(optionalParameters[i].Description!)</p>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
