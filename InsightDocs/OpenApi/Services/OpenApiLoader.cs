@@ -44,17 +44,7 @@ public class OpenApiLoader : IOpenApiLoader
 
                         foreach (MicrosoftOpenApiParameter parameter in operation.Value.Parameters)
                         {
-                            string parameterType = "";
-
-                            if (parameter.Schema != null)
-                            {
-                                if (parameter.Schema.Type != null)
-                                {
-                                    parameterType = parameter.Schema.Type.ToString()!;
-                                }
-                            }
-
-                            InsightDocsOpenApiParameter openApiParameter = new InsightDocsOpenApiParameter(parameter.Name!, String.IsNullOrEmpty(parameter.Description) ? null : Markdig.Markdown.ToHtml(parameter.Description, Pipeline), (OpenApiParameterLocation)Enum.Parse(typeof(OpenApiParameterLocation), parameter.In!.Value.ToString("G")), parameter.Required, parameterType);
+                            InsightDocsOpenApiParameter openApiParameter = new InsightDocsOpenApiParameter(parameter.Name!, String.IsNullOrEmpty(parameter.Description) ? null : Markdig.Markdown.ToHtml(parameter.Description, Pipeline), (OpenApiParameterLocation)Enum.Parse(typeof(OpenApiParameterLocation), parameter.In!.Value.ToString("G")), parameter.Required, parameter.Schema);
                             operationMetadata.Parameters.Add(openApiParameter);
                         }
                     }
@@ -69,14 +59,7 @@ public class OpenApiLoader : IOpenApiLoader
 
                             foreach (KeyValuePair<string, IOpenApiSchema> formField in schema.Properties)
                             {
-                                string formFieldParameterType = "";
-
-                                if (formField.Value.Type != null)
-                                {
-                                    formFieldParameterType = formField.Value.Type.ToString()!;
-                                }
-
-                                InsightDocsOpenApiParameter formFieldParameter = new InsightDocsOpenApiParameter(formField.Key, String.IsNullOrEmpty(formField.Value.Description) ? null : Markdig.Markdown.ToHtml(formField.Value.Description, Pipeline), OpenApiParameterLocation.Form, schema.Required != null && schema.Required.Contains(formField.Key), formFieldParameterType);
+                                InsightDocsOpenApiParameter formFieldParameter = new InsightDocsOpenApiParameter(formField.Key, String.IsNullOrEmpty(formField.Value.Description) ? null : Markdig.Markdown.ToHtml(formField.Value.Description, Pipeline), OpenApiParameterLocation.Form, schema.Required != null && schema.Required.Contains(formField.Key), formField.Value);
                                 operationMetadata.Parameters.Add(formFieldParameter);
                             }
                         }

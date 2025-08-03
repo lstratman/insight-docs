@@ -1,51 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.OpenApi;
 
 namespace InsightDocs.OpenApi.Model;
 
-public class OpenApiParameter
+public class OpenApiParameter(string name, string? description, OpenApiParameterLocation location, bool isRequired, IOpenApiSchema? schema)
 {
-    public OpenApiParameter(string name, string? description, OpenApiParameterLocation location, bool isRequired, string type)
-    {
-        Name = name;
-        Description = description;
-        Location = location;
-        IsRequired = isRequired;
-        Type = type;
-    }
-
     public string Name
     {
         get;
         set;
-    }
+    } = name;
 
     public string? Description
     {
         get;
         set;
-    }
+    } = description;
 
     public OpenApiParameterLocation Location
     {
         get;
         set;
-    }
+    } = location;
 
     public bool IsRequired
     {
         get;
         set;
-    }
+    } = isRequired;
 
-    public string Type
+    public IOpenApiSchema? Schema
     {
         get;
         set;
-    }
+    } = schema;
 }
 
 public enum OpenApiParameterLocation

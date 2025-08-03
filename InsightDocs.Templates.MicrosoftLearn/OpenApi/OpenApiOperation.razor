@@ -49,10 +49,31 @@
                                         <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
                                             <dl class="parameterList">
                                                 <dt>@requiredParameters[i].Name</dt>
-                                                <dd>@requiredParameters[i].Type</dd>
+                                                <dd>
+                                                    @if (requiredParameters[i].Schema != null)
+                                                    {
+                                                        if (requiredParameters[i].Schema is Microsoft.OpenApi.OpenApiSchemaReference)
+                                                        {
+                                                            <!-- TODO: reference link -->
+                                                        }
+
+                                                        else if (requiredParameters[i].Schema!.Type != null && requiredParameters[i].Schema!.Enum != null)
+                                                        {
+                                                            @Raw("Enum");
+                                                        }
+
+                                                        else if (requiredParameters[i].Schema!.Type != null)
+                                                        {
+                                                            @requiredParameters[i].Schema!.Type!.ToString()
+                                                        }
+                                                    }
+                                                </dd>
                                             </dl>
 
-                                            <p><b>Location:</b> @requiredParameters[i].Location.ToString("G")</p>
+                                            <p>
+                                                <b>Location:</b> @requiredParameters[i].Location.ToString("G")
+                                                <!-- TODO: enum values -->
+                                            </p>
 
                                             @if (requiredParameters[i].Description != null)
                                             {
@@ -71,7 +92,25 @@
                                         <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
                                             <dl class="parameterList">
                                                 <dt>@optionalParameters[i].Name</dt>
-                                                <dd>@optionalParameters[i].Type</dd>
+                                                <dd>
+                                                    @if (optionalParameters[i].Schema != null)
+                                                    {
+                                                        if (optionalParameters[i].Schema is Microsoft.OpenApi.OpenApiSchemaReference)
+                                                        {
+                                                            <!-- TODO: reference link -->
+                                                        }
+
+                                                        else if (optionalParameters[i].Schema!.Type != null && optionalParameters[i].Schema!.Enum != null)
+                                                        {
+                                                            @Raw("Enum");
+                                                        }
+
+                                                        else if (optionalParameters[i].Schema!.Type != null)
+                                                        {
+                                                            @optionalParameters[i].Schema!.Type!.ToString()
+                                                        }
+                                                    }
+                                                </dd>
                                             </dl>
 
                                             <p><b>Location:</b> @optionalParameters[i].Location.ToString("G")</p>
