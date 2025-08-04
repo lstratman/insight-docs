@@ -42,23 +42,43 @@
 
                             <h2>Definition</h2>
                             
-                            <div class="codeHeader">
-                                <span class="language">JSON Schema</span>
-                                <button type="button" class="action position-relative display-none-print" onclick="copyCodeBlock(event)">
-                                    <span class="icon margin-right-xxs" aria-hidden="true">
-                                        <span class="docon docon-edit-copy"></span>
-                                    </span>
-                                    <span>Copy</span>
-                                    <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
-                                        <span class="icon font-size-lg">
-                                            <span class="docon docon-check-mark"></span>
+                            @if (Item.SchemaDefinition.Properties != null && Item.SchemaDefinition.Properties.Any(p => p.Value.Xml != null))
+                            {
+                                <div class="codeHeader">
+                                    <span class="language">XML Schema</span>
+                                    <button type="button" class="action position-relative display-none-print" onclick="copyCodeBlock(event)">
+                                        <span class="icon margin-right-xxs" aria-hidden="true">
+                                            <span class="docon docon-edit-copy"></span>
                                         </span>
-                                    </div>
-                                </button>
-                            </div>
-                            <pre class="wrap has-inner-focus"><code class="json language-json" dir="ltr">@Item.SchemaDefinition.ToJsonSchemaText()</code></pre>
+                                        <span>Copy</span>
+                                        <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+                                            <span class="icon font-size-lg">
+                                                <span class="docon docon-check-mark"></span>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                                <pre class="wrap has-inner-focus"><code class="html language-html" dir="ltr">@Item.SchemaDefinition.ToXmlSchemaText(Item.Name.Replace(".", ""))</code></pre>
+                            }
 
-                            @{
+                            else
+                            {
+                                <div class="codeHeader">
+                                    <span class="language">JSON Schema</span>
+                                    <button type="button" class="action position-relative display-none-print" onclick="copyCodeBlock(event)">
+                                        <span class="icon margin-right-xxs" aria-hidden="true">
+                                            <span class="docon docon-edit-copy"></span>
+                                        </span>
+                                        <span>Copy</span>
+                                        <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+                                            <span class="icon font-size-lg">
+                                                <span class="docon docon-check-mark"></span>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                                <pre class="wrap has-inner-focus"><code class="json language-json" dir="ltr">@Item.SchemaDefinition.ToJsonSchemaText()</code></pre>
+
                                 Dictionary<string, string> schemaReferenceUrls = new Dictionary<string, string>();
                                 GetSchemaReferenceUrls(Item.SchemaDefinition, schemaReferenceUrls);
 
