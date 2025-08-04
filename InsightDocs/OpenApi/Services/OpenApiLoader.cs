@@ -7,6 +7,7 @@ using InsightDocsOpenApiOperation = InsightDocs.OpenApi.Model.OpenApiOperation;
 using InsightDocsOpenApiParameter = InsightDocs.OpenApi.Model.OpenApiParameter;
 using MicrosoftOpenApiOperation = Microsoft.OpenApi.OpenApiOperation;
 using MicrosoftOpenApiParameter = Microsoft.OpenApi.OpenApiParameter;
+using OpenApiResponse = InsightDocs.OpenApi.Model.OpenApiResponse;
 
 namespace InsightDocs.OpenApi.Services;
 
@@ -62,6 +63,29 @@ public class OpenApiLoader : IOpenApiLoader
                                 InsightDocsOpenApiParameter formFieldParameter = new InsightDocsOpenApiParameter(formField.Key, String.IsNullOrEmpty(formField.Value.Description) ? null : Markdig.Markdown.ToHtml(formField.Value.Description, Pipeline), OpenApiParameterLocation.Form, schema.Required != null && schema.Required.Contains(formField.Key), formField.Value);
                                 operationMetadata.Parameters.Add(formFieldParameter);
                             }
+                        }
+                    }
+
+                    if (operation.Value.Responses != null && operation.Value.Responses.Any())
+                    {
+                        operationMetadata.Responses = [];
+
+                        foreach (KeyValuePair<string, IOpenApiResponse> response in operation.Value.Responses)
+                        {
+                            OpenApiResponse responseMetadata = new OpenApiResponse(String.IsNullOrEmpty(response.Value.Description) ? null : Markdig.Markdown.ToHtml(response.Value.Description, Pipeline), response.Key);
+
+                            if (response.Value.Content != null && response.Value.Content.Any())
+                            {
+                                responseMetadata.Content = new List<OpenApiResponseContent>();
+
+                                foreach (KeyValuePair<string, OpenApiMediaType> content in response.Value.Content)
+                                {
+                                    OpenApiResponseContent responseContent = new OpenApiResponseContent(content.Key, content.Value.Schema);
+                                    responseMetadata.Content.Add(responseContent);
+                                }
+                            }
+
+                            operationMetadata.Responses.Add(responseMetadata);
                         }
                     }
 

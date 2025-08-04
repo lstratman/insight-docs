@@ -1,6 +1,7 @@
 @inherits InsightDocs.RazorTemplate<InsightDocs.OpenApi.Model.OpenApiOperation>
 @using InsightDocs.Abstractions
 @using InsightDocs.DotNet.Model
+@using InsightDocs.OpenApi
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @using Microsoft.Extensions.DependencyInjection
 
@@ -10,9 +11,12 @@
 
         @AddAdditionalCss()
 
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
         <script type="text/javascript" src="@GetUrl(TemplateAssets.CommonScript)"></script>
 
         @AddAdditionalJavaScript()
+
+        <script type="text/javascript">hljs.highlightAll();</script>
     </head>
     <body>
         <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
@@ -79,13 +83,15 @@
                                             {
                                                 @Raw(requiredParameters[i].Description!, "p")
                                             }
+
+                                            <!-- TODO: object schema -->
                                         </div>
                                     }
                                 }
 
                                 if (optionalParameters.Count > 0)
                                 {
-                                    <h3 class="propertyInfoTitle stack heading-anchor" id="required-parameters">Optional Parameters</h3>
+                                    <h3 class="propertyInfoTitle stack heading-anchor" id="optional-parameters">Optional Parameters</h3>
 
                                     @for (int i = 0; i < optionalParameters.Count; i++)
                                     {
@@ -120,6 +126,63 @@
                                                 @Raw(optionalParameters[i].Description!, "p")
                                             }
                                         </div>
+                                    }
+                                }
+                            }
+
+                            @if (Item.Responses != null && Item.Responses.Count > 0)
+                            {
+                                <h2 class="propertyInfoTitle stack heading-anchor" id="responses">Responses</h2>
+
+                                @foreach (var response in Item.Responses.OrderBy(r => r.HttpStatusCode))
+                                {
+                                    <h3 class="propertyInfoTitle stack heading-anchor" id="@response.HttpStatusCode">HTTP @response.HttpStatusCode</h3>
+
+                                    @if (response.Description != null)
+                                    {
+                                        <div class="summaryHolder">@Raw(response.Description)</div>
+                                    }
+
+                                    @if (response.Content != null && response.Content.Count > 0)
+                                    {
+                                        foreach (var content in response.Content)
+                                        {
+                                            <h4 class="propertyInfoTitle">@content.MimeType</h4>
+
+                                            if (content.Schema is Microsoft.OpenApi.OpenApiSchemaReference)
+                                            {
+                                                <!-- TODO: reference link -->
+                                            }
+
+                                            else if (content.Schema!.Type != null && content.Schema!.Enum != null)
+                                            {
+                                                <!-- TODO: enum values -->
+                                            }
+
+                                            else if (content.Schema!.Type != null && content.Schema!.Type != Microsoft.OpenApi.JsonSchemaType.Object)
+                                            {
+                                                @Raw(content.Schema!.Type!.ToString()!)
+                                            }
+
+                                            else if (content.Schema!.Type == Microsoft.OpenApi.JsonSchemaType.Object && content.MimeType == "application/json")
+                                            {
+                                                <div class="codeHeader">
+                                                    <span class="language">JSON Schema</span>
+                                                    <button type="button" class="action position-relative display-none-print" onclick="copyCodeBlock(event)">
+                                                        <span class="icon margin-right-xxs" aria-hidden="true">
+                                                            <span class="docon docon-edit-copy"></span>
+                                                        </span>
+                                                        <span>Copy</span>
+                                                        <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+                                                            <span class="icon font-size-lg">
+                                                                <span class="docon docon-check-mark"></span>
+                                                            </span>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                                <pre class="wrap has-inner-focus"><code class="json language-json" dir="ltr">@content.Schema.ToJsonSchemaText()</code></pre>
+                                            }
+                                        }
                                     }
                                 }
                             }

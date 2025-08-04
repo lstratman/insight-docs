@@ -15,6 +15,7 @@ public class OpenApiOperation : ILinkTarget
         Url = url;
         Description = description;
     }
+
     public string Method 
     { 
         get; 
@@ -37,6 +38,12 @@ public class OpenApiOperation : ILinkTarget
     { 
         get; 
         set; 
+    }
+
+    public List<OpenApiResponse>? Responses 
+    { 
+        get; 
+        set;
     }
 
     public string LinkText

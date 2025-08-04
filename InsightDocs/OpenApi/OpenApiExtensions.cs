@@ -2,6 +2,7 @@
 using InsightDocs.OpenApi.Abstractions;
 using InsightDocs.OpenApi.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi;
 
 namespace InsightDocs.OpenApi;
 
@@ -40,5 +41,13 @@ public static class OpenApiTocItemExtensions
         });
 
         return tocItem;
+    }
+}
+
+public static class OpenApiModelExtensions
+{
+    public static string ToJsonSchemaText(this IOpenApiSchema schema)
+    {
+        return schema.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_1).Result;
     }
 }
