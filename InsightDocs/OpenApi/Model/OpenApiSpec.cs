@@ -8,9 +8,9 @@ public class OpenApiSpec
         set;
     } = new List<OpenApiOperation>();
 
-    public List<OpenApiSchema>? Schemas
+    public List<OpenApiSchema> Schemas
     {
         get;
         set;
-    }
+    } = [];
 }

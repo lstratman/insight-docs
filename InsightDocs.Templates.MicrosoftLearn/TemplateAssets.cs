@@ -48,4 +48,14 @@ public class TemplateAssets
     {
         get;
     } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/site-index.css");
+
+    public static IAsset OpenApiScript
+    {
+        get;
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "js/openapi.js");
+
+    public static IAsset OpenApiCss
+    {
+        get;
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/openapi.css");
 }

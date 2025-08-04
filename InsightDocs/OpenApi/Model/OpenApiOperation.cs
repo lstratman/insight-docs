@@ -1,38 +1,26 @@
 ﻿using InsightDocs.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InsightDocs.OpenApi.Model;
 
-public class OpenApiOperation : ILinkTarget
+public class OpenApiOperation(string method, string url, List<OpenApiSchema> allSchemas, string? description = null) : ILinkTarget
 {
-    public OpenApiOperation(string method, string url, string? description = null)
+    public string Method
     {
-        Method = method;
-        Url = url;
-        Description = description;
-    }
-
-    public string Method 
-    { 
-        get; 
-        set; 
-    }
-    
-    public string Url 
-    { 
-        get; 
-        set; 
-    }
-    
-    public string? Description 
-    { 
-        get; 
+        get;
         set;
-    }
+    } = method;
+
+    public string Url
+    {
+        get;
+        set;
+    } = url;
+
+    public string? Description
+    {
+        get;
+        set;
+    } = description;
 
     public List<OpenApiParameter>? Parameters 
     { 
@@ -45,6 +33,12 @@ public class OpenApiOperation : ILinkTarget
         get; 
         set;
     }
+
+    public List<OpenApiSchema> AllSchemas
+    {
+        get;
+        set;
+    } = allSchemas;
 
     public string LinkText
     {

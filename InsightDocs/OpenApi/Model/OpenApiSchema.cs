@@ -3,7 +3,7 @@ using Microsoft.OpenApi;
 
 namespace InsightDocs.OpenApi.Model;
 
-public class OpenApiSchema(string name, IOpenApiSchema schemaDefinition) : ILinkTarget
+public class OpenApiSchema(string name, IOpenApiSchema schemaDefinition, List<OpenApiSchema> allSchemas) : ILinkTarget
 {
     public string Name
     {
@@ -16,6 +16,12 @@ public class OpenApiSchema(string name, IOpenApiSchema schemaDefinition) : ILink
         get;
         set;
     } = schemaDefinition;
+
+    public List<OpenApiSchema> AllSchemas
+    {
+        get;
+        set;
+    } = allSchemas;
 
     public string LinkText
     {

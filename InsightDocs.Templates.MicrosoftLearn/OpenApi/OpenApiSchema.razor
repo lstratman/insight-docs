@@ -1,6 +1,6 @@
 @inherits InsightDocs.RazorTemplate<InsightDocs.OpenApi.Model.OpenApiSchema>
+@inject InsightDocs.Abstractions.IUrlProvider<InsightDocs.OpenApi.Model.OpenApiSchema> OpenApiSchemaUrlProvider
 @using InsightDocs.Abstractions
-@using InsightDocs.DotNet.Model
 @using InsightDocs.OpenApi
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @using Microsoft.Extensions.DependencyInjection
@@ -8,15 +8,23 @@
 <html>
     <head>
         <link rel="stylesheet" href="@GetUrl(TemplateAssets.MicrosoftLearnCss)"/>
+        <link rel="stylesheet" href="@GetUrl(TemplateAssets.OpenApiCss)"/>
 
         @AddAdditionalCss()
 
         <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
         <script type="text/javascript" src="@GetUrl(TemplateAssets.CommonScript)"></script>
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.OpenApiScript)"></script>
 
         @AddAdditionalJavaScript()
 
-        <script type="text/javascript">hljs.highlightAll();</script>
+        <script type="text/javascript">
+            hljs.highlightAll();
+
+            window.addEventListener('DOMContentLoaded', function () {
+                addSchemaReferenceLinks();
+            });
+        </script>
     </head>
     <body>
         <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
@@ -49,6 +57,23 @@
                                 </button>
                             </div>
                             <pre class="wrap has-inner-focus"><code class="json language-json" dir="ltr">@Item.SchemaDefinition.ToJsonSchemaText()</code></pre>
+
+                            @{
+                                Dictionary<string, string> schemaReferenceUrls = new Dictionary<string, string>();
+                                GetSchemaReferenceUrls(Item.SchemaDefinition, schemaReferenceUrls);
+
+                                if (schemaReferenceUrls.Count > 0)
+                                {
+                                    <script type="text/javascript">
+                                        window.schemaReferenceUrls = {};
+
+                                        @foreach (KeyValuePair<string, string> schemaReferenceUrl in schemaReferenceUrls)
+                                        {
+                                            @Raw($@"window.schemaReferenceUrls[""{schemaReferenceUrl.Key}""] = ""{schemaReferenceUrl.Value}"";");
+                                        }
+                                    </script>
+                                }
+                            }
                         </div>
                     </div>
                 </div>
@@ -56,3 +81,46 @@
         </main>
     </body>
 </html>
+
+@code {
+    private void GetSchemaReferenceUrls(Microsoft.OpenApi.IOpenApiSchema schema, Dictionary<string, string> urls)
+    {
+        if (schema == null)
+        {
+            return;
+        }
+
+        if (schema.Type == Microsoft.OpenApi.JsonSchemaType.Array && schema.Items != null)
+        {
+            GetSchemaReferenceUrls(schema.Items, urls);
+        }
+
+        else if (schema is Microsoft.OpenApi.OpenApiSchemaReference schemaReference && !String.IsNullOrEmpty(schemaReference.Reference.Id))
+        {
+            string schemaName = schemaReference.Reference.Id;
+            InsightDocs.OpenApi.Model.OpenApiSchema? targetSchema = Item!.AllSchemas.FirstOrDefault(s => s.Name == schemaName);
+
+            if (targetSchema == null)
+            {
+                throw new Exception("Schema not found: " + schemaName);
+            }
+
+            string url = OpenApiSchemaUrlProvider.GetUrl(targetSchema);
+
+            urls[schemaReference.Reference.ReferenceV3!] = url;
+        }
+
+        else
+        {
+            if (schema.Properties == null)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<string, Microsoft.OpenApi.IOpenApiSchema> property in schema.Properties)
+            {
+                GetSchemaReferenceUrls(property.Value, urls);
+            }
+        }
+    }
+}

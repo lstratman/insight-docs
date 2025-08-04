@@ -37,7 +37,7 @@ public class OpenApiLoader : IOpenApiLoader
             {
                 foreach (KeyValuePair<HttpMethod, MicrosoftOpenApiOperation> operation in path.Value.Operations)
                 {
-                    InsightDocsOpenApiOperation operationMetadata = new InsightDocsOpenApiOperation(operation.Key.Method.ToUpperInvariant(), path.Key, String.IsNullOrEmpty(operation.Value.Description) ? null : Markdig.Markdown.ToHtml(operation.Value.Description, Pipeline));
+                    InsightDocsOpenApiOperation operationMetadata = new InsightDocsOpenApiOperation(operation.Key.Method.ToUpperInvariant(), path.Key, openApiSpec.Schemas, String.IsNullOrEmpty(operation.Value.Description) ? null : Markdig.Markdown.ToHtml(operation.Value.Description, Pipeline));
 
                     if (operation.Value.Parameters != null && operation.Value.Parameters.Any())
                     {
@@ -96,11 +96,9 @@ public class OpenApiLoader : IOpenApiLoader
 
         if (openApiDocument.Components != null && openApiDocument.Components.Schemas != null)
         {
-            openApiSpec.Schemas = [];
-
             foreach (KeyValuePair<string, IOpenApiSchema> schema in openApiDocument.Components.Schemas)
             {
-                openApiSpec.Schemas.Add(new Model.OpenApiSchema(schema.Key, schema.Value));
+                openApiSpec.Schemas.Add(new Model.OpenApiSchema(schema.Key, schema.Value, openApiSpec.Schemas));
             }
         }
 
