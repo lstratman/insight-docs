@@ -36,7 +36,8 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
       IUrlProvider<TypeScriptMethodSignature>,
       IUrlProvider<TypeScriptNamespace>,
       IUrlProvider<IntrinsicType>,
-      IUrlProvider<OpenApiOperation>
+      IUrlProvider<OpenApiOperation>,
+      IUrlProvider<OpenApiSchema>
 {
     protected KebabCaseUrlProviderOptions Options
     {
@@ -806,6 +807,21 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
         return url.ToString();
     }
+
+    public string GetUrl(OpenApiSchema item)
+    {
+        StringBuilder url = new();
+
+        if (!String.IsNullOrEmpty(urlPrefixProvider.UrlPrefix))
+        {
+            url.Append(urlPrefixProvider.UrlPrefix);
+            url.Append('/');
+        }
+
+        url.Append(item.Name);
+
+        return url.ToString();
+    }
 }
 
 public class KebabCaseUrlProviderOptions
@@ -848,6 +864,7 @@ public static class KebabCaseUrlProviderExtensions
         builder.Services.AddScoped<IUrlProvider<TypeScriptNamespace>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<IntrinsicType>, KebabCaseUrlProvider>();
         builder.Services.AddScoped<IUrlProvider<OpenApiOperation>, KebabCaseUrlProvider>();
+        builder.Services.AddScoped<IUrlProvider<OpenApiSchema>, KebabCaseUrlProvider>();
 
         if (optionsFactory != null)
         {

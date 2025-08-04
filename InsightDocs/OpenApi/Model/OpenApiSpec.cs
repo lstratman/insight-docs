@@ -7,4 +7,10 @@ public class OpenApiSpec
         get;
         set;
     } = new List<OpenApiOperation>();
+
+    public List<OpenApiSchema>? Schemas
+    {
+        get;
+        set;
+    }
 }

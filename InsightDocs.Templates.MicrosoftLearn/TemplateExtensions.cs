@@ -29,6 +29,7 @@ public static class TemplateExtensions
         builder.RegisterRazorItemTemplate<TypeScriptProperty, TypeScript.TypeScriptProperty>();
         builder.RegisterRazorItemTemplate<TypeScriptNamespace, TypeScript.TypeScriptNamespace>();
         builder.RegisterRazorItemTemplate<OpenApiOperation, OpenApi.OpenApiOperation>();
+        builder.RegisterRazorItemTemplate<OpenApiSchema, OpenApi.OpenApiSchema>();
 
         builder.Services.AddSingleton<IAssetProvider, TemplateAssetProvider>();
 

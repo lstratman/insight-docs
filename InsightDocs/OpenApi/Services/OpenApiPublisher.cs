@@ -9,7 +9,9 @@ public partial class OpenApiPublisher(
     ILoggerFactory loggerFactory,
     IOpenApiLoader openApiLoader,
     IItemTemplateProvider<OpenApiOperation> openApiOperationTemplateProvider,
+    IItemTemplateProvider<OpenApiSchema> openApiSchemaTemplateProvider,
     IUrlProvider<OpenApiOperation> openApiOperationUrlProvider,
+    IUrlProvider<OpenApiSchema> openApiSchemaUrlProvider,
     IPublisher publisher
 ) : IOpenApiPublisher
 {
@@ -21,6 +23,9 @@ public partial class OpenApiPublisher(
     
     [LoggerMessage(LogLevel.Debug, "Publishing topic for endpoint {method} {endpoint}")]
     public static partial void LogPublishingEndpoint(ILogger logger, string method, string endpoint);
+
+    [LoggerMessage(LogLevel.Debug, "Publishing topic for schema {schemaName}")]
+    public static partial void LogPublishingSchema(ILogger logger, string schemaName);
 
     public async Task PublishTopics(TocItem tocRoot, string openApiSpecFilePath)
     {
@@ -104,10 +109,21 @@ public partial class OpenApiPublisher(
             }, true);
         }
 
-        //if (openApiSpec.Components?.Schemas != null && openApiSpec.Components.Schemas.Any())
-        //{
-        //    TocItem schemasTocItem = tocRoot.AddTocItem("Schemas");
-        //}
+        if (openApiSpec.Schemas != null && openApiSpec.Schemas.Any())
+        {
+            TocItem schemasTocItem = tocRoot.AddTocItem("Schemas");
+
+            foreach (OpenApiSchema schema in openApiSpec.Schemas.OrderBy(s => s.Name))
+            {
+                LogPublishingSchema(logger, schema.Name);
+
+                string url = openApiSchemaUrlProvider.GetUrl(schema);
+                string schemaHtml = await openApiSchemaTemplateProvider.GetContent(schema, url);
+                TocItem schemaTocItem = schemasTocItem.AddTocItem(schema.Name, url);
+
+                await publisher.Publish(url, schemaHtml, "text/html", schema.Name);
+            }
+        }
 
         LogFinishedPublishingTopics(logger);
     }

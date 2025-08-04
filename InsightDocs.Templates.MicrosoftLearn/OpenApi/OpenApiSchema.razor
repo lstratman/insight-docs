@@ -1,0 +1,58 @@
+@inherits InsightDocs.RazorTemplate<InsightDocs.OpenApi.Model.OpenApiSchema>
+@using InsightDocs.Abstractions
+@using InsightDocs.DotNet.Model
+@using InsightDocs.OpenApi
+@using InsightDocs.Templates.MicrosoftLearn.Components
+@using Microsoft.Extensions.DependencyInjection
+
+<html>
+    <head>
+        <link rel="stylesheet" href="@GetUrl(TemplateAssets.MicrosoftLearnCss)"/>
+
+        @AddAdditionalCss()
+
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.HighlightJsScript)"></script>
+        <script type="text/javascript" src="@GetUrl(TemplateAssets.CommonScript)"></script>
+
+        @AddAdditionalJavaScript()
+
+        <script type="text/javascript">hljs.highlightAll();</script>
+    </head>
+    <body>
+        <main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+            <div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+                    <div class="content">
+                        <div data-chunk-ids="0">
+                            <h1>@Item!.Name Schema</h1>
+
+                            <div class="margin-block-xxs">
+	                            <ul class="metadata page-metadata align-items-center">
+		                            <li>Reference</li>
+	                            </ul>
+                            </div>
+
+                            <h2>Definition</h2>
+                            
+                            <div class="codeHeader">
+                                <span class="language">JSON Schema</span>
+                                <button type="button" class="action position-relative display-none-print" onclick="copyCodeBlock(event)">
+                                    <span class="icon margin-right-xxs" aria-hidden="true">
+                                        <span class="docon docon-edit-copy"></span>
+                                    </span>
+                                    <span>Copy</span>
+                                    <div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+                                        <span class="icon font-size-lg">
+                                            <span class="docon docon-check-mark"></span>
+                                        </span>
+                                    </div>
+                                </button>
+                            </div>
+                            <pre class="wrap has-inner-focus"><code class="json language-json" dir="ltr">@Item.SchemaDefinition.ToJsonSchemaText()</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

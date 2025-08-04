@@ -94,6 +94,16 @@ public class OpenApiLoader : IOpenApiLoader
             }
         }
 
+        if (openApiDocument.Components != null && openApiDocument.Components.Schemas != null)
+        {
+            openApiSpec.Schemas = [];
+
+            foreach (KeyValuePair<string, IOpenApiSchema> schema in openApiDocument.Components.Schemas)
+            {
+                openApiSpec.Schemas.Add(new Model.OpenApiSchema(schema.Key, schema.Value));
+            }
+        }
+
         return openApiSpec;
     }
 }
