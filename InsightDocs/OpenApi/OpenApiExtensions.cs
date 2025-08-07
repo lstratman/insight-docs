@@ -127,6 +127,11 @@ public static class OpenApiModelExtensions
                             xsdType = "xs:boolean";
                         }
 
+                        else if (property.Value.Type == null)
+                        {
+                            xsdType = "xs:any";
+                        }
+
                         else
                         {
                             throw new Exception("Unsupported schema type for XML attribute: " + property.Value.Type);
