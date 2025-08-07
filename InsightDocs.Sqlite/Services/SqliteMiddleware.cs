@@ -105,7 +105,7 @@ public class SqliteMiddleware
         }
 
         using (SqliteConnection connection = GetConnection())
-        using (SqliteCommand command = new SqliteCommand("SELECT MimeType, DataContentLength, Data FROM Urls JOIN MimeTypes ON Urls.MimeTypeId = MimeTypes.MimeTypeId WHERE url = @url", connection))
+        using (SqliteCommand command = new SqliteCommand("SELECT MimeType, DataIsGzipped, DataContentLength, Data FROM Urls JOIN MimeTypes ON Urls.MimeTypeId = MimeTypes.MimeTypeId WHERE url = @url", connection))
         {
             command.Parameters.AddWithValue("@url", path);
 
@@ -114,8 +114,9 @@ public class SqliteMiddleware
                 if (reader.Read())
                 {
                     string mimeType = reader.GetString(0);
-                    long dataContentLength = reader.GetInt64(1);
-                    byte[] data = reader.GetFieldValue<byte[]>(2);
+                    bool dataIsGzipped = reader.GetBoolean(1);
+                    long dataContentLength = reader.GetInt64(2);
+                    byte[] data = reader.GetFieldValue<byte[]>(3);
 
                     context.Response.ContentType = mimeType;
                     context.Response.ContentLength = dataContentLength;
@@ -123,6 +124,11 @@ public class SqliteMiddleware
                     if (mimeType.StartsWith("text/"))
                     {
                         context.Response.ContentType += "; charset=utf-8";
+                    }
+
+                    if (dataIsGzipped)
+                    {
+                        context.Response.Headers.Add("Content-Encoding", "gzip");
                     }
 
                     await context.Response.Body.WriteAsync(data);

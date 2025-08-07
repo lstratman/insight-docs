@@ -2,6 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
+using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 
@@ -20,6 +21,12 @@ public class SqlitePublisherOptions
         get;
         set;
     } = true;
+
+    public bool GzipContent
+    {
+        get;
+        set;
+    } = false;
 }
 
 public class SqlitePublisher : IPublisher, IDisposable
@@ -43,6 +50,7 @@ public class SqlitePublisher : IPublisher, IDisposable
 
         DatabasePath = databasePath;
         ClearExistingDatabase = options.ClearExistingDatabase;
+        GzipContent = options.GzipContent;
         SearchService = serviceProvider.GetService<ISearchService>();
     }
 
@@ -55,6 +63,12 @@ public class SqlitePublisher : IPublisher, IDisposable
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     internal static string DatabasePath
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+        get;
+        set;
+    }
+
+    protected bool GzipContent
     {
         get;
         set;
@@ -176,6 +190,19 @@ public class SqlitePublisher : IPublisher, IDisposable
             }
         }
 
+        if (GzipContent)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+                {
+                    gzipStream.Write(contentBytes, 0, contentBytes.Length);
+                }
+
+                contentBytes = memoryStream.ToArray();
+            }
+        }
+
         lock (_connectionLock)
         {
             if (PublishedUrls.ContainsKey(url))
@@ -198,7 +225,7 @@ public class SqlitePublisher : IPublisher, IDisposable
                 }
             }
 
-            using (SqliteCommand command = new SqliteCommand("INSERT INTO Urls VALUES(@url, @mimeTypeId, @dataContentLength, @data)", Connection, Transaction))
+            using (SqliteCommand command = new SqliteCommand("INSERT INTO Urls VALUES(@url, @mimeTypeId, @dataIsGzipped, @dataContentLength, @data)", Connection, Transaction))
             {
                 if (!url.StartsWith('/'))
                 {
@@ -207,6 +234,7 @@ public class SqlitePublisher : IPublisher, IDisposable
 
                 command.Parameters.AddWithValue("@url", url);
                 command.Parameters.AddWithValue("@mimeTypeId", mimeTypeId);
+                command.Parameters.AddWithValue("@dataIsGzipped", GzipContent);
                 command.Parameters.AddWithValue("@dataContentLength", contentBytes.Length);
                 command.Parameters.AddWithValue("@data", contentBytes);
 
