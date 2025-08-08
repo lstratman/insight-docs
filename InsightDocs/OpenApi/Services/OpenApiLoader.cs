@@ -30,6 +30,16 @@ public class OpenApiLoader : IOpenApiLoader
 
         OpenApiSpec openApiSpec = new OpenApiSpec();
 
+        if (openApiDocument.Components != null && openApiDocument.Components.Schemas != null)
+        {
+            foreach (KeyValuePair<string, IOpenApiSchema> schema in openApiDocument.Components.Schemas)
+            {
+                openApiSpec.Schemas.Add(new Model.OpenApiSchema(schema.Key, schema.Value, openApiSpec.Schemas));
+            }
+        }
+
+        List<IOpenApiSchema> referencedSchemas = [];
+
         foreach (KeyValuePair<string, IOpenApiPathItem> path in openApiDocument.Paths)
         {
             if (path.Value.Operations != null)
@@ -81,6 +91,11 @@ public class OpenApiLoader : IOpenApiLoader
                                 {
                                     OpenApiResponseContent responseContent = new OpenApiResponseContent(content.Key, content.Value.Schema);
                                     responseMetadata.Content.Add(responseContent);
+
+                                    if (content.Value.Schema != null)
+                                    {
+                                        ApplyMimeTypeToSchema(content.Key, content.Value.Schema, openApiSpec.Schemas, referencedSchemas, []);
+                                    }
                                 }
                             }
 
@@ -93,14 +108,78 @@ public class OpenApiLoader : IOpenApiLoader
             }
         }
 
-        if (openApiDocument.Components != null && openApiDocument.Components.Schemas != null)
+        openApiSpec.Schemas.RemoveAll(s => !referencedSchemas.Contains(s.SchemaDefinition));
+
+        return openApiSpec;
+    }
+
+    protected virtual void ApplyMimeTypeToSchema(string mimeType, IOpenApiSchema schema, List<Model.OpenApiSchema> insightDocsSchemas, List<IOpenApiSchema> referencedSchemas, Stack<IOpenApiSchema> stack)
+    {
+        if (schema is OpenApiSchemaReference schemaReference)
         {
-            foreach (KeyValuePair<string, IOpenApiSchema> schema in openApiDocument.Components.Schemas)
+            if (schemaReference.Reference != null && !String.IsNullOrEmpty(schemaReference.Reference.Id))
             {
-                openApiSpec.Schemas.Add(new Model.OpenApiSchema(schema.Key, schema.Value, openApiSpec.Schemas));
+                Model.OpenApiSchema? insightDocsSchema = insightDocsSchemas.FirstOrDefault(s => s.Name == schemaReference.Reference.Id);
+
+                if (insightDocsSchema != null)
+                {
+                    insightDocsSchema.MimeTypes.Add(mimeType);
+
+                    if (insightDocsSchema.SchemaDefinition != null)
+                    {
+                        schema = insightDocsSchema.SchemaDefinition;
+                    }
+                }
             }
         }
 
-        return openApiSpec;
+        if (stack.Contains(schema))
+        {
+            return;
+        }
+
+        stack.Push(schema);
+
+        if (!referencedSchemas.Contains(schema))
+        {
+            referencedSchemas.Add(schema);
+        }
+
+        if (schema.AllOf != null)
+        {
+            foreach (IOpenApiSchema? subSchema in schema.AllOf)
+            {
+                if (subSchema != null)
+                {
+                    ApplyMimeTypeToSchema(mimeType, subSchema, insightDocsSchemas, referencedSchemas, stack);
+                }
+            }
+        }
+
+        if (schema.AnyOf != null)
+        {
+            foreach (IOpenApiSchema? subSchema in schema.AnyOf)
+            {
+                if (subSchema != null)
+                {
+                    ApplyMimeTypeToSchema(mimeType, subSchema, insightDocsSchemas, referencedSchemas, stack);
+                }
+            }
+        }
+
+        if (schema.Properties != null)
+        {
+            foreach (KeyValuePair<string, IOpenApiSchema> property in schema.Properties)
+            {
+                ApplyMimeTypeToSchema(mimeType, property.Value, insightDocsSchemas, referencedSchemas, stack);
+            }
+        }
+
+        if (schema.Items != null)
+        {
+            ApplyMimeTypeToSchema(mimeType, schema.Items, insightDocsSchemas, referencedSchemas, stack);
+        }
+
+        stack.Pop();
     }
 }

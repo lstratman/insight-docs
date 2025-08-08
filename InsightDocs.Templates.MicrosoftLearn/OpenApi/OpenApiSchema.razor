@@ -42,7 +42,7 @@
 
                             <h2>Definition</h2>
                             
-                            @if (Item.SchemaDefinition.Properties != null && Item.SchemaDefinition.Properties.Any(p => p.Value.Xml != null))
+                            @if (Item.MimeTypes.Any(m => m.EndsWith("/xml") || m.EndsWith("+xml")))
                             {
                                 <div class="codeHeader">
                                     <span class="language">XML Schema</span>
@@ -58,10 +58,10 @@
                                         </div>
                                     </button>
                                 </div>
-                                <pre class="wrap has-inner-focus"><code class="xml language-xml" dir="ltr">@Item.SchemaDefinition.ToXmlSchemaText(Item.Name.Replace(".", ""))</code></pre>
+                                <pre class="wrap has-inner-focus"><code class="xml language-xml" dir="ltr">@Item.SchemaDefinition.ToXmlSchemaText(Item.Name)</code></pre>
                             }
 
-                            else
+                            @if (Item.MimeTypes.Any(m => m.EndsWith("/json") || m.EndsWith("+json")))
                             {
                                 <div class="codeHeader">
                                     <span class="language">JSON Schema</span>

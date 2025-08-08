@@ -52,29 +52,29 @@ public static class OpenApiModelExtensions
         return schema.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_1).Result;
     }
 
-    public static string ToXmlSchemaText(this IOpenApiSchema schema, string elementName)
+    public static string ToXmlSchemaText(this IOpenApiSchema schema, string typeName)
     {
         StringBuilder output = new StringBuilder(@"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">");
 
-        schema.ToXmlSchemaTextInternal(elementName, output, []);
+        schema.ToXmlSchemaTextInternal(typeName, output, []);
         output.Append("</xs:schema>");
 
         return output.ToString();
     }
 
-    private static void ToXmlSchemaTextInternal(this IOpenApiSchema schema, string elementName, StringBuilder output, List<string> renderedTypes)
+    private static void ToXmlSchemaTextInternal(this IOpenApiSchema schema, string typeName, StringBuilder output, List<string> renderedTypes)
     {
         if (schema.Type == JsonSchemaType.Object)
         {
-            if (renderedTypes.Contains(elementName))
+            if (renderedTypes.Contains(typeName))
             {
                 return;
             }
 
-            renderedTypes.Add(elementName);
+            renderedTypes.Add(typeName);
 
             output.AppendLine("");
-            output.AppendLine($@"  <xs:complexType name=""{elementName}"">");
+            output.AppendLine($@"  <xs:complexType name=""{typeName}"">");
 
             Dictionary<string, IOpenApiSchema> deferredSchemas = [];
 
@@ -90,12 +90,43 @@ public static class OpenApiModelExtensions
                     foreach (KeyValuePair<string, IOpenApiSchema> property in elementProperties)
                     {
                         string propertyElementName = property.Value.Xml?.Name ?? property.Key;
-                        string propertyType = property.Value.Type == JsonSchemaType.Array
-                            ? $"{property.Key}Array"
-                            : propertyElementName;
+                        string propertyType;
+                        string minOccurs = "0";
+                        string maxOccurs = "1";
 
-                        output.AppendLine($@"      <xs:element name=""{propertyElementName}"" type=""{propertyType}"" minOccurs=""{(schema.Required != null && schema.Required.Contains(property.Key) ? "1" : "0")}"" maxOccurs=""1""/>");
-                        deferredSchemas.Add(propertyElementName, property.Value);
+                        if (property.Value is OpenApiSchemaReference reference)
+                        {
+                            propertyType = reference.Reference.Id!;
+                            minOccurs = schema.Required != null && schema.Required.Contains(property.Key) ? "1" : "0";
+                        }
+
+                        else
+                        {
+                            if (property.Value.Type == JsonSchemaType.Array)
+                            {
+                                if ((property.Value.Xml == null || !property.Value.Xml.Wrapped) && property.Value.Items is OpenApiSchemaReference itemsReference)
+                                {
+                                    propertyType = itemsReference.Reference.Id!;
+                                    minOccurs = schema.Required != null && schema.Required.Contains(property.Key) ? "1" : "0";
+                                    maxOccurs = "unbounded";
+                                }
+
+                                else
+                                {
+                                    propertyType = $"{property.Key}Array";
+                                    deferredSchemas.Add(propertyType, property.Value);
+                                }
+                            }
+
+                            else
+                            {
+                                propertyType = propertyElementName;
+                                minOccurs = schema.Required != null && schema.Required.Contains(property.Key) ? "1" : "0";
+                                deferredSchemas.Add(propertyType, property.Value);
+                            }
+                        }
+
+                        output.AppendLine($@"      <xs:element name=""{propertyElementName}"" type=""{propertyType}"" minOccurs=""{minOccurs}"" maxOccurs=""{maxOccurs}""/>");
                     }
 
                     output.AppendLine("    </xs:sequence>");
@@ -139,7 +170,7 @@ public static class OpenApiModelExtensions
                         }
 #pragma warning restore IDE0045 // Convert to conditional expression
 
-                        output.AppendLine($@"    <xs:attribute name=""{property.Key}"" type=""{xsdType}""{(schema.Required == null || !schema.Required.Contains(property.Key) ? "" : " use=\"optional\"")}/>");
+                        output.AppendLine($@"    <xs:attribute name=""{property.Key}"" type=""{xsdType}""{(schema.Required != null && schema.Required.Contains(property.Key) ? " use=\"required\"" : "")}/>");
                     }
                 }
             }
@@ -157,7 +188,7 @@ public static class OpenApiModelExtensions
 
         else if (schema.Type == JsonSchemaType.Array)
         {
-            if (renderedTypes.Contains($"{elementName}Array"))
+            if (renderedTypes.Contains($"{typeName}Array"))
             {
                 return;
             }
@@ -167,26 +198,31 @@ public static class OpenApiModelExtensions
                 throw new Exception("Array schema must have items defined.");
             }
 
-            string itemElementName = elementName;
+            string itemElementName = typeName;
 
             if (schema.Items.Xml != null && !String.IsNullOrEmpty(schema.Items.Xml.Name))
             {
                 itemElementName = schema.Items.Xml.Name;
             }
 
+            string itemType = schema.Items is OpenApiSchemaReference reference ? reference.Reference.Id! : itemElementName;
+
             output.AppendLine("");
-            output.AppendLine($@"  <xs:complexType name=""{elementName}Array"">");
+            output.AppendLine($@"  <xs:complexType name=""{typeName}"">");
             output.AppendLine("    <xs:sequence>");
-            output.AppendLine($@"      <xs:element name=""{itemElementName}"" type=""{itemElementName}"" minOccurs=""1"" maxOccurs=""unbounded""/>");
+            output.AppendLine($@"      <xs:element name=""{itemElementName}"" type=""{itemType}"" minOccurs=""{(schema.MinItems == null ? "1" : schema.MinItems.ToString())}"" maxOccurs=""{(schema.MaxItems == null ? "unbounded" : schema.MaxItems.ToString())}""/>");
             output.AppendLine("    </xs:sequence>");
             output.AppendLine("  </xs:complexType>");
 
-            schema.Items.ToXmlSchemaTextInternal(itemElementName, output, renderedTypes);
+            if (schema.Items is not OpenApiSchemaReference)
+            {
+                schema.Items.ToXmlSchemaTextInternal(itemElementName, output, renderedTypes);
+            }
         }
 
         else
         {
-            output.AppendLine($@"  <xs:element name=""{elementName}"" type=""xs:string""/>");
+            output.AppendLine($@"  <xs:element name=""{typeName}"" type=""xs:string""/>");
         }
     }
 }

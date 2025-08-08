@@ -23,6 +23,12 @@ public class OpenApiSchema(string name, IOpenApiSchema schemaDefinition, List<Op
         set;
     } = allSchemas;
 
+    public HashSet<string> MimeTypes
+    {
+        get;
+        set;
+    } = [];
+
     public string LinkText
     {
         get
