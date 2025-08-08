@@ -8,10 +8,10 @@ namespace InsightDocs.Sqlite.Services;
 
 public class SqliteSearchServiceOptions
 {
-    public string SearchUrl 
-    { 
-        get; 
-        set; 
+    public string SearchUrl
+    {
+        get;
+        set;
     } = "/_search";
 
     public int SearchResultsLimit
@@ -107,7 +107,7 @@ public class SqliteSearchService(SqliteSearchServiceOptions options, IServicePro
 
                 using (SqliteDataReader reader = command.ExecuteReader())
                 {
-                    List<JsonSearchResult> results = new List<JsonSearchResult>();
+                    List<JsonSearchResult> results = [];
 
                     while (reader.Read())
                     {

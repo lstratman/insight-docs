@@ -63,12 +63,12 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
         {
             foreach (TypeScriptModule module in api.Modules.Values)
             {
-                if (module.ExportType != null && module.ExportType is ReferenceType exportTypeReference)
+                if (module.ExportType is not null and ReferenceType exportTypeReference)
                 {
                     if (api.Types != null)
                     {
                         TypeScriptInterface exportedInterface = (TypeScriptInterface)ReferenceType.AllTypes[exportTypeReference.Target];
-                        
+
                         module.Exports = exportedInterface;
                         exportedInterface.ExportedFromModule = module;
                     }

@@ -1,10 +1,5 @@
 ﻿using InsightDocs.DotNet.Abstractions;
 using InsightDocs.DotNet.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InsightDocs.DotNet.Services;
 
@@ -37,7 +32,7 @@ public class MicrosoftDocsUrlResolver : IMicrosoftDocsUrlResolver
 
     public bool IsMicrosoftType(DotNetType type)
     {
-        return type.Namespace != null && IsMicrosoftNamespace(type.Namespace.FullName); 
+        return type.Namespace != null && IsMicrosoftNamespace(type.Namespace.FullName);
     }
 
     public bool IsMicrosoftNamespace(string ns)

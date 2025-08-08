@@ -122,6 +122,7 @@ public static class OpenApiModelExtensions
                             xsdType = "xs:decimal";
                         }
 
+#pragma warning disable IDE0045 // Convert to conditional expression
                         else if (property.Value.Type == JsonSchemaType.Boolean)
                         {
                             xsdType = "xs:boolean";
@@ -136,6 +137,7 @@ public static class OpenApiModelExtensions
                         {
                             throw new Exception("Unsupported schema type for XML attribute: " + property.Value.Type);
                         }
+#pragma warning restore IDE0045 // Convert to conditional expression
 
                         output.AppendLine($@"    <xs:attribute name=""{property.Key}"" type=""{xsdType}""{(schema.Required == null || !schema.Required.Contains(property.Key) ? "" : " use=\"optional\"")}/>");
                     }

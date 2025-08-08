@@ -1,5 +1,5 @@
 ﻿namespace InsightDocs.TypeScript.Model;
 
-public class TypeScriptParameter: TypeScriptCodeElement
+public class TypeScriptParameter : TypeScriptCodeElement
 {
 }

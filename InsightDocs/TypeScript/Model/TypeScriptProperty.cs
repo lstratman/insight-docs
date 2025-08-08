@@ -2,7 +2,7 @@
 
 namespace InsightDocs.TypeScript.Model;
 
-public class TypeScriptProperty: TypeScriptTypeMember
+public class TypeScriptProperty : TypeScriptTypeMember
 {
     public override string Title
     {

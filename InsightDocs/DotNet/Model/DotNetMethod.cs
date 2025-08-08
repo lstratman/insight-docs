@@ -53,6 +53,7 @@ public class DotNetMethod : ILinkTarget
     {
         get
         {
+#pragma warning disable IDE0046 // Convert to conditional expression
             if (DeclaringType != null && DeclaringType.Type != null)
             {
                 return IsConstructor ? DeclaringType.Type.DisplayName : DeclaringType.Type.DisplayName + "." + (Overloads.Count == 1 ? Overloads[0].MemberDisplayName : Name);
@@ -62,6 +63,7 @@ public class DotNetMethod : ILinkTarget
             {
                 return Overloads.Count == 1 ? Overloads[0].MemberDisplayName : Name;
             }
+#pragma warning restore IDE0046 // Convert to conditional expression
         }
     }
 

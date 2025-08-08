@@ -16,7 +16,7 @@ public class Flags
     {
         get;
         set;
-    }        
+    }
 
     [JsonProperty("isProtected")]
     public bool IsProtected

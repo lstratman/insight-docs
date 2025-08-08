@@ -243,7 +243,7 @@ public class DotNetType : DotNetXmlDocSource, ILinkTarget
                 code.Append(String.Join(", ", ImplementedInterfaces.Select(i => i.VBCode)));
             }
 
-            if ((BaseType != null && BaseType.CSharpCode != "object") || ImplementedInterfaces != null && ImplementedInterfaces.Count > 0)
+            if ((BaseType != null && BaseType.CSharpCode != "object") || (ImplementedInterfaces != null && ImplementedInterfaces.Count > 0))
             {
                 code.Append("\nEnd " + TypeName);
             }

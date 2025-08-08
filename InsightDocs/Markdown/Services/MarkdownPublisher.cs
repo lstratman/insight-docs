@@ -36,11 +36,11 @@ public partial class MarkdownPublisher(
     [LoggerMessage(LogLevel.Debug, "Publishing topic for Markdown file {file}")]
     public static partial void LogPublishingMarkdownFile(ILogger logger, string file);
 
-    protected readonly static Regex ImageTagsRegex = new Regex(@"<img\s+(?<otherAttributes>[^>]*)src\s*=\s*[""'](?<url>[^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    protected readonly static Regex HeaderTagsRegex = new Regex(@"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    protected readonly static Regex HeaderTitleRegex = new Regex(@"<h1(?<otherAttributes>[^>]*)>(?<title>.*?)</h1>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    protected readonly static Regex LinkMatcher = new Regex(@"<a href\s*=\s*(['""])(?<url>.*?)\1");
-    protected Dictionary<string, string> _imageUrls = new Dictionary<string, string>();
+    protected static readonly Regex ImageTagsRegex = new Regex(@"<img\s+(?<otherAttributes>[^>]*)src\s*=\s*[""'](?<url>[^""']+)[""']", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    protected static readonly Regex HeaderTagsRegex = new Regex(@"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    protected static readonly Regex HeaderTitleRegex = new Regex(@"<h1(?<otherAttributes>[^>]*)>(?<title>.*?)</h1>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    protected static readonly Regex LinkMatcher = new Regex(@"<a href\s*=\s*(['""])(?<url>.*?)\1");
+    protected Dictionary<string, string> _imageUrls = [];
 
     public virtual async Task PublishTopic(TocItem tocItem, string markdownFilePath)
     {
@@ -98,7 +98,7 @@ public partial class MarkdownPublisher(
                 {
                     continue;
                 }
-                
+
                 markdownFilePaths.Add(Path.GetFullPath(Path.Combine(rootDirectoryPath, trimmedLine)));
             }
         }
@@ -189,7 +189,7 @@ public partial class MarkdownPublisher(
         {
             string id = match.Groups["id"].Value;
             string title = match.Groups["title"].Value;
-            int level = int.Parse(match.Groups["level"].Value);
+            int level = Int32.Parse(match.Groups["level"].Value);
 
             if (level == 1)
             {

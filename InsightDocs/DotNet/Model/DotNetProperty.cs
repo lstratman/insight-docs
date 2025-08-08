@@ -93,31 +93,19 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
     {
         get
         {
+#pragma warning disable IDE0046 // Convert to conditional expression
             if (IsIndexer)
             {
-                if (IndexParameters != null && IndexParameters.Count > 0)
-                {
-                    return "this[" + String.Join(", ", IndexParameters.Select(p => p.Type.DisplayName + " " + p.Name)) + "]";
-                }
-
-                else
-                {
-                    return "this[]";
-                }
+                return IndexParameters != null && IndexParameters.Count > 0
+                    ? "this[" + String.Join(", ", IndexParameters.Select(p => p.Type.DisplayName + " " + p.Name)) + "]"
+                    : "this[]";
             }
 
             else
             {
-                if (DeclaringType != null)
-                {
-                    return DeclaringType.DisplayName + "." + Name;
-                }
-
-                else
-                {
-                    return Name;
-                }
+                return DeclaringType != null ? DeclaringType.DisplayName + "." + Name : Name;
             }
+#pragma warning restore IDE0046 // Convert to conditional expression
         }
     }
 
@@ -133,23 +121,19 @@ public class DotNetProperty : DotNetXmlDocSource, ILinkTarget
     {
         get
         {
+#pragma warning disable IDE0046 // Convert to conditional expression
             if (IsIndexer)
             {
-                if (IndexParameters != null && IndexParameters.Count > 0)
-                {
-                    return "this[" + String.Join(", ", IndexParameters.Select(p => p.Type.DisplayName + " " + p.Name)) + "]";
-                }
-
-                else
-                {
-                    return "this[]";
-                }
+                return IndexParameters != null && IndexParameters.Count > 0
+                    ? "this[" + String.Join(", ", IndexParameters.Select(p => p.Type.DisplayName + " " + p.Name)) + "]"
+                    : "this[]";
             }
 
             else
             {
                 return Name;
             }
+#pragma warning restore IDE0046 // Convert to conditional expression
         }
     }
 

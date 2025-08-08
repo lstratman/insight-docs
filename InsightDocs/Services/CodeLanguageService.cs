@@ -12,22 +12,22 @@ public partial class CodeLanguageService(InsightDocsOptions options, ILoggerFact
 
     public virtual string GetTitle(string languageId)
     {
-        if (languageId == "csharp" || languageId == "cs" || languageId == "c#")
+        if (languageId is "csharp" or "cs" or "c#")
         {
             return "C#";
         }
 
-        else if (languageId == "vb" || languageId == "visualbasic")
+        else if (languageId is "vb" or "visualbasic")
         {
             return "Visual Basic";
         }
 
-        else if (languageId == "javascript" || languageId == "js")
+        else if (languageId is "javascript" or "js")
         {
             return "JavaScript";
         }
 
-        else if (languageId == "typescript" || languageId == "ts")
+        else if (languageId is "typescript" or "ts")
         {
             return "TypeScript";
         }

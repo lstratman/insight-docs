@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace InsightDocs.DotNet.Services;
 
 public partial class DotNetPublisher(
-    ILoggerFactory loggerFactory, 
+    ILoggerFactory loggerFactory,
     IDotNetLoader dotNetLoader,
     IItemTemplateProvider<DotNetIndex> dotNetIndexTemplate,
     IItemTemplateProvider<DotNetNamespace> dotNetNamespaceTemplate,
@@ -68,7 +68,7 @@ public partial class DotNetPublisher(
 
         if (insightDocsOptions.EnableParallelism)
         {
-            List<TocItem> tocItems = new List<TocItem>();
+            List<TocItem> tocItems = [];
 
             await Parallel.ForEachAsync(indexData.Namespaces, new ParallelOptions { MaxDegreeOfParallelism = insightDocsOptions.MaxDegreeOfParallelism }, async (ns, cancellationToken) =>
             {

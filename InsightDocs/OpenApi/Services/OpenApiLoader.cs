@@ -6,7 +6,6 @@ using Microsoft.OpenApi.Reader;
 using InsightDocsOpenApiOperation = InsightDocs.OpenApi.Model.OpenApiOperation;
 using InsightDocsOpenApiParameter = InsightDocs.OpenApi.Model.OpenApiParameter;
 using MicrosoftOpenApiOperation = Microsoft.OpenApi.OpenApiOperation;
-using MicrosoftOpenApiParameter = Microsoft.OpenApi.OpenApiParameter;
 using OpenApiResponse = InsightDocs.OpenApi.Model.OpenApiResponse;
 
 namespace InsightDocs.OpenApi.Services;
@@ -23,7 +22,7 @@ public class OpenApiLoader : IOpenApiLoader
     public async Task<OpenApiSpec> LoadOpenApiSpecFile(string openApiSpecFilePath)
     {
         (OpenApiDocument? openApiDocument, OpenApiDiagnostic? _) = await OpenApiDocument.LoadAsync(openApiSpecFilePath);
-        
+
         if (openApiDocument == null)
         {
             throw new Exception($"Unable to load OpenAPI specification file: {openApiSpecFilePath}");
@@ -41,9 +40,9 @@ public class OpenApiLoader : IOpenApiLoader
 
                     if (operation.Value.Parameters != null && operation.Value.Parameters.Any())
                     {
-                        operationMetadata.Parameters = new List<InsightDocsOpenApiParameter>();
+                        operationMetadata.Parameters = [];
 
-                        foreach (MicrosoftOpenApiParameter parameter in operation.Value.Parameters)
+                        foreach (IOpenApiParameter parameter in operation.Value.Parameters)
                         {
                             InsightDocsOpenApiParameter openApiParameter = new InsightDocsOpenApiParameter(parameter.Name!, String.IsNullOrEmpty(parameter.Description) ? null : Markdig.Markdown.ToHtml(parameter.Description, Pipeline), (OpenApiParameterLocation)Enum.Parse(typeof(OpenApiParameterLocation), parameter.In!.Value.ToString("G")), parameter.Required, parameter.Schema);
                             operationMetadata.Parameters.Add(openApiParameter);
@@ -56,7 +55,7 @@ public class OpenApiLoader : IOpenApiLoader
 
                         if (schema != null && schema.Type == JsonSchemaType.Object && schema.Properties != null && schema.Properties.Count > 0)
                         {
-                            operationMetadata.Parameters ??= new List<InsightDocsOpenApiParameter>();
+                            operationMetadata.Parameters ??= [];
 
                             foreach (KeyValuePair<string, IOpenApiSchema> formField in schema.Properties)
                             {
@@ -76,7 +75,7 @@ public class OpenApiLoader : IOpenApiLoader
 
                             if (response.Value.Content != null && response.Value.Content.Any())
                             {
-                                responseMetadata.Content = new List<OpenApiResponseContent>();
+                                responseMetadata.Content = [];
 
                                 foreach (KeyValuePair<string, OpenApiMediaType> content in response.Value.Content)
                                 {

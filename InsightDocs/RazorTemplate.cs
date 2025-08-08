@@ -26,10 +26,10 @@ public class RazorTemplate<T> : ComponentBase
     }
 
     [Parameter]
-    public T? Item 
-    { 
-        get; 
-        set; 
+    public T? Item
+    {
+        get;
+        set;
     }
 
     [Parameter]
@@ -88,7 +88,7 @@ public class RazorTemplate<T> : ComponentBase
     public virtual RenderFragment AddAdditionalCss()
     {
         IEnumerable<IAdditionalCssProvider<T>> additionalCssProviders = ServiceProvider.GetServices<IAdditionalCssProvider<T>>();
-        List<IAsset> additionalCssAssets = new List<IAsset>();
+        List<IAsset> additionalCssAssets = [];
 
         if (additionalCssProviders != null && additionalCssProviders.Any())
         {
@@ -125,7 +125,7 @@ public class RazorTemplate<T> : ComponentBase
     public virtual RenderFragment AddAdditionalJavaScript()
     {
         IEnumerable<IAdditionalJavaScriptProvider<T>> additionalJavaScriptProviders = ServiceProvider.GetServices<IAdditionalJavaScriptProvider<T>>();
-        List<IAsset> additionalJavaScriptAssets = new List<IAsset>();
+        List<IAsset> additionalJavaScriptAssets = [];
 
         if (additionalJavaScriptProviders != null && additionalJavaScriptProviders.Any())
         {

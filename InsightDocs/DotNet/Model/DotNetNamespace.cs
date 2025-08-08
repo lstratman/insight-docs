@@ -2,32 +2,25 @@ using InsightDocs.Abstractions;
 
 namespace InsightDocs.DotNet.Model;
 
-public class DotNetNamespace : ILinkTarget
+public class DotNetNamespace(string ns, DotNetIndex index) : ILinkTarget
 {
-    public DotNetNamespace(string ns, DotNetIndex index)
-    {
-        Name = ns.Contains('.', StringComparison.CurrentCulture) ? ns[(ns.LastIndexOf('.') + 1)..] : ns;
-        FullName = ns;
-        Index = index;
-    }
-
     public DotNetIndex Index
     {
         get;
         set;
-    }
+    } = index;
 
     public string Name
     {
         get;
         set;
-    }
+    } = ns.Contains('.', StringComparison.CurrentCulture) ? ns[(ns.LastIndexOf('.') + 1)..] : ns;
 
     public string FullName
     {
         get;
         set;
-    }
+    } = ns;
 
     public bool IsExternal
     {

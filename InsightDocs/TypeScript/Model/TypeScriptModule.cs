@@ -34,12 +34,7 @@ public class TypeScriptModule : TypeScriptDocumentedElement, ILinkTarget
     {
         get
         {
-            if (Name.Count(c => c == '/') == 1 && Name.StartsWith('@'))
-            {
-                return Name;
-            }
-
-            return Name.Split('/').Last();
+            return Name.Count(c => c == '/') == 1 && Name.StartsWith('@') ? Name : Name.Split('/').Last();
         }
     }
 

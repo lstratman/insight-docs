@@ -1,5 +1,4 @@
 ﻿using InsightDocs.Abstractions;
-using InsightDocs.DotNet.Abstractions;
 using InsightDocs.TypeScript.Abstractions;
 using InsightDocs.TypeScript.Model;
 using Microsoft.Extensions.DependencyInjection;

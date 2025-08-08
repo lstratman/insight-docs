@@ -110,7 +110,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
             MetadataLoadContext metadataLoadContext = new(pathAssemblyResolver);
             Assembly assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
-            
+
             LogFinishedAssemblyLoad(logger, assemblyPath);
 
             foreach (Type type in assembly.GetTypes())
@@ -227,6 +227,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 typeName = "Interface";
             }
 
+#pragma warning disable IDE0045 // Convert to conditional expression
             else if (type.IsEnum)
             {
                 typeName = "Enum";
@@ -241,6 +242,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
             {
                 typeName = "Class";
             }
+#pragma warning restore IDE0045 // Convert to conditional expression
 
             while (currentDeclaringType != null)
             {
@@ -279,11 +281,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                 typeMetadata.AccessType = DotNetMemberInfoAccessType.Protected;
             }
 
-            if (ns != null)
-            {
-                ns.Types.Add(typeMetadata);
-            }
-
+            ns?.Types.Add(typeMetadata);
             CacheType(typeMetadata, type);
 
             if (typeParameters != null && typeParameters.Length > 0)
@@ -406,7 +404,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
                     }
                 }
             }
- 
+
             if (Convert.ToInt32(type.Name[0]) < 127)
             {
                 ConstructorInfo[] constructors = [.. type.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !dotNetOptions.OmitPrivateMembers || !m.IsPrivate)];
@@ -705,7 +703,7 @@ public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocP
 
         if (indexParameters != null && indexParameters.Length > 0)
         {
-            propertyMetadata.IndexParameters = [..indexParameters.Select(p => LoadMethodParameter(p, index))];
+            propertyMetadata.IndexParameters = [.. indexParameters.Select(p => LoadMethodParameter(p, index))];
             propertyMetadata.IsIndexer = true;
         }
 

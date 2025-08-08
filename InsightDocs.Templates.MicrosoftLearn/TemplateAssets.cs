@@ -4,16 +4,16 @@ namespace InsightDocs.Templates.MicrosoftLearn;
 
 public class TemplateAssets
 {
-    public static IAsset MicrosoftLearnCss 
-    { 
-        get; 
+    public static IAsset MicrosoftLearnCss
+    {
+        get;
     } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/microsoft-learn.css");
 
     public static IAsset DoconsFont
     {
         get;
-    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/docons.woff2"); 
-    
+    } = new EmbeddedResourceAsset(typeof(TemplateAssets).Assembly, "Assets", "css/docons.woff2");
+
     public static IAsset SegoeUIFont
     {
         get;

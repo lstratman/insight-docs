@@ -41,17 +41,17 @@ public class MarkdownLoader(IServiceProvider serviceProvider) : IMarkdownLoader
 
     protected virtual string FromKebabCase(string input)
     {
-        if (string.IsNullOrEmpty(input))
+        if (String.IsNullOrEmpty(input))
         {
             return input;
         }
 
         StringBuilder output = new StringBuilder(input.Length);
         bool toUpper = true;
-        
+
         foreach (char c in input)
         {
-            if (c == '-' || c == ' ')
+            if (c is '-' or ' ')
             {
                 toUpper = true;
                 output.Append(' ');
@@ -59,7 +59,7 @@ public class MarkdownLoader(IServiceProvider serviceProvider) : IMarkdownLoader
 
             else
             {
-                output.Append(toUpper ? char.ToUpper(c) : c);
+                output.Append(toUpper ? Char.ToUpper(c) : c);
                 toUpper = false;
             }
         }

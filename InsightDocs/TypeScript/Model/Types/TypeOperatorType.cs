@@ -24,10 +24,10 @@ public class TypeOperatorType : TypeScriptType
 
     public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return new List<TypeToStringComponent>
-        {
+        return
+        [
             new TypeToStringTextComponent(Operator + " "),
             new TypeToStringTypeComponent(Target)
-        };
+        ];
     }
 }

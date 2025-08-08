@@ -45,7 +45,7 @@ public class TocItem
                     return parentUrlPrefix;
                 }
 
-                else if (!String.IsNullOrEmpty(parentUrlPrefix)) 
+                else if (!String.IsNullOrEmpty(parentUrlPrefix))
                 {
                     return parentUrlPrefix + "/" + UrlPrefix;
                 }

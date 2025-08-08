@@ -121,6 +121,7 @@ public class LinkTagCommentSegment : CommentSegment
 
                 if (targetTypeDeclaration is TypeScriptInterface targetType)
                 {
+#pragma warning disable IDE0045 // Convert to conditional expression
                     if (targetType.Methods != null && targetType.Methods.TryGetValue(memberName, out TypeScriptMethod? value))
                     {
                         TargetElement = value.Signatures[0];
@@ -135,6 +136,7 @@ public class LinkTagCommentSegment : CommentSegment
                     {
                         throw new Exception("Unable to resolve the JSDoc comment link to " + (string.IsNullOrEmpty(LinkText) ? Text : LinkText));
                     }
+#pragma warning restore IDE0045 // Convert to conditional expression
                 }
 
                 else
@@ -146,7 +148,7 @@ public class LinkTagCommentSegment : CommentSegment
             Url = TargetElement.Url;
         }
 
-        string text = (string.IsNullOrEmpty(LinkText) ? Text : LinkText) + (TargetElement != null && TargetElement is TypeScriptMethodSignature ? "()" : "");
+        string text = (string.IsNullOrEmpty(LinkText) ? Text : LinkText) + (TargetElement is not null and TypeScriptMethodSignature ? "()" : "");
         return $"[{text.Replace("#", ".")}]({Url})";
     }
 }

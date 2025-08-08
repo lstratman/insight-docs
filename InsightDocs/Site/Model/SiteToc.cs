@@ -26,13 +26,13 @@ public class SiteToc : ILinkTarget
         }
 
         if (item.Children != null)
+        {
+            foreach (TocItem child in item.Children)
             {
-                foreach (TocItem child in item.Children)
-                {
-                    siteTocItem.ChildIndices ??= [];
-                    siteTocItem.ChildIndices.Add(PopulateFromItem(child, itemIndex));
-                }
+                siteTocItem.ChildIndices ??= [];
+                siteTocItem.ChildIndices.Add(PopulateFromItem(child, itemIndex));
             }
+        }
 
         return itemIndex;
     }

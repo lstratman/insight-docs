@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, DotNetOptions dotNetOptions, TypeScriptOptions typeScriptOptions) 
+public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, DotNetOptions dotNetOptions, TypeScriptOptions typeScriptOptions)
     : IUrlProvider<DotNetType>,
       IUrlProvider<DotNetIndex>,
       IUrlProvider<DotNetNamespace>,
@@ -157,7 +157,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             url.Append('.');
         }
-        
+
         url.Append(item.IsConstructor ? "ctor" : item.Name);
 
         if (Options.IncludeFileExtensions)
@@ -201,7 +201,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             url.Append('.');
         }
-        
+
         url.Append(item.Name);
 
         if (Options.IncludeFileExtensions)
@@ -245,7 +245,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             url.Append('.');
         }
-        
+
         url.Append(item.Name);
 
         if (Options.IncludeFileExtensions)
@@ -289,7 +289,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             url.Append('.');
         }
-        
+
         url.Append(item.IsConstructor ? "ctor" : item.Name);
 
         if (Options.IncludeFileExtensions)
@@ -531,17 +531,17 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             }
 
             string typeName = item.Name;
-            
+
             if (typeName.Contains('<'))
             {
                 typeName = typeName[..typeName.IndexOf('<')];
             }
-            
+
             if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}";
             }
-            
+
             else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";

@@ -9,17 +9,17 @@ namespace InsightDocs.Sqlite.Services;
 
 public class SqliteMiddlewareOptions
 {
-    public string? DatabasePath 
+    public string? DatabasePath
     {
-        get; 
-        set; 
+        get;
+        set;
     }
 }
 
 public class SqliteMiddleware
 {
     protected readonly RequestDelegate _next;
-    
+
     protected string DatabasePath
     {
         get;

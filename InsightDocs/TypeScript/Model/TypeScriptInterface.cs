@@ -150,7 +150,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
             if (Extends != null && Extends.Count > 0)
             {
                 output.Append(" extends ");
-             
+
                 for (int i = 0; i < Extends.Count; i++)
                 {
                     if (i > 0)
@@ -170,12 +170,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
     {
         get
         {
-            if (ExportedFromModule != null)
-            {
-                return ExportedFromModule.Title;
-            }
-
-            return Name + (FunctionSignatures != null ? " Function" : " Interface");
+            return ExportedFromModule != null ? ExportedFromModule.Title : Name + (FunctionSignatures != null ? " Function" : " Interface");
         }
     }
 
@@ -213,7 +208,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
         if (BuiltInTypes.Contains(FullName))
         {
             BuiltIn = true;
-        }    
+        }
 
         if (HTMLElementTypes.Contains(name))
         {
@@ -313,7 +308,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
         {
             for (int i = Extends.Count - 1; i >= 0; i--)
             {
-                var baseType = Extends[i];
+                TypeScriptType baseType = Extends[i];
 
                 if (baseType is ReferenceType baseTypeReference)
                 {

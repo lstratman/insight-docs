@@ -7,9 +7,9 @@ namespace InsightDocs.Services;
 
 public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublisher
 {
-    protected ConcurrentDictionary<string, bool> PublishedUrls 
-    { 
-        get; 
+    protected ConcurrentDictionary<string, bool> PublishedUrls
+    {
+        get;
     } = new ConcurrentDictionary<string, bool>();
 
     protected StaticFilesPublisherOptions Options
@@ -51,15 +51,9 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
 
         if (contents is not byte[] contentBytes)
         {
-            if (contents is string contentString)
-            {
-                contentBytes = Encoding.UTF8.GetBytes(contentString);
-            }
-
-            else
-            {
-                throw new ArgumentException("Contents must be a byte array or a string.", nameof(contents));
-            }
+            contentBytes = contents is string contentString
+                ? Encoding.UTF8.GetBytes(contentString)
+                : throw new ArgumentException("Contents must be a byte array or a string.", nameof(contents));
         }
 
         PublishedUrls.AddOrUpdate(url, true, (key, oldValue) => true);
@@ -99,7 +93,8 @@ public static class StaticFilesPublisherExtensions
 {
     public static InsightDocsBuilder PublishToStaticFiles(this InsightDocsBuilder builder, StaticFilesPublisherOptions options)
     {
-        builder.Services.AddSingleton<IPublisher, StaticFilesPublisher>((provider) => {
+        builder.Services.AddSingleton<IPublisher, StaticFilesPublisher>((provider) =>
+        {
             return new StaticFilesPublisher(options);
         });
 

@@ -211,7 +211,7 @@ public abstract class TypeScriptType
 
     public abstract List<TypeToStringComponent> GetToStringComponents();
 
-    override public string ToString()
+    public override string ToString()
     {
         StringBuilder output = new StringBuilder();
 
@@ -219,7 +219,7 @@ public abstract class TypeScriptType
         {
             output.Append(component.ToString());
         }
-        
+
         return output.ToString();
     }
 

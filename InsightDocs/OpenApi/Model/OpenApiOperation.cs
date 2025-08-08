@@ -22,15 +22,15 @@ public class OpenApiOperation(string method, string url, List<OpenApiSchema> all
         set;
     } = description;
 
-    public List<OpenApiParameter>? Parameters 
-    { 
-        get; 
-        set; 
+    public List<OpenApiParameter>? Parameters
+    {
+        get;
+        set;
     }
 
-    public List<OpenApiResponse>? Responses 
-    { 
-        get; 
+    public List<OpenApiResponse>? Responses
+    {
+        get;
         set;
     }
 

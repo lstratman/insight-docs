@@ -33,7 +33,7 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
             {
                 continue;
             }
-            
+
             else if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
                 // TODO

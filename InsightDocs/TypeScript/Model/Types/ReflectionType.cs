@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InsightDocs.TypeScript.Model.Types;
 
@@ -30,7 +25,7 @@ public class ReflectionType : TypeScriptType
         if (IndexSignature != null && IndexSignature.Parameters != null)
         {
             components.Add(new TypeToStringTextComponent("["));
-            
+
             bool first = true;
 
             foreach (TypeScriptParameter param in IndexSignature.Parameters)

@@ -15,11 +15,11 @@ public class StringLiteralType : TypeScriptType
 
     public override List<TypeToStringComponent> GetToStringComponents()
     {
-        return new List<TypeToStringComponent>
-        {
+        return
+        [
             new TypeToStringTextComponent("'"),
             new TypeToStringTextComponent(Value),
             new TypeToStringTextComponent("'")
-        };
+        ];
     }
 }

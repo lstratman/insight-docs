@@ -18,15 +18,7 @@ public class DotNetGenericArgument
     {
         get
         {
-            if (Type != null)
-            {
-                return Type.DisplayName;
-            }
-
-            else
-            {
-                return TypeParameterName!;
-            }
+            return Type != null ? Type.DisplayName : TypeParameterName!;
         }
     }
 
@@ -34,15 +26,7 @@ public class DotNetGenericArgument
     {
         get
         {
-            if (TypeParameterName != null)
-            {
-                return TypeParameterName;
-            }
-
-            else
-            {
-                return Type!.XmlDocKey;
-            }
+            return TypeParameterName ?? Type!.XmlDocKey;
         }
     }
 
@@ -50,15 +34,7 @@ public class DotNetGenericArgument
     {
         get
         {
-            if (Type != null)
-            {
-                return Type.CSharpCode;
-            }
-
-            else
-            {
-                return TypeParameterName!;
-            }
+            return Type != null ? Type.CSharpCode : TypeParameterName!;
         }
     }
 
@@ -66,15 +42,7 @@ public class DotNetGenericArgument
     {
         get
         {
-            if (Type != null)
-            {
-                return Type.VBCode;
-            }
-
-            else
-            {
-                return TypeParameterName!;
-            }
+            return Type != null ? Type.VBCode : TypeParameterName!;
         }
     }
 }

@@ -3,7 +3,6 @@ using InsightDocs.DotNet.Model;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace InsightDocs.DotNet.Services;
 
@@ -64,7 +63,7 @@ public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOpt
             {
                 if (xmlElement.ParentNode is XmlElement parentElement)
                 {
-                    if (parentElement.GetAttribute("type") == "bullet" || parentElement.GetAttribute("type") == "number")
+                    if (parentElement.GetAttribute("type") is "bullet" or "number")
                     {
                         components.Add(new XmlDocCommentHtmlTagComponent("li", xmlElement, serviceProvider));
                     }
@@ -98,7 +97,7 @@ public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOpt
             {
                 if (xmlElement.ParentNode is XmlElement parentElement && parentElement.ParentNode is XmlElement grandParentElement)
                 {
-                    if (grandParentElement.GetAttribute("type") == "bullet" || grandParentElement.GetAttribute("type") == "number")
+                    if (grandParentElement.GetAttribute("type") is "bullet" or "number")
                     {
                         foreach (XmlNode childNode in xmlElement.ChildNodes)
                         {
@@ -127,7 +126,7 @@ public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOpt
             {
                 if (xmlElement.ParentNode is XmlElement parentElement && parentElement.ParentNode is XmlElement grandParentElement)
                 {
-                    if (grandParentElement.GetAttribute("type") == "bullet" || grandParentElement.GetAttribute("type") == "number")
+                    if (grandParentElement.GetAttribute("type") is "bullet" or "number")
                     {
                         if (parentElement.SelectSingleNode("term") != null)
                         {
@@ -174,12 +173,12 @@ public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOpt
 
                         if (codeText.StartsWith('\r'))
                         {
-                            codeText = codeText.Substring(1);
+                            codeText = codeText[1..];
                         }
 
                         if (codeText.StartsWith('\n'))
                         {
-                            codeText = codeText.Substring(1);
+                            codeText = codeText[1..];
                         }
 
                         Match leadingSpaces = Regex.Match(codeText, @"^\s+");
@@ -209,12 +208,12 @@ public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOpt
                 }
             }
 
-            else if (xmlElement.Name == "see" || xmlElement.Name == "seealso")
+            else if (xmlElement.Name is "see" or "seealso")
             {
                 components.Add(new XmlDocSeeTagComponent(xmlElement, serviceProvider));
             }
 
-            else if (xmlElement.Name == "paramref" || xmlElement.Name == "typeparamref")
+            else if (xmlElement.Name is "paramref" or "typeparamref")
             {
                 XmlDocCommentHtmlTagComponent codeTag = new("code", null, serviceProvider);
                 codeTag.ChildComponents.Add(new XmlDocCommentTextComponent(xmlElement.GetAttribute("name")));

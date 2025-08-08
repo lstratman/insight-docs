@@ -91,12 +91,7 @@ public class Comment
     {
         string? combinedMarkdown = GetCombinedMarkdown(markdown);
 
-        if (string.IsNullOrEmpty(combinedMarkdown))
-        {
-            return null;
-        }
-
-        return MarkdownToHTML(combinedMarkdown);
+        return String.IsNullOrEmpty(combinedMarkdown) ? null : MarkdownToHTML(combinedMarkdown);
     }
 
     public static string? MarkdownToHTML(string combinedMarkdown)

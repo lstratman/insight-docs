@@ -76,7 +76,7 @@ public class TypeScriptDocumentedElement
             return Name;
         }
     }
-    
+
     public virtual string FullName
     {
         get

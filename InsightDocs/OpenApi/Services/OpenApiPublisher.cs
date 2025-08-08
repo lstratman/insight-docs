@@ -19,8 +19,8 @@ public partial class OpenApiPublisher(
     public static partial void LogPublishingTopics(ILogger logger);
 
     [LoggerMessage(LogLevel.Information, "Finished publishing topics")]
-    public static partial void LogFinishedPublishingTopics(ILogger logger); 
-    
+    public static partial void LogFinishedPublishingTopics(ILogger logger);
+
     [LoggerMessage(LogLevel.Debug, "Publishing topic for endpoint {method} {endpoint}")]
     public static partial void LogPublishingEndpoint(ILogger logger, string method, string endpoint);
 
@@ -76,7 +76,7 @@ public partial class OpenApiPublisher(
                 string url = openApiOperationUrlProvider.GetUrl(operation);
                 TocItem operationTocItem = tocStack.Last().AddTocItem($"{method} {pathComponents.Last()}", url);
                 string operationHtml = await openApiOperationTemplateProvider.GetContent(operation, url);
-                    
+
                 await publisher.Publish(url, operationHtml, "text/html", operation.LinkText);
             }
 
@@ -100,12 +100,9 @@ public partial class OpenApiPublisher(
                 string[] aComponents = a.Title.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 string[] bComponents = b.Title.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                if (aComponents[1] == bComponents[1])
-                {
-                    return String.Compare(aComponents[0], bComponents[0]);
-                }
-
-                return String.Compare(aComponents[1], bComponents[1]);
+                return aComponents[1] == bComponents[1]
+                    ? String.Compare(aComponents[0], bComponents[0])
+                    : String.Compare(aComponents[1], bComponents[1]);
             }, true);
         }
 

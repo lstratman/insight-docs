@@ -1,9 +1,7 @@
 ﻿using InsightDocs.Abstractions;
-using InsightDocs.DotNet;
 using InsightDocs.Markdown.Abstractions;
 using InsightDocs.Markdown.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace InsightDocs.Markdown;
 

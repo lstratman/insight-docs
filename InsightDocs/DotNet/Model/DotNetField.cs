@@ -44,15 +44,7 @@ public class DotNetField : DotNetMemberInfo
     {
         get
         {
-            if (DeclaringType != null)
-            {
-                return DeclaringType.DisplayName + "." + Name + " Field";
-            }
-
-            else
-            {
-                return Name + " Field";
-            }
+            return DeclaringType != null ? DeclaringType.DisplayName + "." + Name + " Field" : Name + " Field";
         }
     }
 

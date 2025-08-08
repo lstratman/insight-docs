@@ -9,12 +9,7 @@ public class TypeParameter
     {
         public bool Equals(TypeParameter? x, TypeParameter? y)
         {
-            if (x != null && y != null)
-            {
-                return x.Name == y.Name;
-            }
-
-            return x == null && y == null;
+            return x != null && y != null ? x.Name == y.Name : x == null && y == null;
         }
 
         public int GetHashCode(TypeParameter obj)

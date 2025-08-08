@@ -2,5 +2,5 @@
 
 public interface IUrlRemapper
 {
-    public string? RemapUrl(string link);
+    string? RemapUrl(string link);
 }

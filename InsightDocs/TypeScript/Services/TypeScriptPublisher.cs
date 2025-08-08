@@ -99,6 +99,7 @@ public partial class TypeScriptPublisher(
 
             modulesRoot.SortChildren((a, b) =>
             {
+#pragma warning disable IDE0046 // Convert to conditional expression
                 if (a.Title.EndsWith('/') && !b.Title.EndsWith('/'))
                 {
                     return -1;
@@ -113,6 +114,7 @@ public partial class TypeScriptPublisher(
                 {
                     return a.Title.CompareTo(b.Title);
                 }
+#pragma warning restore IDE0046 // Convert to conditional expression
             }, true);
         }
 
@@ -280,15 +282,9 @@ public partial class TypeScriptPublisher(
 
             foreach (string component in pathComponents.Take(pathComponents.Length - 1))
             {
-                if (tocItem.Children.All(c => c.Title != component + (String.IsNullOrEmpty(currentPath) ? "" : "/")))
-                {
-                    tocItem = tocItem.AddTocItem(component + (String.IsNullOrEmpty(currentPath) ? "" : "/"));
-                }
-
-                else
-                {
-                    tocItem = tocItem.Children.First(c => c.Title == component + (String.IsNullOrEmpty(currentPath) ? "" : "/"));
-                }
+                tocItem = tocItem.Children.All(c => c.Title != component + (String.IsNullOrEmpty(currentPath) ? "" : "/"))
+                    ? tocItem.AddTocItem(component + (String.IsNullOrEmpty(currentPath) ? "" : "/"))
+                    : tocItem.Children.First(c => c.Title == component + (String.IsNullOrEmpty(currentPath) ? "" : "/"));
 
                 if (!String.IsNullOrEmpty(currentPath))
                 {

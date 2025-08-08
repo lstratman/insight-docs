@@ -10,10 +10,10 @@ namespace InsightDocs.Sqlite.Services;
 
 public class SqlitePublisherOptions
 {
-    public string? DatabasePath 
-    { 
-        get; 
-        set; 
+    public string? DatabasePath
+    {
+        get;
+        set;
     }
 
     public bool ClearExistingDatabase
@@ -31,7 +31,7 @@ public class SqlitePublisherOptions
 
 public class SqlitePublisher : IPublisher, IDisposable
 {
-    protected Dictionary<string, int> _mimeTypes = new Dictionary<string, int>();
+    protected Dictionary<string, int> _mimeTypes = [];
     protected int _mimeTypeCounter = 1;
 
     public SqlitePublisher(SqlitePublisherOptions options, IServiceProvider serviceProvider)
@@ -179,15 +179,9 @@ public class SqlitePublisher : IPublisher, IDisposable
     {
         if (contents is not byte[] contentBytes)
         {
-            if (contents is string contentString)
-            {
-                contentBytes = Encoding.UTF8.GetBytes(contentString);
-            }
-
-            else
-            {
-                throw new ArgumentException("Contents must be a byte array or a string.", nameof(contents));
-            }
+            contentBytes = contents is string contentString
+                ? Encoding.UTF8.GetBytes(contentString)
+                : throw new ArgumentException("Contents must be a byte array or a string.", nameof(contents));
         }
 
         if (GzipContent)
@@ -255,7 +249,7 @@ public class SqlitePublisher : IPublisher, IDisposable
             }
         }
 
-        if (SearchService != null && !(SearchService is SqliteSearchService) && mimeType == "text/html")
+        if (SearchService != null && SearchService is not SqliteSearchService && mimeType == "text/html")
         {
             if (contents is string contentString)
             {

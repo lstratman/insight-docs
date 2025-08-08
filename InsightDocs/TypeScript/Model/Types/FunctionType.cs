@@ -36,7 +36,7 @@ public class FunctionType : TypeScriptType
 
         if (Parameters != null && Parameters.Count > 0)
         {
-            
+
             foreach (TypeScriptParameter parameter in Parameters)
             {
                 if (components.Count > 1)

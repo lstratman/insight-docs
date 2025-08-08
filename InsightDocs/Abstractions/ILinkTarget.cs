@@ -2,7 +2,7 @@ namespace InsightDocs.Abstractions;
 
 public interface ILinkTarget
 {
-    public string LinkText
+    string LinkText
     {
         get;
     }
