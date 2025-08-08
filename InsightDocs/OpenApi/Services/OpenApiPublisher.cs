@@ -53,7 +53,7 @@ public partial class OpenApiPublisher(
                     string pathComponent = pathComponents[i];
                     TocItem? tocItem = tocStack.Count <= i + 1 ? null : tocStack[i + 1];
 
-                    if (tocItem?.Title == pathComponent)
+                    if (tocItem?.Title == pathComponent + "/")
                     {
                         continue;
                     }
@@ -62,7 +62,7 @@ public partial class OpenApiPublisher(
 
                     for (int j = i; j < pathComponents.Length - 1; j++)
                     {
-                        tocStack.Add(tocStack.Last().AddTocItem(pathComponents[j]));
+                        tocStack.Add(tocStack.Last().AddTocItem(pathComponents[j] + "/"));
                     }
 
                     break;
@@ -98,7 +98,7 @@ public partial class OpenApiPublisher(
                 }
 
                 string[] aComponents = a.Title.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                string[] bComponents = a.Title.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string[] bComponents = b.Title.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                 if (aComponents[1] == bComponents[1])
                 {
