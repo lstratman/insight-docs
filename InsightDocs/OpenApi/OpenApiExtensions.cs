@@ -138,7 +138,12 @@ public static class OpenApiModelExtensions
                     {
                         string xsdType = "";
 
-                        if (property.Value.Type == JsonSchemaType.String)
+                        if (property.Value is OpenApiSchemaReference schemaReference)
+                        {
+                            xsdType = schemaReference.Reference.Id!;
+                        }
+
+                        else if (property.Value.Type == JsonSchemaType.String)
                         {
                             xsdType = "xs:string";
                         }
