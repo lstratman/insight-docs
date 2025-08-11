@@ -4,6 +4,7 @@ using InsightDocs.OpenApi.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using System.Text;
+using System.Text.Json.Nodes;
 
 namespace InsightDocs.OpenApi;
 
@@ -223,6 +224,29 @@ public static class OpenApiModelExtensions
             {
                 schema.Items.ToXmlSchemaTextInternal(itemElementName, output, renderedTypes);
             }
+        }
+
+        else if (schema.Enum != null)
+        {
+            if (renderedTypes.Contains(typeName))
+            {
+                return;
+            }
+
+            renderedTypes.Add(typeName);
+
+            output.AppendLine("");
+            output.AppendLine($@"  <xs:simpleType name=""{typeName}"">");
+            output.AppendLine($"    <xs:restriction base=\"{(schema.Type == JsonSchemaType.Integer ? "xs:integer" : "xs:string")}\">");
+
+            foreach (JsonNode enumValue in schema.Enum)
+            {
+                string escapedValue = enumValue.ToString();
+                output.AppendLine($@"      <xs:enumeration value=""{escapedValue}""/>");
+            }
+
+            output.AppendLine("    </xs:restriction>");
+            output.AppendLine("  </xs:simpleType>");
         }
 
         else
