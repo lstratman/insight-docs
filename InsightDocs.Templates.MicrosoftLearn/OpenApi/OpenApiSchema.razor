@@ -130,12 +130,7 @@
             return;
         }
 
-        if (schema.Type == Microsoft.OpenApi.JsonSchemaType.Array && schema.Items != null)
-        {
-            GetSchemaReferenceUrls(schema.Items, urls);
-        }
-
-        else if (schema is Microsoft.OpenApi.OpenApiSchemaReference schemaReference && !String.IsNullOrEmpty(schemaReference.Reference.Id))
+        if (schema is Microsoft.OpenApi.OpenApiSchemaReference schemaReference && !String.IsNullOrEmpty(schemaReference.Reference.Id))
         {
             string schemaName = schemaReference.Reference.Id;
             InsightDocs.OpenApi.Model.OpenApiSchema? targetSchema = Item!.AllSchemas.FirstOrDefault(s => s.Name == schemaName);
@@ -148,6 +143,11 @@
             string url = OpenApiSchemaUrlProvider.GetUrl(targetSchema);
 
             urls[schemaReference.Reference.ReferenceV3!] = url;
+        }
+
+        else if (schema.Type == Microsoft.OpenApi.JsonSchemaType.Array && schema.Items != null)
+        {
+            GetSchemaReferenceUrls(schema.Items, urls);
         }
 
         else
