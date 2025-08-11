@@ -59,6 +59,24 @@
                                     </button>
                                 </div>
                                 <pre class="wrap has-inner-focus"><code class="xml language-xml" dir="ltr">@Item.SchemaDefinition.ToXmlSchemaText(Item.Name)</code></pre>
+
+                                Dictionary<string, string> schemaReferenceUrls = new Dictionary<string, string>();
+                                GetSchemaReferenceUrls(Item.SchemaDefinition, schemaReferenceUrls);
+
+                                if (schemaReferenceUrls.Count > 0)
+                                {
+                                    <script type="text/javascript">
+                                        if (!window.schemaReferenceUrls) {
+                                            window.schemaReferenceUrls = {};
+                                        }
+
+                                        @foreach (KeyValuePair<string, string> schemaReferenceUrl in schemaReferenceUrls)
+                                        {
+                                            string schemaReferenceUrlKey = schemaReferenceUrl.Key.Substring(schemaReferenceUrl.Key.LastIndexOf("/") + 1);
+                                            @Raw($@"window.schemaReferenceUrls[""{schemaReferenceUrlKey}""] = ""{schemaReferenceUrl.Value}"";");
+                                        }
+                                    </script>
+                                }
                             }
 
                             @if (Item.MimeTypes.Any(m => m.EndsWith("/json") || m.EndsWith("+json")))
@@ -85,7 +103,9 @@
                                 if (schemaReferenceUrls.Count > 0)
                                 {
                                     <script type="text/javascript">
-                                        window.schemaReferenceUrls = {};
+                                        if (!window.schemaReferenceUrls) {
+                                            window.schemaReferenceUrls = {};
+                                        }
 
                                         @foreach (KeyValuePair<string, string> schemaReferenceUrl in schemaReferenceUrls)
                                         {
@@ -132,14 +152,28 @@
 
         else
         {
-            if (schema.Properties == null)
+            if (schema.Properties != null)
             {
-                return;
+                foreach (KeyValuePair<string, Microsoft.OpenApi.IOpenApiSchema> property in schema.Properties)
+                {
+                    GetSchemaReferenceUrls(property.Value, urls);
+                }
             }
 
-            foreach (KeyValuePair<string, Microsoft.OpenApi.IOpenApiSchema> property in schema.Properties)
+            if (schema.OneOf != null)
             {
-                GetSchemaReferenceUrls(property.Value, urls);
+                foreach (Microsoft.OpenApi.IOpenApiSchema oneOfSchema in schema.OneOf)
+                {
+                    GetSchemaReferenceUrls(oneOfSchema, urls);
+                }
+            }
+
+            if (schema.AllOf != null)
+            {
+                foreach (Microsoft.OpenApi.IOpenApiSchema allOfSchema in schema.AllOf)
+                {
+                    GetSchemaReferenceUrls(allOfSchema, urls);
+                }
             }
         }
     }

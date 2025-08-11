@@ -167,6 +167,17 @@ public class OpenApiLoader : IOpenApiLoader
             }
         }
 
+        if (schema.OneOf != null)
+        {
+            foreach (IOpenApiSchema? subSchema in schema.OneOf)
+            {
+                if (subSchema != null)
+                {
+                    ApplyMimeTypeToSchema(mimeType, subSchema, insightDocsSchemas, referencedSchemas, stack);
+                }
+            }
+        }
+
         if (schema.Properties != null)
         {
             foreach (KeyValuePair<string, IOpenApiSchema> property in schema.Properties)

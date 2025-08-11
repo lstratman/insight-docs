@@ -27,7 +27,7 @@ public partial class OpenApiPublisher(
     [LoggerMessage(LogLevel.Debug, "Publishing topic for schema {schemaName}")]
     public static partial void LogPublishingSchema(ILogger logger, string schemaName);
 
-    public async Task PublishTopics(TocItem tocRoot, string openApiSpecFilePath)
+    public virtual async Task PublishTopics(TocItem tocRoot, string openApiSpecFilePath)
     {
         OpenApiSpec openApiSpec = await openApiLoader.LoadOpenApiSpecFile(openApiSpecFilePath);
         ILogger logger = loggerFactory.CreateLogger<OpenApiPublisher>();
