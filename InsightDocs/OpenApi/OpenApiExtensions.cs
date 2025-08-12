@@ -127,7 +127,21 @@ public static class OpenApiModelExtensions
                             }
                         }
 
-                        output.AppendLine($@"      <xs:element name=""{propertyElementName}"" type=""{propertyType}"" minOccurs=""{minOccurs}"" maxOccurs=""{maxOccurs}""/>");
+                        output.Append($@"      <xs:element name=""{propertyElementName}"" type=""{propertyType}"" minOccurs=""{minOccurs}"" maxOccurs=""{maxOccurs}""");
+
+                        if (!String.IsNullOrEmpty(property.Value.Description))
+                        {
+                            output.AppendLine($">");
+                            output.AppendLine("        <xs:annotation>");
+                            output.AppendLine($"          <xs:documentation>{property.Value.Description}</xs:documentation>");
+                            output.AppendLine("        </xs:annotation>");
+                            output.AppendLine("      </xs:element>");
+                        }
+
+                        else
+                        {
+                            output.AppendLine("/>");
+                        }
                     }
 
                     output.AppendLine("    </xs:sequence>");
@@ -176,7 +190,21 @@ public static class OpenApiModelExtensions
                         }
 #pragma warning restore IDE0045 // Convert to conditional expression
 
-                        output.AppendLine($@"    <xs:attribute name=""{property.Key}"" type=""{xsdType}""{(schema.Required != null && schema.Required.Contains(property.Key) ? " use=\"required\"" : "")}/>");
+                        output.Append($@"    <xs:attribute name=""{property.Key}"" type=""{xsdType}""{(schema.Required != null && schema.Required.Contains(property.Key) ? " use=\"required\"" : "")}");
+
+                        if (!String.IsNullOrEmpty(property.Value.Description))
+                        {
+                            output.AppendLine($">");
+                            output.AppendLine("      <xs:annotation>");
+                            output.AppendLine($"        <xs:documentation>{property.Value.Description}</xs:documentation>");
+                            output.AppendLine("      </xs:annotation>");
+                            output.AppendLine("    </xs:attribute>");
+                        }
+
+                        else
+                        {
+                            output.AppendLine("/>");
+                        }
                     }
                 }
             }
