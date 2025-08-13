@@ -3,6 +3,7 @@ using InsightDocs.OpenApi.Abstractions;
 using InsightDocs.OpenApi.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.Json.Nodes;
 
@@ -61,6 +62,41 @@ public static class OpenApiModelExtensions
         output.Append("</xs:schema>");
 
         return output.ToString();
+    }
+
+    private static string? GetXsdSchemaType(this IOpenApiSchema schema)
+    {
+        if (schema.Type == JsonSchemaType.String)
+        {
+            return "xs:string";
+        }
+
+        else if (schema.Type == JsonSchemaType.Integer)
+        {
+            return "xs:integer";
+        }
+
+        else if (schema.Type == JsonSchemaType.Number)
+        {
+            return "xs:decimal";
+        }
+
+#pragma warning disable IDE0046 // Convert to conditional expression
+        else if (schema.Type == JsonSchemaType.Boolean)
+        {
+            return "xs:boolean";
+        }
+
+        else if (schema.Type == null)
+        {
+            return "xs:any";
+        }
+
+        else
+        {
+            return null;
+        }
+#pragma warning restore IDE0046 // Convert to conditional expression
     }
 
     private static void ToXmlSchemaTextInternal(this IOpenApiSchema schema, string typeName, StringBuilder output, List<string> renderedTypes)
@@ -126,9 +162,13 @@ public static class OpenApiModelExtensions
 
                             else
                             {
-                                propertyType = propertyElementName;
+                                propertyType = property.Value.GetXsdSchemaType() ?? propertyElementName;
                                 minOccurs = schema.Required != null && schema.Required.Contains(property.Key) ? "1" : "0";
-                                deferredSchemas.Add(propertyType, property.Value);
+
+                                if (property.Value.GetXsdSchemaType() == null)
+                                {
+                                    deferredSchemas.Add(propertyType, property.Value);
+                                }
                             }
                         }
 
@@ -156,44 +196,7 @@ public static class OpenApiModelExtensions
                 {
                     foreach (KeyValuePair<string, IOpenApiSchema> property in attributeProperties)
                     {
-                        string xsdType = "";
-
-                        if (property.Value is OpenApiSchemaReference schemaReference)
-                        {
-                            xsdType = schemaReference.Reference.Id!;
-                        }
-
-                        else if (property.Value.Type == JsonSchemaType.String)
-                        {
-                            xsdType = "xs:string";
-                        }
-
-                        else if (property.Value.Type == JsonSchemaType.Integer)
-                        {
-                            xsdType = "xs:integer";
-                        }
-
-                        else if (property.Value.Type == JsonSchemaType.Number)
-                        {
-                            xsdType = "xs:decimal";
-                        }
-
-#pragma warning disable IDE0045 // Convert to conditional expression
-                        else if (property.Value.Type == JsonSchemaType.Boolean)
-                        {
-                            xsdType = "xs:boolean";
-                        }
-
-                        else if (property.Value.Type == null)
-                        {
-                            xsdType = "xs:any";
-                        }
-
-                        else
-                        {
-                            throw new Exception("Unsupported schema type for XML attribute: " + property.Value.Type);
-                        }
-#pragma warning restore IDE0045 // Convert to conditional expression
+                        string? xsdType = (property.Value is OpenApiSchemaReference schemaReference ? schemaReference.Reference.Id : property.Value.GetXsdSchemaType()) ?? throw new Exception("Unsupported schema type for XML attribute: " + schema.Type);
 
                         output.Append($@"    <xs:attribute name=""{property.Key}"" type=""{xsdType}""{(schema.Required != null && schema.Required.Contains(property.Key) ? " use=\"required\"" : "")}");
 
@@ -294,7 +297,82 @@ public static class OpenApiModelExtensions
 
         else
         {
-            output.AppendLine($@"  <xs:element name=""{typeName}"" type=""xs:string""/>");
+            if (renderedTypes.Contains(typeName))
+            {
+                return;
+            }
+
+            renderedTypes.Add(typeName);
+
+            output.AppendLine("");
+            output.AppendLine($@"  <xs:simpleType name=""{typeName}"">");
+
+            if (!String.IsNullOrEmpty(schema.Description))
+            {
+                output.AppendLine("    <xs:annotation>");
+                output.AppendLine($"      <xs:documentation>{schema.Description}</xs:documentation>");
+                output.AppendLine("    </xs:annotation>");
+            }
+
+            output.Append($"    <xs:restriction base=\"{GetXsdSchemaType(schema)}\"");
+
+            bool hasRestrictions = false;
+
+            if (!String.IsNullOrEmpty(schema.Minimum))
+            {
+                if (!hasRestrictions)
+                {
+                    hasRestrictions = true;
+                    output.AppendLine(">");
+                }
+
+                output.AppendLine($@"      <xs:minInclusive value=""{schema.Minimum}""/>");
+            }
+
+            if (!String.IsNullOrEmpty(schema.Maximum))
+            {
+                if (!hasRestrictions)
+                {
+                    hasRestrictions = true;
+                    output.AppendLine(">");
+                }
+
+                output.AppendLine($@"      <xs:maxInclusive value=""{schema.Maximum}""/>");
+            }
+
+            if (schema.MaxLength != null)
+            {
+                if (!hasRestrictions)
+                {
+                    hasRestrictions = true;
+                    output.AppendLine(">");
+                }
+
+                output.AppendLine($@"      <xs:maxLength value=""{schema.MaxLength}""/>");
+            }
+
+            if (!String.IsNullOrEmpty(schema.Pattern))
+            {
+                if (!hasRestrictions)
+                {
+                    hasRestrictions = true;
+                    output.AppendLine(">");
+                }
+
+                output.AppendLine($@"      <xs:pattern value=""{schema.Pattern}""/>");
+            }
+
+            if (!hasRestrictions)
+            {
+                output.AppendLine("/>");
+            }
+
+            else
+            {
+                output.AppendLine("    </xs:restriction>");
+            }
+
+            output.AppendLine("  </xs:simpleType>");
         }
     }
 }
