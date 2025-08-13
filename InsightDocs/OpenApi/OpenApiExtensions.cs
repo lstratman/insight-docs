@@ -197,6 +197,11 @@ public static class OpenApiModelExtensions
 
                         output.Append($@"    <xs:attribute name=""{property.Key}"" type=""{xsdType}""{(schema.Required != null && schema.Required.Contains(property.Key) ? " use=\"required\"" : "")}");
 
+                        if (property.Value.Default != null)
+                        {
+                            output.Append($" default=\"{property.Value.Default.ToString()}\"");
+                        }
+
                         if (!String.IsNullOrEmpty(property.Value.Description))
                         {
                             output.AppendLine($">");
