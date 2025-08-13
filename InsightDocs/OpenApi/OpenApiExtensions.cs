@@ -97,6 +97,11 @@ public static class OpenApiModelExtensions
 
                         if (property.Value is OpenApiSchemaReference reference)
                         {
+                            if (property.Value.Type == JsonSchemaType.Object)
+                            {
+                                propertyElementName = property.Key;
+                            }
+
                             propertyType = reference.Reference.Id!;
                             minOccurs = schema.Required != null && schema.Required.Contains(property.Key) ? "1" : "0";
                         }
@@ -206,6 +211,11 @@ public static class OpenApiModelExtensions
                             output.AppendLine("/>");
                         }
                     }
+                }
+
+                if (schema.AdditionalProperties != null && schema.AdditionalProperties.Xml != null && schema.AdditionalProperties.Xml.Attribute)
+                {
+                    output.AppendLine("    <xs:anyAttribute processContents=\"lax\" namespace=\"##other\"/>");
                 }
             }
 
