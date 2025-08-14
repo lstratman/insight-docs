@@ -220,11 +220,11 @@ public static class OpenApiModelExtensions
                         }
                     }
                 }
+            }
 
-                if (schema.AdditionalProperties != null && schema.AdditionalProperties.Xml != null && schema.AdditionalProperties.Xml.Attribute)
-                {
-                    output.AppendLine("    <xs:anyAttribute processContents=\"lax\" namespace=\"##other\"/>");
-                }
+            if (schema.AdditionalProperties != null && schema.AdditionalProperties.Xml != null && schema.AdditionalProperties.Xml.Attribute)
+            {
+                output.AppendLine("    <xs:anyAttribute processContents=\"lax\" namespace=\"##other\"/>");
             }
 
             output.AppendLine("  </xs:complexType>");
@@ -269,6 +269,12 @@ public static class OpenApiModelExtensions
             output.AppendLine("    <xs:sequence>");
             output.AppendLine($@"      <xs:element name=""{itemElementName}"" type=""{itemType}"" minOccurs=""{(schema.MinItems == null ? "1" : schema.MinItems.ToString())}"" maxOccurs=""{(schema.MaxItems == null ? "unbounded" : schema.MaxItems.ToString())}""/>");
             output.AppendLine("    </xs:sequence>");
+
+            if (schema.AdditionalProperties != null && schema.AdditionalProperties.Xml != null && schema.AdditionalProperties.Xml.Attribute)
+            {
+                output.AppendLine("    <xs:anyAttribute processContents=\"lax\" namespace=\"##other\"/>");
+            }
+
             output.AppendLine("  </xs:complexType>");
 
             if (schema.Items is not OpenApiSchemaReference)
