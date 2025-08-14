@@ -113,6 +113,13 @@ public static class OpenApiModelExtensions
             output.AppendLine("");
             output.AppendLine($@"  <xs:complexType name=""{typeName}"">");
 
+            if (!String.IsNullOrEmpty(schema.Description))
+            {
+                output.AppendLine("    <xs:annotation>");
+                output.AppendLine($"      <xs:documentation>{schema.Description}</xs:documentation>");
+                output.AppendLine("    </xs:annotation>");
+            }
+
             Dictionary<string, IOpenApiSchema> deferredSchemas = [];
 
             if (schema.Properties != null)
