@@ -252,7 +252,12 @@ public static class OpenApiModelExtensions
 
             string itemElementName = typeName;
 
-            if (schema.Items.Xml != null && !String.IsNullOrEmpty(schema.Items.Xml.Name))
+            if (!String.IsNullOrEmpty(schema.Xml?.Name))
+            {
+                itemElementName = schema.Xml.Name;
+            }
+
+            else if (schema.Items.Xml != null && !String.IsNullOrEmpty(schema.Items.Xml.Name))
             {
                 itemElementName = schema.Items.Xml.Name;
             }
