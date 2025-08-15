@@ -55,7 +55,7 @@ public static class OpenApiModelExtensions
 
     public static string ToXmlSchemaTextWithElement(this IOpenApiSchema schema, string typeName, string elementName)
     {
-        StringBuilder output = new StringBuilder($@"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+        StringBuilder output = new StringBuilder($@"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""{(schema.Xml != null && schema.Xml.Namespace != null ? " targetNamespace=\"" + schema.Xml.Namespace.ToString() + "\"" : "")}>
   <xs:element name=""{elementName}"" type=""{typeName}""/>");
 
         if (schema is not OpenApiSchemaReference)
@@ -75,7 +75,7 @@ public static class OpenApiModelExtensions
 
     public static string ToXmlSchemaText(this IOpenApiSchema schema, string typeName)
     {
-        StringBuilder output = new StringBuilder(@"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">");
+        StringBuilder output = new StringBuilder($@"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""{(schema.Xml != null && schema.Xml.Namespace != null ? " targetNamespace=\"" + schema.Xml.Namespace.ToString() + "\"" : "")}>");
 
         schema.ToXmlSchemaTextInternal(typeName, output, []);
         output.Append("</xs:schema>");
