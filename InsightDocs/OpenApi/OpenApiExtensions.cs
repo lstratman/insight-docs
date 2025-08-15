@@ -53,6 +53,26 @@ public static class OpenApiModelExtensions
         return schema.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_1).Result;
     }
 
+    public static string ToXmlSchemaTextWithElement(this IOpenApiSchema schema, string typeName, string elementName)
+    {
+        StringBuilder output = new StringBuilder($@"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""{elementName}"" type=""{typeName}""/>");
+
+        if (schema is not OpenApiSchemaReference)
+        {
+            schema.ToXmlSchemaTextInternal(typeName, output, []);
+        }
+
+        else
+        {
+            output.AppendLine("");
+        }
+
+        output.Append("</xs:schema>");
+
+        return output.ToString();
+    }
+
     public static string ToXmlSchemaText(this IOpenApiSchema schema, string typeName)
     {
         StringBuilder output = new StringBuilder(@"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">");
