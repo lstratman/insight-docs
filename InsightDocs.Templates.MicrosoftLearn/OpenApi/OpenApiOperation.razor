@@ -158,9 +158,17 @@
                                         {
                                             <h4 class="propertyInfoTitle">@content.MimeType</h4>
 
-                                            if (content.Schema is Microsoft.OpenApi.OpenApiSchemaReference)
+                                            if (content.Schema is Microsoft.OpenApi.OpenApiSchemaReference schemaReference)
                                             {
-                                                <!-- TODO: reference link -->
+                                                string schemaName = schemaReference.Reference.Id!;
+                                                InsightDocs.OpenApi.Model.OpenApiSchema? targetSchema = Item!.AllSchemas.FirstOrDefault(s => s.Name == schemaName);
+
+                                                if (targetSchema == null)
+                                                {
+                                                    throw new Exception("Schema not found: " + schemaName);
+                                                }
+
+                                                @GetLink(targetSchema)
                                             }
 
                                             else if (content.Schema!.Type != null && content.Schema!.Enum != null)
