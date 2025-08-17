@@ -1,0 +1,47 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<NPMBuildScriptName Condition=" '$(NPMBuildScriptName)' == '' ">build</NPMBuildScriptName>
+	</PropertyGroup>
+	
+	<Target Name="GetNPMBuildFiles">
+		<ItemGroup>
+			<NPMBuildJsFiles Include="$(ProjectDir)**\*.js" Exclude="$(ProjectDir)node_modules\**\*">
+				<InProject>false</InProject>
+			</NPMBuildJsFiles>
+			<NPMBuildTsFiles Include="$(ProjectDir)**\*.ts" Exclude="$(ProjectDir)node_modules\**\*">
+				<InProject>false</InProject>
+			</NPMBuildTsFiles>
+			<NPMBuildTsGeneratedFiles Include="@(NPMBuildTsFiles->'$(ProjectDir)%(recursivedir)%(filename).js'->Replace('\', '/'))">
+				<InProject>false</InProject>
+			</NPMBuildTsGeneratedFiles>
+			<NPMBuildFiles Include="@(NPMBuildJsFiles);@(NPMBuildTsFiles);$(ProjectDir)package-lock.json;$(ProjectDir)package.json" Exclude="@(NPMBuildTsGeneratedFiles);@(NPMBuildExcludeFiles)">
+				<InProject>false</InProject>
+			</NPMBuildFiles>
+		</ItemGroup>
+	</Target>
+	
+	<Target Name="NPMInstall" Inputs="$(ProjectDir)package.json;$(ProjectDir)package-lock.json" Outputs="$(ProjectDir)obj\$(MSBuildProjectName).npm.install.timestamp.txt" BeforeTargets="CoreCompile">
+		<Message Text="Installing NPM packages..." Importance="high" />
+		<Exec Command="npm install --no-color --scripts-prepend-node-path=true" ConsoleToMsBuild="true" EchoOff="true" IgnoreExitCode="true" WorkingDirectory="$(ProjectDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8">
+			<Output TaskParameter="ConsoleOutput" ItemName="NPMInstallOutput" />
+			<Output TaskParameter="ExitCode" PropertyName="NPMInstallErrorCode" />
+		</Exec>
+		<Touch Condition="'$(NPMInstallErrorCode)' == '0'" AlwaysCreate="true" Files="$(ProjectDir)obj\$(MSBuildProjectName).npm.install.timestamp.txt" />
+		<ItemGroup>
+			<FileWrites Include="$(ProjectDir)obj\$(MSBuildProjectName).npm.install.timestamp.txt"/>
+		</ItemGroup>
+		<Error Condition="'$(NPMInstallErrorCode)' != '0'" Text="NPM install failed" />
+	</Target>
+
+	<Target Name="NPMBuild" DependsOnTargets="GetNPMBuildFiles" AfterTargets="CoreBuild" Condition=" '$(RunNPMBuild)' == 'true' " Inputs="@(NPMBuildFiles)" Outputs="$(ProjectDir)obj\$(Configuration)\$(MSBuildProjectName).npm.build.timestamp.txt">
+		<Message Text="Running NPM build..." Importance="high"/>
+		<Exec Command="npm run-script $(NPMBuildScriptName) --scripts-prepend-node-path=true" WorkingDirectory="$(ProjectDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8" IgnoreExitCode="true">
+			<Output TaskParameter="ExitCode" PropertyName="NPMBuildErrorCode" />
+		</Exec>
+		<Touch Condition="'$(NPMBuildErrorCode)' == '0'" AlwaysCreate="true" Files="$(ProjectDir)obj\$(Configuration)\$(MSBuildProjectName).npm.build.timestamp.txt" />
+		<ItemGroup>
+			<FileWrites Include="$(ProjectDir)obj\$(Configuration)\$(MSBuildProjectName).npm.build.timestamp.txt"/>
+		</ItemGroup>
+		<Error Condition="'$(NPMBuildErrorCode)' != '0'" Text="NPM build failed" />
+	</Target>
+</Project>

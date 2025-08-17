@@ -1,0 +1,17 @@
+{
+  "name": "get-typescript-api-json",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "typescript": "^5.4.5",
+    "nconf": "^0.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.2",
+    "@types/nconf": "0.10.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": ""
+  }
+}
