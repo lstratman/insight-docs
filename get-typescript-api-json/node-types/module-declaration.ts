@@ -1,8 +1,7 @@
 import * as ts from 'typescript';
 import { registerNodeTypeHandler, registerSymbolForReflection, registerTypeNodeForReflection } from '../reflection.js';
 import NodeError from '../node-error.js';
-
-let nconf = require('nconf');
+import * as nconf from 'nconf';
 
 function handleModuleDeclaration(node: ts.Node, typeChecker: ts.TypeChecker): TypeScriptType {
     let moduleStatement = node as ts.ModuleDeclaration;
@@ -25,7 +24,7 @@ function handleModuleDeclaration(node: ts.Node, typeChecker: ts.TypeChecker): Ty
         return null;
     }
     
-    else if (moduleStatement.name.text === 'Client' || moduleStatement.name.text === 'qc/Promise' || moduleStatement.name.text.startsWith('dojox/') || (moduleStatement.name.text.startsWith('@') && nconf.get('excludePackageRoot') && !moduleStatement.name.text.endsWith('.js'))) {
+    else if (moduleStatement.name.text === 'Client' || (moduleStatement.name.text.startsWith('@') && nconf.get('excludePackageRoot') && !moduleStatement.name.text.endsWith('.js'))) {
         return null;
     }
 

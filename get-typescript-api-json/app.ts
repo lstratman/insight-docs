@@ -1,12 +1,11 @@
 import * as ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as nconf from 'nconf';
 
 import { registerTypeNodeForReflection, typesLookup } from './reflection.js';
 import './node-types/index.js';
 import NodeError from './node-error.js';
-
-let nconf = require('nconf');
 
 nconf.argv({
     'outputFile': {
@@ -44,7 +43,7 @@ try {
             rootFilePath
         ],
         options: {
-            rootDir: nconf.get('rootDirectory'),
+            rootDir: nconf.get('rootDirectory')
         }
     });
 

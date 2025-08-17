@@ -4,17 +4,19 @@
   "type": "module",
   "dependencies": {
     "typescript": "^5.4.5",
-    "nconf": "^0.12.1"
+    "nconf": "^0.13.0"
   },
   "devDependencies": {
-    "@types/node": "20.14.2",
-    "@types/nconf": "0.10.0",
-    "rollup": "4.46.2",
     "@rollup/plugin-commonjs": "28.0.6",
-    "@rollup/plugin-node-resolve": "16.0.1"
+    "@rollup/plugin-node-resolve": "16.0.1",
+    "@rollup/plugin-json": "6.1.0",
+    "@types/node": "20.14.2",
+    "@types/nconf": "0.10.7",
+    "cross-env": "10.0.0",
+    "rollup": "4.46.2"
   },
   "scripts": {
-    "build": "tsc && rollup -c rollup.config.js",
+    "build": "cross-env-shell FORCE_COLOR=0 \"tsc && rollup -c rollup.config.js\"",
     "clean": ""
   }
 }

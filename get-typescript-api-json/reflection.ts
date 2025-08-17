@@ -96,7 +96,7 @@ export function registerSymbolForReflection(symbol: ts.Symbol, typeChecker: ts.T
         else if (currentDeclarationContainer.kind === ts.SyntaxKind.SourceFile) {
             let sourceFile = currentDeclarationContainer as ts.SourceFile;
 
-            if (sourceFile.fileName.indexOf('node_modules/typescript/lib') !== -1) {
+            if (sourceFile.fileName.indexOf('/lib.') !== -1) {
                 typeLookup.typeMetadata.builtIn = true;
             }
         }
