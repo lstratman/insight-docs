@@ -1,5 +1,5 @@
 import path from 'path';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 export default class NodeError extends Error {
     public node: ts.Node;

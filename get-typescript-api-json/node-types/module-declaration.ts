@@ -1,7 +1,8 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { registerNodeTypeHandler, registerSymbolForReflection, registerTypeNodeForReflection } from '../reflection.js';
 import NodeError from '../node-error.js';
-import { default as nconf } from 'nconf';
+
+let nconf = require('nconf');
 
 function handleModuleDeclaration(node: ts.Node, typeChecker: ts.TypeChecker): TypeScriptType {
     let moduleStatement = node as ts.ModuleDeclaration;

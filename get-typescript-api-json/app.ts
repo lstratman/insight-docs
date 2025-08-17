@@ -1,11 +1,12 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import * as fs from 'fs';
-import { default as nconf } from 'nconf';
 import * as path from 'path';
 
 import { registerTypeNodeForReflection, typesLookup } from './reflection.js';
 import './node-types/index.js';
 import NodeError from './node-error.js';
+
+let nconf = require('nconf');
 
 nconf.argv({
     'outputFile': {

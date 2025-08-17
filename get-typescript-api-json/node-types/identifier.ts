@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { registerNodeTypeHandler, registerSymbolForReflection } from '../reflection.js';
 import NodeError from '../node-error.js';
 

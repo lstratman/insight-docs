@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import NodeError from './node-error.js';
 import * as path from 'path';
 

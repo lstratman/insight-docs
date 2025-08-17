@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { getPropertyName, registerNodeTypeHandler } from '../reflection.js';
 
 function handleInferType(node: ts.Node, typeChecker: ts.TypeChecker): TypeScriptType {

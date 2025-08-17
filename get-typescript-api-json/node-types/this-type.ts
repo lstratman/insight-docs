@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { registerNodeTypeHandler } from '../reflection.js';
 
 function handleThisType(node: ts.Node, typeChecker: ts.TypeChecker): TypeScriptType {
