@@ -102,7 +102,7 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
         return commonSegments.Count == 0 ? String.Empty : String.Join(Path.DirectorySeparatorChar.ToString(), commonSegments);
     }
 
-    public async Task<TypeScriptProject> LoadDefinitionFiles(List<string> definitionFilePaths)
+    public async Task<TypeScriptProject> LoadDefinitionFiles(List<string> definitionFilePaths, bool excludePackageRoot)
     {
         ILogger logger = loggerFactory.CreateLogger<TypeScriptLoader>();
 
@@ -115,11 +115,16 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
 
         string outputJson = Path.GetTempFileName();
         string commonRootDirectory = FindCommonRoot(definitionFilePaths);
-        string processorArguments = $"{DefinitionFileProcessorPath} --excludePackageRoot true --rootDirectory \"{commonRootDirectory}\" --outputFile \"{outputJson}\" --inputFiles";
+        string processorArguments = $"{DefinitionFileProcessorPath} --rootDirectory \"{commonRootDirectory}\" --outputFile \"{outputJson}\" --inputFiles";
 
         foreach (string definitionFilePath in definitionFilePaths)
         {
             processorArguments += $" \"{definitionFilePath[(commonRootDirectory.Length + 1)..]}\"";
+        }
+
+        if (excludePackageRoot)
+        {
+            processorArguments += " --excludePackageRoot";
         }
 
         TypeScriptProject api;

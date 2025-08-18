@@ -29,6 +29,12 @@ public class TypeScriptTocItem : TocItem
         set;
     }
 
+    public bool ExcludePackageRoot
+    {
+        get;
+        set;
+    } = false;
+
     public override List<TocItem> Children
     {
         get
@@ -100,7 +106,7 @@ public class TypeScriptTocItem : TocItem
                 prefixProvider.UrlPrefix = FullUrlPrefix;
 
                 ITypeScriptPublisher typeScriptPublisher = serviceScope.ServiceProvider.GetRequiredService<ITypeScriptPublisher>();
-                await typeScriptPublisher.PublishTopics(this, definitionFilePaths, TypeFilter, ModuleFilter);
+                await typeScriptPublisher.PublishTopics(this, definitionFilePaths, TypeFilter, ModuleFilter, ExcludePackageRoot);
             }
         }
     }

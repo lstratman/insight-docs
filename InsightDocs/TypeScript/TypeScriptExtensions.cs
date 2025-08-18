@@ -72,6 +72,18 @@ public static class TypeScriptTocItemExtensions
         return typeScriptTocItem;
     }
 
+    public static TocItem ExcludeTypeScriptPackageRoot(this TocItem tocItem)
+    {
+        if (tocItem is not TypeScriptTocItem typeScriptTocItem)
+        {
+            typeScriptTocItem = new TypeScriptTocItem(tocItem);
+        }
+
+        typeScriptTocItem.ExcludePackageRoot = true;
+
+        return typeScriptTocItem;
+    }
+
     public static TocItem ExcludeTypeScriptDefinitionFiles(this TocItem tocItem, string glob)
     {
         if (tocItem is not TypeScriptTocItem typeScriptTocItem)

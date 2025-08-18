@@ -53,10 +53,10 @@ public partial class TypeScriptPublisher(
     [LoggerMessage(LogLevel.Debug, "Skipping type {module}")]
     public static partial void LogSkippingLoadingModule(ILogger logger, string module);
 
-    public virtual async Task PublishTopics(TocItem tocRoot, List<string> definitionFilePaths, Func<TypeScriptTypeDeclaration, bool>? typeFilter, Func<TypeScriptModule, bool>? moduleFilter)
+    public virtual async Task PublishTopics(TocItem tocRoot, List<string> definitionFilePaths, Func<TypeScriptTypeDeclaration, bool>? typeFilter, Func<TypeScriptModule, bool>? moduleFilter, bool excludePackageRoot)
     {
         ILogger logger = loggerFactory.CreateLogger<TypeScriptPublisher>();
-        TypeScriptProject api = await typeScriptLoader.LoadDefinitionFiles(definitionFilePaths);
+        TypeScriptProject api = await typeScriptLoader.LoadDefinitionFiles(definitionFilePaths, excludePackageRoot);
 
         if (urlPrefixProvider.UrlPrefix != null)
         {
