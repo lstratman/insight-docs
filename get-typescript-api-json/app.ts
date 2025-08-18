@@ -43,7 +43,10 @@ try {
             rootFilePath
         ],
         options: {
-            rootDir: nconf.get('rootDirectory')
+            rootDir: nconf.get('rootDirectory'),
+            types: [],
+            target: ts.ScriptTarget.ESNext,
+            module: ts.ModuleKind.ESNext
         }
     });
 
