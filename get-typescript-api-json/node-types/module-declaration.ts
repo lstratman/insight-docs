@@ -7,17 +7,15 @@ function handleModuleDeclaration(node: ts.Node, typeChecker: ts.TypeChecker): Ty
     let moduleStatement = node as ts.ModuleDeclaration;
     
     if (moduleStatement.getText().startsWith('declare namespace ')) {
-        if (moduleStatement.getSourceFile().fileName.endsWith('model-interfaces.d.ts')) {
-            let body = moduleStatement.body;
+        let body = moduleStatement.body;
 
-            while (body.kind === ts.SyntaxKind.ModuleDeclaration) {
-                body = (<ts.ModuleDeclaration>body).body;
-            }
+        while (body.kind === ts.SyntaxKind.ModuleDeclaration) {
+            body = (<ts.ModuleDeclaration>body).body;
+        }
             
-            for (let namespaceMember of (body as ts.ModuleBlock).statements) {
-                if (namespaceMember.kind === ts.SyntaxKind.InterfaceDeclaration) {
-                    registerSymbolForReflection(typeChecker.getSymbolAtLocation((<ts.InterfaceDeclaration>namespaceMember).name), typeChecker);
-                }
+        for (let namespaceMember of (body as ts.ModuleBlock).statements) {
+            if (namespaceMember.kind === ts.SyntaxKind.InterfaceDeclaration) {
+                registerSymbolForReflection(typeChecker.getSymbolAtLocation((<ts.InterfaceDeclaration>namespaceMember).name), typeChecker);
             }
         }
 

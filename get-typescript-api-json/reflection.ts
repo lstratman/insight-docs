@@ -428,6 +428,14 @@ export function registerSymbolForReflection(symbol: ts.Symbol, typeChecker: ts.T
             // TODO
         }
 
+        else if (declaration.kind === ts.SyntaxKind.ImportClause) {
+            // TODO
+        }
+
+        else if (declaration.kind === ts.SyntaxKind.NamespaceImport) {
+            // TODO
+        }
+
         else {
             throw new NodeError(`Unsupported type declaration kind: ${declaration.kind}`, declaration);
         }
