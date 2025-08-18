@@ -6,8 +6,16 @@
     <!--Command to run on project clean-->
     <CleanCommand>npm run clean</CleanCommand>
     <OutDir>obj\$(Configuration)</OutDir>
-    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
-  <Import Project=".\NPM.targets"/>
+  <Import Project="./NPM.targets"/>
+
+  <Target Name="SetPropertiesForEsproj" BeforeTargets="GetReferenceAssemblyPaths">
+    <CreateProperty Value="v8.0">
+      <Output TaskParameter="Value" PropertyName="TargetFrameworkVersion" />
+    </CreateProperty>
+    <CreateProperty Value="">
+      <Output TaskParameter="Value" PropertyName="TargetFrameworkMoniker" />
+    </CreateProperty>
+  </Target>
 </Project>
