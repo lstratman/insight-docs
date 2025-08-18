@@ -2,6 +2,7 @@
 using InsightDocs.TypeScript.Model;
 using InsightDocs.TypeScript.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace InsightDocs.TypeScript;
 
@@ -43,20 +44,58 @@ public static class TypeScriptExtensions
 
 public static class TypeScriptTocItemExtensions
 {
-    public static TocItem IncludeTypeScriptApi(this TocItem tocItem, string typeScriptApiJsonFilePath)
+    public static TocItem IncludeTypeScriptDefinitionFiles(this TocItem tocItem, string glob)
     {
         if (tocItem is not TypeScriptTocItem typeScriptTocItem)
         {
             typeScriptTocItem = new TypeScriptTocItem(tocItem);
         }
 
-        if (!Path.IsPathRooted(typeScriptApiJsonFilePath))
+        if (!Path.IsPathRooted(glob))
         {
-            typeScriptApiJsonFilePath = Path.Combine(AppContext.BaseDirectory, typeScriptApiJsonFilePath);
-            typeScriptApiJsonFilePath = Path.GetFullPath(typeScriptApiJsonFilePath);
+            glob = Path.Combine(AppContext.BaseDirectory, glob);
+            glob = Path.GetFullPath(glob);
         }
 
-        typeScriptTocItem.TypeScriptApiJsonFilePath = typeScriptApiJsonFilePath;
+        string root = Path.GetPathRoot(glob)!;
+
+        typeScriptTocItem.RootedDefinitionGlobMatchers ??= [];
+
+        if (!typeScriptTocItem.RootedDefinitionGlobMatchers.TryGetValue(root, out Matcher? matcher))
+        {
+            matcher = new Matcher();
+            typeScriptTocItem.RootedDefinitionGlobMatchers[root] = matcher;
+        }
+
+        matcher.AddInclude(glob[root.Length..]);
+
+        return typeScriptTocItem;
+    }
+
+    public static TocItem ExcludeTypeScriptDefinitionFiles(this TocItem tocItem, string glob)
+    {
+        if (tocItem is not TypeScriptTocItem typeScriptTocItem)
+        {
+            typeScriptTocItem = new TypeScriptTocItem(tocItem);
+        }
+
+        if (!Path.IsPathRooted(glob))
+        {
+            glob = Path.Combine(AppContext.BaseDirectory, glob);
+            glob = Path.GetFullPath(glob);
+        }
+
+        string root = Path.GetPathRoot(glob)!;
+
+        typeScriptTocItem.RootedDefinitionGlobMatchers ??= [];
+
+        if (!typeScriptTocItem.RootedDefinitionGlobMatchers.TryGetValue(root, out Matcher? matcher))
+        {
+            matcher = new Matcher();
+            typeScriptTocItem.RootedDefinitionGlobMatchers[root] = matcher;
+        }
+
+        matcher.AddExclude(glob[root.Length..]);
 
         return typeScriptTocItem;
     }

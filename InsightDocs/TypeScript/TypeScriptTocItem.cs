@@ -2,23 +2,19 @@
 using InsightDocs.TypeScript.Abstractions;
 using InsightDocs.TypeScript.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace InsightDocs.TypeScript;
 
 public class TypeScriptTocItem : TocItem
 {
     protected TocItem _baseTocItem;
+    public Dictionary<string, Matcher>? RootedDefinitionGlobMatchers;
 
     public TypeScriptTocItem(TocItem baseTocItem)
     {
         _baseTocItem = baseTocItem;
         RegisterExecutor(TypeScriptExecutor);
-    }
-
-    public string? TypeScriptApiJsonFilePath
-    {
-        get;
-        set;
     }
 
     public Func<TypeScriptTypeDeclaration, bool>? TypeFilter
@@ -87,20 +83,25 @@ public class TypeScriptTocItem : TocItem
 
     protected async Task TypeScriptExecutor(IServiceProvider serviceProvider)
     {
-        if (String.IsNullOrEmpty(TypeScriptApiJsonFilePath))
+        if (RootedDefinitionGlobMatchers != null)
         {
-            throw new Exception("TypeScriptApiJsonFilePath must be set before building the TypeScript topics.");
-        }
+            List<string> definitionFilePaths = [];
 
-        IServiceScopeFactory serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+            foreach (KeyValuePair<string, Matcher> matcherAndRoot in RootedDefinitionGlobMatchers)
+            {
+                definitionFilePaths.AddRange(matcherAndRoot.Value.GetResultsInFullPath(matcherAndRoot.Key));
+            }
 
-        using (IServiceScope serviceScope = serviceScopeFactory.CreateScope())
-        {
-            IUrlPrefixProvider prefixProvider = serviceScope.ServiceProvider.GetRequiredService<IUrlPrefixProvider>();
-            prefixProvider.UrlPrefix = FullUrlPrefix;
+            IServiceScopeFactory serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-            ITypeScriptPublisher typeScriptPublisher = serviceScope.ServiceProvider.GetRequiredService<ITypeScriptPublisher>();
-            await typeScriptPublisher.PublishTopics(this, TypeScriptApiJsonFilePath, TypeFilter, ModuleFilter);
+            using (IServiceScope serviceScope = serviceScopeFactory.CreateScope())
+            {
+                IUrlPrefixProvider prefixProvider = serviceScope.ServiceProvider.GetRequiredService<IUrlPrefixProvider>();
+                prefixProvider.UrlPrefix = FullUrlPrefix;
+
+                ITypeScriptPublisher typeScriptPublisher = serviceScope.ServiceProvider.GetRequiredService<ITypeScriptPublisher>();
+                await typeScriptPublisher.PublishTopics(this, definitionFilePaths, TypeFilter, ModuleFilter);
+            }
         }
     }
 }
