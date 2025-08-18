@@ -45,7 +45,7 @@ try {
         options: {
             rootDir: nconf.get('rootDirectory'),
             types: [],
-            target: ts.ScriptTarget.ESNext,
+            target: ts.ScriptTarget.ES2024,
             module: ts.ModuleKind.ESNext
         }
     });
