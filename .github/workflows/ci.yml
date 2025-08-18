@@ -32,11 +32,11 @@ jobs:
     - name: Build NuGet packages
       run: |
         cd InsightDocs
-        dotnet pack -c Release -p:BuildNumber=${{github.run_number}} -p:RunNPMBuild=false -p:RunNPMInstall=false --no-build
+        dotnet pack -c Release -p:BuildNumber=${{github.run_number}} --no-build
         cd ../InsightDocs.Sqlite
-        dotnet pack -c Release -p:BuildNumber=${{github.run_number}} -p:RunNPMBuild=false -p:RunNPMInstall=false --no-build
+        dotnet pack -c Release -p:BuildNumber=${{github.run_number}} --no-build
         cd ../InsightDocs.Templates.MicrosoftLearn
-        dotnet pack -c Release -p:BuildNumber=${{github.run_number}} -p:RunNPMBuild=false -p:RunNPMInstall=false --no-build
+        dotnet pack -c Release -p:BuildNumber=${{github.run_number}} --no-build
     - name: Add GitHub Packages source
       run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
     - name: Publish packages
