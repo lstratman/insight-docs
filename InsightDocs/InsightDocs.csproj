@@ -11,11 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TypeScript\Resources\get-typescript-api-json.js" />
+    <None Remove="TypeScript\Resources\*" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Resources\get-typescript-api-json.js" />
+    <EmbeddedResource Include="TypeScript\Resources\*" />
   </ItemGroup>
 
   <ItemGroup>
