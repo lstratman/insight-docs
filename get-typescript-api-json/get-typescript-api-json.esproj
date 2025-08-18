@@ -2,7 +2,8 @@
   <PropertyGroup>
     <!--Command to run on project build-->
     <BuildCommand></BuildCommand>
-    <RunNPMBuild>true</RunNPMBuild>
+    <RunNPMBuild Condition="'$(RunNPMBuild)' == ''">true</RunNPMBuild>
+    <RunNPMInstall Condition="'$(RunNPMInstall)' == ''">true</RunNPMInstall>
     <!--Command to run on project clean-->
     <CleanCommand>npm run clean</CleanCommand>
     <OutDir>obj\$(Configuration)</OutDir>

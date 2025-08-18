@@ -20,7 +20,7 @@
 		</ItemGroup>
 	</Target>
 	
-	<Target Name="NPMInstall" Inputs="$(ProjectDir)package.json;$(ProjectDir)package-lock.json" Outputs="$(ProjectDir)obj\$(MSBuildProjectName).npm.install.timestamp.txt" BeforeTargets="CoreCompile">
+	<Target Name="NPMInstall" Condition=" '$(RunNPMInstall)' == 'true' " Inputs="$(ProjectDir)package.json;$(ProjectDir)package-lock.json" Outputs="$(ProjectDir)obj\$(MSBuildProjectName).npm.install.timestamp.txt" BeforeTargets="CoreCompile">
 		<Message Text="Installing NPM packages..." Importance="high" />
 		<Exec Command="npm install --no-color --scripts-prepend-node-path=true" ConsoleToMsBuild="true" EchoOff="true" IgnoreExitCode="true" WorkingDirectory="$(ProjectDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8">
 			<Output TaskParameter="ConsoleOutput" ItemName="NPMInstallOutput" />
