@@ -3,6 +3,7 @@
     "forceConsistentCasingInFileNames": true,
     "module": "node16",
     "target": "es2021",
-    "sourceMap": true
+    "sourceMap": true,
+    "skipLibCheck": true
   }
 }
