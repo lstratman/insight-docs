@@ -8,13 +8,14 @@ using InsightDocs.Markdown.Model;
 using InsightDocs.OpenApi.Model;
 using InsightDocs.Site.Model;
 using InsightDocs.TypeScript;
+using InsightDocs.TypeScript.Abstractions;
 using InsightDocs.TypeScript.Model;
 using InsightDocs.TypeScript.Model.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, DotNetOptions dotNetOptions, TypeScriptOptions typeScriptOptions)
+public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, IMDNUrlResolver mdnUrlResolver, DotNetOptions dotNetOptions, TypeScriptOptions typeScriptOptions)
     : IUrlProvider<DotNetType>,
       IUrlProvider<DotNetIndex>,
       IUrlProvider<DotNetNamespace>,
@@ -477,30 +478,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
     {
         if (item.BuiltIn)
         {
-            if (!typeScriptOptions.ResolveMDNUrls)
-            {
-                return "";
-            }
-
-            string typeName = item.Name;
-
-            if (typeName.Contains('<'))
-            {
-                typeName = typeName[..typeName.IndexOf('<')];
-            }
-
-            if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
-            {
-                return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}";
-            }
-
-            else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
-            {
-                return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
-            }
-
-            // TODO: throw error
-            return "";
+            return typeScriptOptions.ResolveMDNUrls ? mdnUrlResolver.GetUrl(item) : "";
         }
 
         StringBuilder url = new();
@@ -525,30 +503,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
     {
         if (item.BuiltIn)
         {
-            if (!typeScriptOptions.ResolveMDNUrls)
-            {
-                return "";
-            }
-
-            string typeName = item.Name;
-
-            if (typeName.Contains('<'))
-            {
-                typeName = typeName[..typeName.IndexOf('<')];
-            }
-
-            if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
-            {
-                return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}";
-            }
-
-            else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
-            {
-                return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
-            }
-
-            // TODO: throw error
-            return "";
+            return typeScriptOptions.ResolveMDNUrls ? mdnUrlResolver.GetUrl(item) : "";
         }
 
         StringBuilder url = new();
@@ -577,30 +532,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             if (sourceType.BuiltIn)
             {
-                if (!typeScriptOptions.ResolveMDNUrls)
-                {
-                    return "";
-                }
-
-                string typeName = sourceType.Name;
-
-                if (typeName.Contains('<'))
-                {
-                    typeName = typeName[..typeName.IndexOf('<')];
-                }
-
-                if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
-                {
-                    return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
-                }
-
-                else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
-                {
-                    return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}/{item.Name}";
-                }
-
-                // TODO: throw error
-                return "";
+                return typeScriptOptions.ResolveMDNUrls ? mdnUrlResolver.GetUrl(item) : "";
             }
         }
 
@@ -638,30 +570,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             if (sourceType.BuiltIn)
             {
-                if (!typeScriptOptions.ResolveMDNUrls)
-                {
-                    return "";
-                }
-
-                string typeName = sourceType.Name;
-
-                if (typeName.Contains('<'))
-                {
-                    typeName = typeName[..typeName.IndexOf('<')];
-                }
-
-                if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
-                {
-                    return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
-                }
-
-                else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
-                {
-                    return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}/{item.Name}";
-                }
-
-                // TODO: throw error
-                return "";
+                return typeScriptOptions.ResolveMDNUrls ? mdnUrlResolver.GetUrl(item) : "";
             }
         }
 
@@ -699,30 +608,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             if (sourceType.BuiltIn)
             {
-                if (!typeScriptOptions.ResolveMDNUrls)
-                {
-                    return "";
-                }
-
-                string typeName = sourceType.Name;
-
-                if (typeName.Contains('<'))
-                {
-                    typeName = typeName[..typeName.IndexOf('<')];
-                }
-
-                if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
-                {
-                    return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
-                }
-
-                else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
-                {
-                    return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}/{item.Name}";
-                }
-
-                // TODO: throw error
-                return "";
+                return typeScriptOptions.ResolveMDNUrls ? mdnUrlResolver.GetUrl(item) : "";
             }
         }
 
@@ -789,7 +675,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     public string GetUrl(IntrinsicType item)
     {
-        return typeScriptOptions.ResolveMDNUrls ? item.Name == "void" ? "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void" : $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{item.Name}" : "";
+        return typeScriptOptions.ResolveMDNUrls ? mdnUrlResolver.GetUrl(item) : "";
     }
 
     public string GetUrl(OpenApiOperation item)
@@ -802,7 +688,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             url.Append('/');
         }
 
-        url.Append(item.Url.StartsWith("/") ? item.Url[1..] : item.Url);
+        url.Append(item.Url.StartsWith('/') ? item.Url[1..] : item.Url);
         url.Append($"/{item.Method.ToLowerInvariant()}");
 
         return url.ToString();

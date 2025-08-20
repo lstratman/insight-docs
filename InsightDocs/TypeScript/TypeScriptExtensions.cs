@@ -21,6 +21,7 @@ public static class TypeScriptExtensions
     {
         builder.Services.AddScoped<ITypeScriptLoader, TypeScriptLoader>();
         builder.Services.AddScoped<ITypeScriptPublisher, TypeScriptPublisher>();
+        builder.Services.AddScoped<IMDNUrlResolver, MDNUrlResolver>();
 
         if (optionsFactory != null)
         {
