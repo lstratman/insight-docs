@@ -22,7 +22,7 @@
                 <div class="content">
                     <div data-chunk-ids="0">
                         @{
-                            string html = Item!.Html!.Replace("<table", "<table class=\"table\"").Replace("<code class=\"language-", "<code class=\"lang-");
+                            string html = Item!.Html!.Replace("<table>", "<table class=\"table\">").Replace("<code class=\"language-", "<code class=\"lang-");
 
                             html = Regex.Replace(html, @"<h(?<level>\d+)(?<otherAttributes>[^>]*)id=[""'](?<id>[^""']+)[""'](?<otherAttributes2>[^>]*)>(?<title>.*?)</h\d+>", (evaluator) =>
                             {
