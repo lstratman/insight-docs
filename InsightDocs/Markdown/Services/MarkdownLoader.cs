@@ -11,15 +11,28 @@ namespace InsightDocs.Markdown.Services;
 
 public class MarkdownLoader(IServiceProvider serviceProvider) : IMarkdownLoader
 {
-    protected MarkdownPipeline _pipeline = new MarkdownPipelineBuilder().UseCustomContainers().UsePipeTables().UseAutoIdentifiers().Build();
+    protected MarkdownPipeline? _pipeline = null;
     protected static readonly Regex LinkMatcher = new Regex(@"<a href\s*=\s*(['""])(?<url>.*?)\1");
+
+    protected MarkdownPipeline Pipeline
+    {
+        get
+        {
+            return _pipeline ??= GetMarkdownPipelineBuilder().Build();
+        }
+    }
+
+    protected virtual MarkdownPipelineBuilder GetMarkdownPipelineBuilder()
+    {
+        return new MarkdownPipelineBuilder().UseCustomContainers().UsePipeTables().UseAutoIdentifiers();
+    }
 
     public virtual async Task<string> GetHtml(MarkdownFile markdownFile)
     {
         string markdownContent = await File.ReadAllTextAsync(markdownFile.FilePath);
         markdownContent = markdownContent.Replace("&nbsp;", " ").Replace(" & ", " &amp; ");
 
-        string markdownHtml = MarkdownProcessor.ToHtml(markdownContent, _pipeline);
+        string markdownHtml = MarkdownProcessor.ToHtml(markdownContent, Pipeline);
         IUrlRemapper? linkRemapper = serviceProvider.GetService<IUrlRemapper>();
 
         if (linkRemapper != null)
