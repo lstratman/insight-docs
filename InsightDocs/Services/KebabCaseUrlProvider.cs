@@ -319,7 +319,17 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
             if (item.Parameters != null && item.Parameters.Count > 0)
             {
-                url.Append(String.Join('-', item.Parameters.Select(p => p.Type.XmlDocKey.ToLower().Replace(".", "-") + (p.IsByRef ? "@" : ""))));
+                List<DotNetMethodParameter> parameters = item.Parameters;
+
+                if (item.DeclaringType != null && item.DeclaringType.GenericArguments != null && item.DeclaringType.Type != null && item.DeclaringType.Type.Methods != null)
+                {
+                    DotNetMethod genericMethod = item.DeclaringType.Type.Methods.First(m => m.Name == item.Name);
+                    DotNetMethodOverload overload = genericMethod.Overloads.First(o => o.Parameters != null && o.Parameters.Count == item.Parameters.Count);
+
+                    parameters = overload.Parameters!;
+                }
+
+                url.Append(String.Join('-', parameters.Select(p => p.Type.XmlDocKey.ToLower().Replace(".", "-") + (p.IsByRef ? "@" : ""))));
             }
 
             url.Append(')');
