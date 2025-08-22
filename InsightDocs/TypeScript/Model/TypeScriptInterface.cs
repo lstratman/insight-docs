@@ -9,12 +9,6 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
 {
     protected bool _normalized = false;
 
-    public static readonly string[] NonElements =
-    [
-        "DialogWithValue",
-        "BuiltWebComponentToolbar"
-    ];
-
     public static readonly string[] HTMLElementTypes =
     [
         "ARIAMixin",
