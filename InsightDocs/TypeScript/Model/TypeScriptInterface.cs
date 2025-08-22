@@ -1,4 +1,5 @@
 ﻿using InsightDocs.TypeScript.Model.Types;
+using InsightDocs.TypeScript.Services;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -183,7 +184,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
             int endIndex = mdnLinkSegment.Text.IndexOf(')', startIndex);
             string mdnUrl = mdnLinkSegment.Text[startIndex..endIndex];
 
-            if (MDNUrlMappings.TryGetValue(mdnUrl, out string? value))
+            if (MDNUrlResolver.MDNUrlMappings.TryGetValue(mdnUrl, out string? value))
             {
                 mdnUrl = value;
                 mdnLinkSegment.Text = "[MDN Reference](" + mdnUrl + ")";
