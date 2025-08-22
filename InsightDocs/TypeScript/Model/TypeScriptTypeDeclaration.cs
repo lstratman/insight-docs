@@ -69,6 +69,79 @@ public abstract class TypeScriptTypeDeclaration : ILinkTarget
         { "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement/scope", "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement" }
     };
 
+    public static readonly Dictionary<string, string> TypeScriptTypes = new Dictionary<string, string>
+    {
+        { "Awaited", "awaitedtype" },
+        { "NonNullable", "nonnullabletype" },
+        { "Parameters", "parameterstype" },
+        { "ConstructorParameters", "constructorparameterstype" },
+        { "ReturnType", "returntypetype" },
+        { "InstanceType", "instancetypetype" },
+        { "ThisParameterType", "thisparametertype" },
+        { "OmitThisParameter", "omitthisparametertype" },
+        { "Required", "requiredtype" },
+        { "Uppercase", "uppercasestringtype" },
+        { "Lowercase", "lowercasestringtype" },
+        { "Capitalize", "capitalizestringtype" },
+        { "Uncapitalize", "uncapitalizestringtype" },
+        { "Record", "recordkeys-type" },
+        { "Partial", "partialtype" },
+        { "Pick", "picktype-keys" },
+        { "Exclude", "excludeuniontype-excludedmembers" },
+        { "Readonly", "readonlytype" },
+        { "Omit", "omittype-keys" },
+        { "Extract", "extracttype-union" },
+        { "ThisType<T>", "thistypetype" }
+    };
+
+    public static readonly Dictionary<string, string> JavaScriptTypeMappings = new Dictionary<string, string>
+    {
+        { "ElementCSSInlineStyle", "HTMLElement" },
+        { "HTMLOrSVGElement", "SVGElement" },
+        { "NonDocumentTypeChildNode", "Node" },
+        { "DocumentAndElementEventHandlers", "HTMLElement" },
+        { "DocumentAndElementEventHandlersEventMap", "Event" },
+        { "GlobalEventHandlersEventMap", "Event" },
+        { "InnerHTML", "Element" },
+        { "ElementContentEditable", "HTMLElement" },
+        { "Animatable", "Element" },
+        { "DocumentEvent", "Event" },
+        { "NodeListOf", "NodeList" },
+        { "ObjectConstructor", "Object" },
+        { "ActiveXObject", "Object" },
+        { "ChildNode", "Node" },
+        { "RegExpExecArray", "Array" },
+        { "RegExpMatchArray", "Array" },
+        { "ARIAMixin", "Element" },
+        { "Slottable", "Element" },
+        { "ParentNode", "Node" },
+        { "PromiseLike", "Promise" },
+        { "Iterable", "Iterator" },
+        { "iterator", "Iterator" },
+        { "ArrayLike", "Array" },
+        { "PropertyKey", "String" },
+        { "ElementEventMap", "Event" },
+        { "HTMLElementEventMap", "Event" },
+        { "HTMLCollectionOf", "NodeList" },
+        { "CanvasRenderingContext2DSettings", "CanvasRenderingContext2D" },
+        { "HTMLTableHeaderCellElement", "HTMLTableCellElement" },
+        { "HTMLFrameElement", "HTMLElement" },
+        { "DocumentOrShadowRoot", "Document" },
+        { "FontFaceSource", "FontFace" },
+        { "XPathEvaluatorBase", "XPathEvaluator" },
+        { "IterableIterator", "Iterator" },
+        { "EventListenerOrEventListenerObject", "EventTarget" },
+        { "EventListener", "EventTarget" },
+        { "AddEventListenerOptions", "EventTarget" },
+        { "CustomElementConstructor", "HTMLElement" },
+        { "CanvasLineJoin", "CanvasRenderingContext2D" },
+        { "CanvasLineCap", "CanvasRenderingContext2D" },
+        { "CanvasTextAlign", "CanvasRenderingContext2D" },
+        { "CanvasTextBaseline", "CanvasRenderingContext2D" },
+        { "NumberFormatOptions", "Intl.NumberFormat" },
+        { "NonElementParentNode", "Node" }
+    };
+
     public static readonly string[] JavaScriptGlobalObjects =
     [
         "Object",
@@ -124,7 +197,8 @@ public abstract class TypeScriptTypeDeclaration : ILinkTarget
         "Reflection",
         "Reflect",
         "Proxy",
-        "Intl"
+        "Intl",
+        "Intl.NumberFormat"
     ];
 
     public static readonly string[] JavaScriptBuiltinTypes =
@@ -714,6 +788,7 @@ public abstract class TypeScriptTypeDeclaration : ILinkTarget
         "ReportBody",
         "ReportingObserver",
         "Request",
+        "RequestInit",
         "ResizeObserver",
         "ResizeObserverEntry",
         "ResizeObserverSize",

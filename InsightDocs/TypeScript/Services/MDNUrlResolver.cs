@@ -15,9 +15,14 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            if (TypeScriptTypeDeclaration.JavaScriptTypeMappings.TryGetValue(typeName, out string? value))
+            {
+                typeName = value;
+            }
+
             if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
             {
-                return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}";
+                return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName.Replace(".", "/")}";
             }
 
             else if (TypeScriptTypeDeclaration.JavaScriptBuiltinTypes.Contains(typeName))
@@ -25,8 +30,12 @@ namespace InsightDocs.TypeScript.Services
                 return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
             }
 
-            // TODO: throw error
-            return "";
+            else if (TypeScriptTypeDeclaration.TypeScriptTypes.TryGetValue(typeName, out string? typeScriptTypeAnchor))
+            {
+                return $"https://www.typescriptlang.org/docs/handbook/utility-types.html#{typeScriptTypeAnchor}";
+            }
+
+            throw new Exception($"No MDN URL mapping for type {item.FullName}.");
         }
 
         public string GetUrl(TypeScriptInterface item)
@@ -48,8 +57,7 @@ namespace InsightDocs.TypeScript.Services
                 return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
             }
 
-            // TODO: throw error
-            return "";
+            throw new Exception($"No MDN URL mapping for type {item.FullName}.");
         }
 
         public string GetUrl(TypeScriptMethod item)
@@ -62,6 +70,11 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            if (TypeScriptTypeDeclaration.JavaScriptTypeMappings.TryGetValue(typeName, out string? value))
+            {
+                typeName = value;
+            }
+
             if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
@@ -72,8 +85,7 @@ namespace InsightDocs.TypeScript.Services
                 return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}/{item.Name}";
             }
 
-            // TODO: throw error
-            return "";
+            throw new Exception($"No MDN URL mapping for method {sourceType.FullName}.{item.Name}().");
         }
 
         public string GetUrl(TypeScriptProperty item)
@@ -86,6 +98,11 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            if (TypeScriptTypeDeclaration.JavaScriptTypeMappings.TryGetValue(typeName, out string? value))
+            {
+                typeName = value;
+            }
+
             if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
@@ -96,8 +113,7 @@ namespace InsightDocs.TypeScript.Services
                 return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}/{item.Name}";
             }
 
-            // TODO: throw error
-            return "";
+            throw new Exception($"No MDN URL mapping for property {sourceType.FullName}.{item.Name}.");
         }
 
         public string GetUrl(TypeScriptMethodSignature item)
@@ -110,6 +126,11 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            if (TypeScriptTypeDeclaration.JavaScriptTypeMappings.TryGetValue(typeName, out string? value))
+            {
+                typeName = value;
+            }
+
             if (TypeScriptTypeDeclaration.JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
@@ -120,8 +141,7 @@ namespace InsightDocs.TypeScript.Services
                 return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}/{item.Name}";
             }
 
-            // TODO: throw error
-            return "";
+            throw new Exception($"No MDN URL mapping for method {sourceType.FullName}.{item.Name}().");
         }
 
         public string GetUrl(IntrinsicType item)
