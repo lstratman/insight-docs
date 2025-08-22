@@ -1,6 +1,7 @@
 @using System.Text.RegularExpressions
 @inherits InsightDocs.RazorTemplate<InsightDocs.Markdown.Model.MarkdownFile>
 @inject InsightDocs.Abstractions.ICodeLanguageService CodeLanguageService
+@inject InsightDocs.Abstractions.IPublisher Publisher
 
 <html>
 <head>
@@ -29,6 +30,8 @@
                                 string id = evaluator.Groups["id"].Value;
                                 string title = evaluator.Groups["title"].Value;
                                 int level = int.Parse(evaluator.Groups["level"].Value);
+
+                                Publisher.RegisterPublishedAnchor(Url, id);
 
                                 if (level == 1)
                                 {

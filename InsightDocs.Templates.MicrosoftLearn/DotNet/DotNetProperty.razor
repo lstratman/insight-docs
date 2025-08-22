@@ -83,7 +83,7 @@
                                 <CodeBlock LanguageId="csharp" LanguageLabel="C#" Code="@Item.CSharpCode"/>
                                 <CodeBlock LanguageId="vb" LanguageLabel="VB" Code="@Item.VBCode"/>
 
-                                <SectionHeader Level="4" LinkId="property-value" Title="Property Value" AdditionalCssClasses="propertyInfoTitle stack"/>
+                                <SectionHeader Level="4" LinkId="property-value" Title="Property Value" AdditionalCssClasses="propertyInfoTitle stack" TopicUrl="@Url"/>
 
                                 <div class="propertyInfo">@GetLink(Item.PropertyType)</div>
 
@@ -94,7 +94,7 @@
 
                                 @if (Item.Examples != null)
                                 {
-                                    <SectionHeader Level="2" LinkId="examples" Title="Examples"/>
+                                    <SectionHeader Level="2" LinkId="examples" Title="Examples" TopicUrl="@Url"/>
 
                                     @foreach (Tuple<string, XmlDocHtml> example in Item.Examples)
                                     {
@@ -123,13 +123,13 @@
 
                                 @if (Item.Remarks != null)
                                 {
-                                    <SectionHeader Level="2" LinkId="remarks" Title="Remarks"/>
+                                    <SectionHeader Level="2" LinkId="remarks" Title="Remarks" TopicUrl="@Url"/>
                                     @Raw(Item.Remarks.ToHtml(), "p")
                                 }
 
                                 @if (Item.SeeAlso != null)
                                 {
-                                    <SectionHeader Level="2" LinkId="see-also" Title="See Also"/>
+                                    <SectionHeader Level="2" LinkId="see-also" Title="See Also" TopicUrl="@Url"/>
 
                                     <ul>
                                         @foreach (XmlDocHtml seeAlso in Item.SeeAlso)

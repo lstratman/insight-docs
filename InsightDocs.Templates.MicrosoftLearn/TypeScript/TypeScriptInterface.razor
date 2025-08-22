@@ -2,6 +2,7 @@
 @using InsightDocs.TypeScript.Model
 @using InsightDocs.TypeScript.Model.Types
 @inherits InsightDocs.TypeScript.RazorTypeScriptTemplate<InsightDocs.TypeScript.Model.TypeScriptInterface>
+@inject InsightDocs.Abstractions.IPublisher Publisher
 
 <html>
     <head>
@@ -119,7 +120,9 @@
                             <div data-no-chunk>
                                 @if (Item.Constructor != null && Item.Constructor.Signatures.Any())
                                 {
-                                    <h2 id="methods">Constructors</h2>
+                                    Publisher.RegisterPublishedAnchor(Url, "constructors");
+
+                                    <h2 id="constructors">Constructors</h2>
 
                                     <div class="has-inner-focus">
                                         <table class="table table-sm margin-top-none" aria-label="Methods">
@@ -150,6 +153,8 @@
 
                                 @if (Item.Properties != null && Item.Properties.Any())
                                 {
+                                    Publisher.RegisterPublishedAnchor(Url, "properties");
+
                                     <h2 id="properties">Properties</h2>
 
                                     <div class="has-inner-focus">
@@ -181,6 +186,8 @@
 
                                 @if (Item.Methods != null && Item.Methods.Any(m => m.Value.Signatures != null && m.Value.Signatures.Any()))
                                 {
+                                    Publisher.RegisterPublishedAnchor(Url, "methods");
+
                                     <h2 id="methods">Methods</h2>
 
                                     <div class="has-inner-focus">

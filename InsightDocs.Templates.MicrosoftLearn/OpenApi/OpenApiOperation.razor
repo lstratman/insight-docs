@@ -1,5 +1,6 @@
 @inherits InsightDocs.RazorTemplate<InsightDocs.OpenApi.Model.OpenApiOperation>
 @inject InsightDocs.Abstractions.IUrlProvider<InsightDocs.OpenApi.Model.OpenApiSchema> OpenApiSchemaUrlProvider
+@inject InsightDocs.Abstractions.IPublisher Publisher
 @using InsightDocs.Abstractions
 @using InsightDocs.DotNet.Model
 @using InsightDocs.OpenApi
@@ -55,6 +56,8 @@
 
                                 if (requiredParameters.Count > 0)
                                 {
+                                    Publisher.RegisterPublishedAnchor(Url, "required-parameters");
+
                                     <h3 class="propertyInfoTitle stack heading-anchor" id="required-parameters">Required Parameters</h3>
 
                                     @for (int i = 0; i < requiredParameters.Count; i++)
@@ -100,6 +103,8 @@
 
                                 if (optionalParameters.Count > 0)
                                 {
+                                    Publisher.RegisterPublishedAnchor(Url, "optional-parameters");
+
                                     <h3 class="propertyInfoTitle stack heading-anchor" id="optional-parameters">Optional Parameters</h3>
 
                                     @for (int i = 0; i < optionalParameters.Count; i++)
@@ -141,10 +146,14 @@
 
                             @if (Item.Responses != null && Item.Responses.Count > 0)
                             {
+                                Publisher.RegisterPublishedAnchor(Url, "responses");
+
                                 <h2 class="propertyInfoTitle stack heading-anchor" id="responses">Responses</h2>
 
                                 @foreach (var response in Item.Responses.OrderBy(r => r.HttpStatusCode))
                                 {
+                                    Publisher.RegisterPublishedAnchor(Url, response.HttpStatusCode);
+
                                     <h3 class="propertyInfoTitle stack heading-anchor" id="@response.HttpStatusCode">HTTP @response.HttpStatusCode</h3>
 
                                     @if (response.Description != null)

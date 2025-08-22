@@ -3,6 +3,7 @@
 @using InsightDocs.DotNet.Model
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @using Microsoft.Extensions.DependencyInjection
+@inject InsightDocs.Abstractions.IPublisher Publisher
 
 <html>
     <head>
@@ -78,25 +79,30 @@
 
                             @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
                             {
+                                Publisher.RegisterPublishedAnchor(Url, "overloads");
                                 <h2 id="overloads">Overloads</h2>
                             }
 
                             @{
-                                bool reduceHeaderSize = Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1;
+                                bool hasOverloads = Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1;
+                                bool reduceHeaderSize = hasOverloads;
                             }
 
                             @foreach (DotNetMethodOverload overload in Item.Overloads.Where(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type))
                             {
                                 <div>
-                                    @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
+                                    @if (hasOverloads)
                                     {
                                         string overloadUrl = ServiceProvider.GetRequiredService<IUrlProvider<DotNetMethodOverload>>().GetUrl(overload);
 
                                         <div class="heading-wrapper" data-heading-level="h3">
                                             @if (overloadUrl.IndexOf("#") != -1)
                                             {
+                                                string anchor = overloadUrl.Substring(overloadUrl.IndexOf("#") + 1);
+                                                Publisher.RegisterPublishedAnchor(Url, anchor);
+
                                                 <a class="anchor-link docon docon-link" href="#@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)"></a>
-                                                <h3 id="@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)" class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
+                                                <h3 id="@anchor" class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
                                             }
 
                                             else
@@ -150,11 +156,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
+                                            <h4 class="propertyInfoTitle stack">Parameters</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "parameters");
                                             <h3 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h3>
                                         }
 
@@ -178,11 +185,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h4>
+                                            <h4 class="propertyInfoTitle stack">Returns</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "returns");
                                             <h3 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h3>
                                         }
 
@@ -198,11 +206,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 class="propertyInfoTitle stack heading-anchor" id="exceptions">Exceptions</h4>
+                                            <h4 class="propertyInfoTitle stack">Exceptions</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "exceptions");
                                             <h3 class="propertyInfoTitle stack heading-anchor" id="exceptions">Exceptions</h3>
                                         }
 
@@ -227,11 +236,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 id="examples" class="heading-anchor">Examples</h4>
+                                            <h4>Examples</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "examples");
                                             <h3 id="examples" class="heading-anchor">Examples</h3>
                                         }
 
@@ -264,11 +274,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 id="remarks" class="heading-anchor">Remarks</h4>
+                                            <h4>Remarks</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "remarks");
                                             <h3 id="remarks" class="heading-anchor">Remarks</h3>
                                         }
 
@@ -279,11 +290,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h4>
+                                            <h4 class="propertyInfoTitle stack">See Also</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "see-also");
                                             <h3 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h3>
                                         }
 

@@ -3,6 +3,7 @@
 @using InsightDocs.TypeScript.Model
 @using InsightDocs.TypeScript.Model.Types
 @using Microsoft.Extensions.DependencyInjection
+@inject InsightDocs.Abstractions.IPublisher Publisher
 
 <html>
     <head>
@@ -73,11 +74,14 @@
 
                             @if (Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1)
                             {
+                                Publisher.RegisterPublishedAnchor(Url, "overloads");
+
                                 <h2 id="overloads">Overloads</h2>
                             }
 
                             @{
-                                bool reduceHeaderSize = Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1;
+                                bool hasOverloads = Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1;
+                                bool reduceHeaderSize = hasOverloads;
                             }
 
                             @foreach (TypeScriptMethodSignature overload in Item.Signatures.Where(o => o.SourceTypeId == Item.SourceTypeId))
@@ -90,8 +94,11 @@
                                         <div class="heading-wrapper" data-heading-level="h3">
                                             @if (overloadUrl.IndexOf("#") != -1)
                                             {
-                                                <a class="anchor-link docon docon-link" href="#@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)"></a>
-                                                <h3 id="@overloadUrl.Substring(overloadUrl.IndexOf("#") + 1)" class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
+                                                string anchor = overloadUrl.Substring(overloadUrl.IndexOf("#") + 1);
+                                                Publisher.RegisterPublishedAnchor(Url, anchor);
+
+                                                <a class="anchor-link docon docon-link" href="#@anchor"></a>
+                                                <h3 id="anchor" class="memberNameHolder heading-anchor">@overload.MemberDisplayName</h3>
                                             }
 
                                             else
@@ -139,11 +146,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h4>
+                                            <h4 class="propertyInfoTitle stack">Parameters</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "parameters");
                                             <h3 class="propertyInfoTitle stack heading-anchor" id="parameters">Parameters</h3>
                                         }
 
@@ -167,11 +175,12 @@
                                     {
                                         if (reduceHeaderSize)
                                         {
-                                            <h4 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h4>
+                                            <h4 class="propertyInfoTitle stack">Returns</h4>
                                         }
 
                                         else
                                         {
+                                            Publisher.RegisterPublishedAnchor(Url, "returns");
                                             <h3 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h3>
                                         }
 

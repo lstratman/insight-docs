@@ -1,6 +1,7 @@
 @using InsightDocs.DotNet.Model
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetIndexer>
+@inject InsightDocs.Abstractions.IPublisher Publisher
 
 <html>
     <head>
@@ -76,6 +77,7 @@
 
                             @if (Item.Overloads.Count(o => o.DeclaringType != null && Item.DeclaringType != null && o.DeclaringType.Type == Item.DeclaringType.Type) > 1)
                             {
+                                Publisher.RegisterPublishedAnchor(Url, "overloads");
                                 <h2 id="overloads">Overloads</h2>
                             }
 
@@ -99,6 +101,10 @@
                                     <CodeBlock LanguageId="csharp" LanguageLabel="C#" Code="@overload.CSharpCode"/>
                                     <CodeBlock LanguageId="vb" LanguageLabel="VB" Code="@overload.VBCode"/>
 
+                                    @{
+                                        Publisher.RegisterPublishedAnchor(Url, "property-value");
+                                    }
+
                                     <div class="heading-wrapper" data-heading-level="h4">
                                         <h4 class="propertyInfoTitle stack heading-anchor" id="property-value">Property Value</h4>
                                     </div>
@@ -112,6 +118,8 @@
 
                                     @if (overload.Examples != null)
                                     {
+                                        Publisher.RegisterPublishedAnchor(Url, "examples");
+
                                         <div class="heading-wrapper" data-heading-level="h2">
                                             <h2 id="examples" class="heading-anchor">Examples</h2>
                                         </div>
@@ -143,6 +151,8 @@
 
                                     @if (overload.Remarks != null)
                                     {
+                                        Publisher.RegisterPublishedAnchor(Url, "remarks");
+
                                         <div class="heading-wrapper" data-heading-level="h2">
                                             <h2 id="remarks" class="heading-anchor">Remarks</h2>
                                         </div>
@@ -152,6 +162,8 @@
 
                                     @if (overload.SeeAlso != null)
                                     {
+                                        Publisher.RegisterPublishedAnchor(Url, "see-also");
+
                                         <div class="heading-wrapper" data-heading-level="h2">
                                             <h2 class="propertyInfoTitle stack heading-anchor" id="see-also">See Also</h2>
                                         </div>

@@ -1,7 +1,13 @@
+@inject InsightDocs.Abstractions.IPublisher Publisher
+
 <div class="heading-wrapper" data-heading-level="h@(Level)">
     <a class="anchor-link docon docon-link" href="#@(LinkId)"></a>
     @Raw("<h" + Level + " class=\"heading-anchor" + AdditionalCssClasses + "\" id=\"" + LinkId + "\">" + Title + "</h" + Level + ">")
 </div>
+
+@{
+    Publisher.RegisterPublishedAnchor(TopicUrl!, LinkId!);
+}
 
 @code {
     public RenderFragment Raw(string html) => __builder =>
@@ -25,6 +31,13 @@
 
     [Parameter]
     public string? LinkId
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public string? TopicUrl
     {
         get;
         set;

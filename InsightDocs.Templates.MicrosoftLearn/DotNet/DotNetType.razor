@@ -1,6 +1,7 @@
 @using InsightDocs.DotNet.Model
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @inherits InsightDocs.DotNet.RazorDotNetTemplate<InsightDocs.DotNet.Model.DotNetType>
+@inject InsightDocs.Abstractions.IPublisher Publisher
 
 <html>
     <head>
@@ -49,6 +50,10 @@
 		                            <li>Reference</li>
 	                            </ul>
                             </div>
+
+                            @{
+                                Publisher.RegisterPublishedAnchor(Url, "definition");
+                            }
 
                             <h2 id="definition">Definition</h2>
 
@@ -150,7 +155,9 @@
 
                             @if (Item.TypeName == "Enum" && Item.Fields != null)
                             {
-                                <h2 id="properties">Fields</h2>
+                                Publisher.RegisterPublishedAnchor(Url, "fields");
+
+                                <h2 id="fields">Fields</h2>
 
                                 <div class="has-inner-focus">
                                     <table class="table table-sm margin-top-none" aria-label="Fields">
@@ -188,6 +195,8 @@
 
                             @if (Item.Examples != null)
                             {
+                                Publisher.RegisterPublishedAnchor(Url, "examples");
+
                                 <div class="heading-wrapper" data-heading-level="h2">
                                     <h2 id="examples" class="heading-anchor">Examples</h2>
                                 </div>
@@ -219,13 +228,13 @@
 
                             @if (Item.Remarks != null)
                             {
-                                <SectionHeader Level="2" LinkId="remarks" Title="Remarks"/>
+                                <SectionHeader Level="2" LinkId="remarks" Title="Remarks" TopicUrl="@Url"/>
                                 @Raw(Item.Remarks.ToHtml(), "p")
                             }
 
                             @if (Item.SeeAlso != null)
                             {
-                                <SectionHeader Level="2" LinkId="see-also" Title="See Also"/>
+                                <SectionHeader Level="2" LinkId="see-also" Title="See Also" TopicUrl="@Url"/>
 
                                 <ul>
                                     @foreach (XmlDocHtml seeAlso in Item.SeeAlso)
@@ -240,7 +249,9 @@
                                 <div data-no-chunk>
                                     @if (Item.Constructor != null && Item.Constructor.Overloads.Any())
                                     {
-                                        <h2 id="methods">Constructors</h2>
+                                        Publisher.RegisterPublishedAnchor(Url, "constructors");
+
+                                        <h2 id="constructors">Constructors</h2>
 
                                         <div class="has-inner-focus">
                                             <table class="table table-sm margin-top-none" aria-label="Methods">
@@ -271,7 +282,9 @@
 
                                     @if (Item.Indexer != null)
                                     {
-                                        <h2 id="properties">Indexers</h2>
+                                        Publisher.RegisterPublishedAnchor(Url, "indexers");
+
+                                        <h2 id="indexers">Indexers</h2>
 
                                         <div class="has-inner-focus">
                                             <table class="table table-sm margin-top-none" aria-label="Fields">
@@ -302,7 +315,9 @@
 
                                     @if (Item.Fields != null && Item.Fields.Any())
                                     {
-                                        <h2 id="properties">Fields</h2>
+                                        Publisher.RegisterPublishedAnchor(Url, "fields");
+
+                                        <h2 id="fields">Fields</h2>
 
                                         <div class="has-inner-focus">
                                             <table class="table table-sm margin-top-none" aria-label="Fields">
@@ -333,6 +348,8 @@
 
                                     @if (Item.Properties != null && Item.Properties.Any())
                                     {
+                                        Publisher.RegisterPublishedAnchor(Url, "properties");
+
                                         <h2 id="properties">Properties</h2>
 
                                         <div class="has-inner-focus">
@@ -364,6 +381,8 @@
 
                                     @if (Item.Methods != null && Item.Methods.Any(m => m.Overloads != null && m.Overloads.Any()))
                                     {
+                                        Publisher.RegisterPublishedAnchor(Url, "methods");
+
                                         <h2 id="methods">Methods</h2>
 
                                         <div class="has-inner-focus">

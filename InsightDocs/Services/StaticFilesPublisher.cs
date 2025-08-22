@@ -68,6 +68,12 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
         await File.WriteAllBytesAsync(outputPath, contentBytes);
     }
 
+    public void RegisterPublishedAnchor(string url, string anchor)
+    {
+        string fullUrl = url + "#" + anchor;
+        PublishedUrls.AddOrUpdate(fullUrl, true, (key, oldValue) => true);
+    }
+
     public Task<bool> UrlWasPublished(string url)
     {
         return Task.FromResult(PublishedUrls.ContainsKey(url));

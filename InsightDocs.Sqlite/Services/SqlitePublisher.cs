@@ -267,4 +267,10 @@ public class SqlitePublisher : IPublisher, IDisposable
     {
         return Task.FromResult(PublishedUrls.ContainsKey(url));
     }
+
+    public void RegisterPublishedAnchor(string url, string anchor)
+    {
+        string fullUrl = url + "#" + anchor;
+        PublishedUrls.AddOrUpdate(fullUrl, true, (key, oldValue) => true);
+    }
 }

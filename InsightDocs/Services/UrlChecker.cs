@@ -36,7 +36,7 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
 
             else if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
-                // TODO
+                // TODO: check external URLs
                 continue;
             }
 
@@ -47,12 +47,6 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
 
             else
             {
-                if (url.Contains("#"))
-                {
-                    // TODO: verify that anchor exists
-                    url = url[..url.IndexOf('#')];
-                }
-
                 if (!await publisher.UrlWasPublished(url))
                 {
                     LogWarningTopicUrlDoesNotExist(logger, url, String.Join(", ", sources.Keys));
