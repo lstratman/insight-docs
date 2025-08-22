@@ -298,7 +298,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
             url.Append(".html");
         }
 
-        if (item.MethodCollection != null && item.MethodCollection.Overloads.Count > 1)
+        if (item.MethodCollection != null && item.MethodCollection.Overloads.Count(o => o.DeclaringType != null && item.DeclaringType != null && o.DeclaringType.Type == item.DeclaringType.Type) > 1)
         {
             url.Append('#');
 
