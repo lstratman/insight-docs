@@ -12,17 +12,18 @@ public class MicrosoftDocsUrlResolver : IMicrosoftDocsUrlResolver
 
     public string GetUrl(DotNetMethodOverload method)
     {
-        return $"https://learn.microsoft.com/dotnet/api/{method.DeclaringType!.Type!.FullName.ToLower()}.{method.Name.ToLower()}{(method.GenericArguments != null && method.GenericArguments.Count != 0 ? "-" + method.GenericArguments.Count.ToString() : "")}";
+        // TODO: add overload anchors
+        return $"https://learn.microsoft.com/dotnet/api/{method.DeclaringType!.Type!.FullName.ToLower()}{(method.DeclaringType.Type.TypeParameters != null && method.DeclaringType.Type.TypeParameters.Count != 0 ? "-" + method.DeclaringType.Type.TypeParameters.Count.ToString() : "")}.{(method.Name.StartsWith("add_") || method.Name.StartsWith("remove_") || method.Name.StartsWith("op_") ? method.Name[(method.Name.IndexOf("_") + 1)..].ToLower() : method.Name.ToLower())}";
     }
 
     public string GetUrl(DotNetProperty property)
     {
-        return $"https://learn.microsoft.com/dotnet/api/{property.DeclaringType!.Type!.FullName.ToLower()}.{property.Name.ToLower()}";
+        return $"https://learn.microsoft.com/dotnet/api/{property.DeclaringType!.Type!.FullName.ToLower()}{(property.DeclaringType.Type.TypeParameters != null && property.DeclaringType.Type.TypeParameters.Count != 0 ? "-" + property.DeclaringType.Type.TypeParameters.Count.ToString() : "")}.{property.Name.ToLower()}";
     }
 
     public string GetUrl(DotNetField field)
     {
-        return $"https://learn.microsoft.com/dotnet/api/{field.DeclaringType!.Type!.FullName.ToLower()}.{field.Name.ToLower()}";
+        return $"https://learn.microsoft.com/dotnet/api/{field.DeclaringType!.Type!.FullName.ToLower()}{(field.DeclaringType.Type.TypeParameters != null && field.DeclaringType.Type.TypeParameters.Count != 0 ? "-" + field.DeclaringType.Type.TypeParameters.Count.ToString() : "")}.{field.Name.ToLower()}";
     }
 
     public string GetUrl(DotNetNamespace ns)
