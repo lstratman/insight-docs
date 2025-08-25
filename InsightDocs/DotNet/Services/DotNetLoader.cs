@@ -389,12 +389,6 @@ public partial class DotNetLoader(
 
                 foreach (MethodInfo method in methods)
                 {
-                    if (method.Name.Contains('.'))
-                    {
-                        // TODO
-                        continue;
-                    }
-
                     DotNetMethod? methodCollection = typeMetadata.Methods.FirstOrDefault(m => m.Name == method.Name);
 
                     if (methodCollection == null)
@@ -437,8 +431,7 @@ public partial class DotNetLoader(
                 }
             }
 
-            // TODO: explicitly implemented interface properties
-            PropertyInfo[] properties = [.. type.GetProperties(bindingFlags).Where(p => !p.Name.Contains('.') && (!dotNetOptions.OmitPrivateMembers || (!p.GetMethod?.IsPrivate ?? false) || (!p.SetMethod?.IsPrivate ?? false)) && (!dotNetOptions.OmitNonPublicMembersForExternalTypes || (p.GetMethod?.IsPublic ?? false) || (p.SetMethod?.IsPublic ?? false) || p.DeclaringType == null || !IsTypeExternal(p.DeclaringType)))];
+            PropertyInfo[] properties = [.. type.GetProperties(bindingFlags).Where(p => (!dotNetOptions.OmitPrivateMembers || (!p.GetMethod?.IsPrivate ?? false) || (!p.SetMethod?.IsPrivate ?? false)) && (!dotNetOptions.OmitNonPublicMembersForExternalTypes || (p.GetMethod?.IsPublic ?? false) || (p.SetMethod?.IsPublic ?? false) || p.DeclaringType == null || !IsTypeExternal(p.DeclaringType)))];
 
             if (properties != null && properties.Length > 0)
             {
