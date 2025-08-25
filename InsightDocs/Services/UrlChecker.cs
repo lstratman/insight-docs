@@ -95,16 +95,19 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
                         anchor = urlReference.Key[(anchorIndex + 1)..];
                     }
 
-                    // HEAD request to check if URL exists
                     try
                     {
-                        using (HttpRequestMessage headRequest = new HttpRequestMessage(HttpMethod.Head, baseUrl))
-                        using (HttpResponseMessage headResponse = await httpClient.SendAsync(headRequest, cancellationToken))
+                        using (HttpRequestMessage testRequest = new HttpRequestMessage(options.DoFullRequest == null || !options.DoFullRequest(baseUrl) ? HttpMethod.Head : HttpMethod.Get, baseUrl))
                         {
-                            if (!headResponse.IsSuccessStatusCode && !redirectStatusCodes.Contains(headResponse.StatusCode))
+                            testRequest.Headers.UserAgent.ParseAdd("InsightDocs UrlChecker");
+
+                            using (HttpResponseMessage testResponse = await httpClient.SendAsync(testRequest, cancellationToken))
                             {
-                                LogWarningTopicUrlDoesNotExist(logger, baseUrl, (int)headResponse.StatusCode, String.Join(", ", urlReference.Value));
-                                return;
+                                if (!testResponse.IsSuccessStatusCode && !redirectStatusCodes.Contains(testResponse.StatusCode))
+                                {
+                                    LogWarningTopicUrlDoesNotExist(logger, baseUrl, (int)testResponse.StatusCode, String.Join(", ", urlReference.Value));
+                                    return;
+                                }
                             }
                         }
                     }
@@ -194,6 +197,12 @@ public class UrlCheckerOptions
     } = true;
 
     public Func<string, bool>? IgnoreUrls
+    {
+        get;
+        set;
+    } = null;
+
+    public Func<string, bool>? DoFullRequest
     {
         get;
         set;
