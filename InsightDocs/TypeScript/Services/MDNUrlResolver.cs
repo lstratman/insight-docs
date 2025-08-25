@@ -18,7 +18,10 @@ namespace InsightDocs.TypeScript.Services
             { "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement/abbr", "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement" },
             { "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement/rowSpan", "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement" },
             { "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement/headers", "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement" },
-            { "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement/scope", "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement" }
+            { "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement/scope", "https://developer.mozilla.org/docs/Web/API/HTMLTableCellElement" },
+            { "https://developer.mozilla.org/en-US/docs/Web/API/Plugin/item", "https://developer.mozilla.org/en-US/docs/Web/API/Plugin" },
+            { "https://developer.mozilla.org/en-US/docs/Web/API/Plugin/namedItem", "https://developer.mozilla.org/en-US/docs/Web/API/Plugin" },
+            { "https://developer.mozilla.org/docs/Web/API/Document/queryCommandValue", "" }
         };
 
         public static readonly Dictionary<string, string> TypeScriptTypes = new Dictionary<string, string>
@@ -1137,6 +1140,58 @@ namespace InsightDocs.TypeScript.Services
             "XSLTProcessor"
         ];
 
+        public static readonly string[] JavaScriptDeprecatedTypes =
+        [
+            "Plugin"
+        ];
+
+        public static readonly string[] JavaScriptUndocumentedMethods =
+        [
+            "Document.queryCommandIndeterm",
+            "Document.queryCommandValue",
+            "Document.captureEvents",
+            "Document.releaseEvents",
+            "Iterator.throw",
+            "Iterator.next",
+            "Iterator.return",
+            "Element.webkitMatchesSelector"
+        ];
+
+        public static readonly string[] JavaScriptUndocumentedProperties =
+        [
+            "Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC",
+            "Node.DOCUMENT_POSITION_CONTAINS",
+            "Node.DOCUMENT_TYPE_NODE",
+            "Node.DOCUMENT_POSITION_FOLLOWING",
+            "Node.DOCUMENT_POSITION_CONTAINED_BY",
+            "Node.DOCUMENT_POSITION_PRECEDING",
+            "Node.DOCUMENT_POSITION_DISCONNECTED",
+            "Node.DOCUMENT_TYPE_NODE",
+            "Range.END_TO_START",
+            "Range.START_TO_START",
+            "Range.START_TO_END",
+            "Range.END_TO_END",
+            "Node.ATTRIBUTE_NODE",
+            "Node.DOCUMENT_FRAGMENT_NODE",
+            "Node.PROCESSING_INSTRUCTION_NODE",
+            "Node.NOTATION_NODE",
+            "Node.ENTITY_NODE",
+            "Node.ELEMENT_NODE",
+            "Node.DOCUMENT_NODE",
+            "Node.TEXT_NODE",
+            "Node.CDATA_SECTION_NODE",
+            "Node.COMMENT_NODE",
+            "Node.ENTITY_REFERENCE_NODE",
+            "HTMLTableCellElement.axis",
+            "HTMLDivElement.align",
+            "HTMLTableColElement.width",
+            "HTMLTableCellElement.height",
+            "HTMLTableCellElement.width",
+            "Iterator.throw",
+            "Iterator.next",
+            "Iterator.return"
+        ];
+
         public string GetUrl(TypeScriptTypeDeclaration item)
         {
             string typeName = item.Name;
@@ -1151,7 +1206,19 @@ namespace InsightDocs.TypeScript.Services
                 typeName = value;
             }
 
-            if (JavaScriptGlobalObjects.Contains(typeName))
+            string? url = GetMDNUrl(item);
+
+            if (!String.IsNullOrEmpty(url))
+            {
+                return url;
+            }
+
+            if (typeName is "GlobalEventHandlers" or "GlobalEventHandlersEventMap" or "ElementEventMap")
+            {
+                return "https://developer.mozilla.org/docs/Web/HTML/Global_attributes";
+            }
+
+            else if (JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName.Replace(".", "/")}";
             }
@@ -1178,6 +1245,18 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            string? url = GetMDNUrl(item);
+
+            if (!String.IsNullOrEmpty(url))
+            {
+                return url;
+            }
+
+            if (typeName is "GlobalEventHandlers" or "GlobalEventHandlersEventMap" or "ElementEventMap")
+            {
+                return "https://developer.mozilla.org/docs/Web/HTML/Global_attributes";
+            }
+
             if (JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}";
@@ -1201,12 +1280,34 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            string? url = GetMDNUrl(item);
+
+            if (!String.IsNullOrEmpty(url))
+            {
+                return url;
+            }
+
             if (JavaScriptTypeMappings.TryGetValue(typeName, out string? value))
             {
                 typeName = value;
             }
 
-            if (JavaScriptGlobalObjects.Contains(typeName))
+            if (typeName == "HTMLElement" && (item.Name == "removeEventListener" || item.Name == "addEventListener"))
+            {
+                return $"https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/{item.Name}";
+            }
+
+            else if (JavaScriptUndocumentedMethods.Contains($"{typeName}.{item.Name}"))
+            {
+                return "";
+            }
+
+            else if (JavaScriptDeprecatedTypes.Contains(typeName))
+            {
+                return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
+            }
+
+            else if (JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
             }
@@ -1229,12 +1330,39 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            string? url = GetMDNUrl(item);
+
+            if (!String.IsNullOrEmpty(url))
+            {
+                return url;
+            }
+
+            if (typeName is "GlobalEventHandlers" or "GlobalEventHandlersEventMap" or "ElementEventMap")
+            {
+                return "https://developer.mozilla.org/docs/Web/HTML/Global_attributes";
+            }
+
             if (JavaScriptTypeMappings.TryGetValue(typeName, out string? value))
             {
                 typeName = value;
             }
 
-            if (JavaScriptGlobalObjects.Contains(typeName))
+            if (typeName == "HTMLElement" && item.Name.StartsWith("onwebkit"))
+            {
+                return "";
+            }
+
+            if (JavaScriptUndocumentedProperties.Contains($"{typeName}.{item.Name}"))
+            {
+                return "";
+            }
+
+            if (JavaScriptDeprecatedTypes.Contains(typeName))
+            {
+                return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
+            }
+
+            else if (JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
             }
@@ -1257,12 +1385,34 @@ namespace InsightDocs.TypeScript.Services
                 typeName = typeName[..typeName.IndexOf('<')];
             }
 
+            string? url = GetMDNUrl(item);
+
+            if (!String.IsNullOrEmpty(url))
+            {
+                return url;
+            }
+
             if (JavaScriptTypeMappings.TryGetValue(typeName, out string? value))
             {
                 typeName = value;
             }
 
-            if (JavaScriptGlobalObjects.Contains(typeName))
+            if (typeName == "HTMLElement" && (item.Name == "removeEventListener" || item.Name == "addEventListener"))
+            {
+                return $"https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/{item.Name}";
+            }
+
+            else if (JavaScriptUndocumentedMethods.Contains($"{typeName}.{item.Name}"))
+            {
+                return "";
+            }
+
+            else if (JavaScriptDeprecatedTypes.Contains(typeName))
+            {
+                return $"https://developer.mozilla.org/en-US/docs/Web/API/{typeName}";
+            }
+
+            else if (JavaScriptGlobalObjects.Contains(typeName))
             {
                 return $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{typeName}/{item.Name}";
             }
@@ -1277,7 +1427,53 @@ namespace InsightDocs.TypeScript.Services
 
         public string GetUrl(IntrinsicType item)
         {
-            return item.Name == "void" ? "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void" : $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{item.Name}";
+            return item.Name is "any" or "unknown" or "never"
+                ? ""
+                : item.Name == "void"
+                    ? "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void"
+                    : $"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/{item.Name}";
+        }
+
+        protected static string? GetMDNUrl(TypeScriptTypeDeclaration member)
+        {
+            if (member.Comment != null && member.Comment.SummaryMarkdown != null && member.Comment.SummaryMarkdown.Any(m => m.Text.Contains("[MDN Reference](")))
+            {
+                CommentSegment mdnLinkSegment = member.Comment.SummaryMarkdown.First(m => m.Text.Contains("[MDN Reference]("));
+                int startIndex = mdnLinkSegment.Text.IndexOf("[MDN Reference](") + 16;
+                int endIndex = mdnLinkSegment.Text.IndexOf(')', startIndex);
+                string mdnUrl = mdnLinkSegment.Text[startIndex..endIndex];
+
+                if (MDNUrlMappings.TryGetValue(mdnUrl, out string? value))
+                {
+                    mdnUrl = value;
+                    mdnLinkSegment.Text = "[MDN Reference](" + mdnUrl + ")";
+                }
+
+                return mdnUrl;
+            }
+
+            return null;
+        }
+
+        protected static string? GetMDNUrl(TypeScriptCodeElement member)
+        {
+            if (member.Comment != null && member.Comment.SummaryMarkdown != null && member.Comment.SummaryMarkdown.Any(m => m.Text.Contains("[MDN Reference](")))
+            {
+                CommentSegment mdnLinkSegment = member.Comment.SummaryMarkdown.First(m => m.Text.Contains("[MDN Reference]("));
+                int startIndex = mdnLinkSegment.Text.IndexOf("[MDN Reference](") + 16;
+                int endIndex = mdnLinkSegment.Text.IndexOf(')', startIndex);
+                string mdnUrl = mdnLinkSegment.Text[startIndex..endIndex];
+
+                if (MDNUrlMappings.TryGetValue(mdnUrl, out string? value))
+                {
+                    mdnUrl = value;
+                    mdnLinkSegment.Text = "[MDN Reference](" + mdnUrl + ")";
+                }
+
+                return mdnUrl;
+            }
+
+            return null;
         }
     }
 }
