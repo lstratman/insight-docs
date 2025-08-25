@@ -37,7 +37,7 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
 
     private static string? DefinitionFileProcessorPath = null;
 
-    protected async Task ExtractDefinitionFileProcessor(ILogger logger)
+    protected virtual async Task ExtractDefinitionFileProcessor(ILogger logger)
     {
         if (DefinitionFileProcessorExtracted)
         {
@@ -71,7 +71,7 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
         LogFinishedExtractingDefinitionFileProcessor(logger);
     }
 
-    public static string FindCommonRoot(List<string> filePaths)
+    protected virtual string FindCommonRoot(List<string> filePaths)
     {
         if (filePaths == null || filePaths.Count == 0)
         {
@@ -102,7 +102,7 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
         return commonSegments.Count == 0 ? String.Empty : String.Join(Path.DirectorySeparatorChar.ToString(), commonSegments);
     }
 
-    public async Task<TypeScriptProject> LoadDefinitionFiles(List<string> definitionFilePaths, bool excludePackageRoot)
+    public virtual async Task<TypeScriptProject> LoadDefinitionFiles(List<string> definitionFilePaths, bool excludePackageRoot)
     {
         ILogger logger = loggerFactory.CreateLogger<TypeScriptLoader>();
 

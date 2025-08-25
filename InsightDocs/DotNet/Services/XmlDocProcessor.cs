@@ -6,7 +6,10 @@ using System.Xml;
 
 namespace InsightDocs.DotNet.Services;
 
-public partial class XmlDocProcessor(IServiceProvider serviceProvider, DotNetOptions dotNetOptions, ILoggerFactory loggerFactory) : IXmlDocProcessor
+public partial class XmlDocProcessor(
+    IServiceProvider serviceProvider,
+    DotNetOptions dotNetOptions,
+    ILoggerFactory loggerFactory) : IXmlDocProcessor
 {
     protected ILogger _logger = loggerFactory.CreateLogger<XmlDocProcessor>();
 

@@ -6,7 +6,10 @@ using System.Collections.Concurrent;
 
 namespace InsightDocs.DotNet.Services;
 
-public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, DotNetOptions dotNetOptions) : IXmlDocUrlResolver
+public partial class XmlDocUrlResolver(
+    IServiceProvider serviceProvider,
+    ILoggerFactory loggerFactory,
+    DotNetOptions dotNetOptions) : IXmlDocUrlResolver
 {
     protected readonly ConcurrentDictionary<string, string> Urls = [];
     protected readonly ConcurrentDictionary<string, string> LinkTexts = [];
@@ -15,7 +18,7 @@ public partial class XmlDocUrlResolver(IServiceProvider serviceProvider, ILogger
     [LoggerMessage(LogLevel.Warning, "No XMLDoc target registered for key: {key}")]
     public static partial void LogNoXmlDocTargetRegistered(ILogger logger, string key);
 
-    public string GetUrl(string key)
+    public virtual string GetUrl(string key)
     {
         if (!Urls.TryGetValue(key, out string? value))
         {

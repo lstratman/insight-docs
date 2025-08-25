@@ -34,7 +34,7 @@ public partial class OpenApiPublisher(
 
         LogPublishingTopics(logger);
 
-        if (openApiSpec.Operations.Any())
+        if (openApiSpec.Operations.Count > 0)
         {
             TocItem endpointsTocItem = tocRoot.AddTocItem("Endpoints");
             List<TocItem> tocStack = [endpointsTocItem];
@@ -106,7 +106,7 @@ public partial class OpenApiPublisher(
             }, true);
         }
 
-        if (openApiSpec.Schemas != null && openApiSpec.Schemas.Any())
+        if (openApiSpec.Schemas != null && openApiSpec.Schemas.Count > 0)
         {
             TocItem schemasTocItem = tocRoot.AddTocItem("Schemas");
 

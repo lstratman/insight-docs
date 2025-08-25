@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 
 namespace InsightDocs.Services;
 
-public partial class CodeLanguageService(InsightDocsOptions options, ILoggerFactory loggerFactory) : ICodeLanguageService
+public partial class CodeLanguageService(
+    InsightDocsOptions options,
+    ILoggerFactory loggerFactory) : ICodeLanguageService
 {
     protected ILogger logger = loggerFactory.CreateLogger<CodeLanguageService>();
 

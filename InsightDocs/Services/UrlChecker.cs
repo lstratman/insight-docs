@@ -6,7 +6,10 @@ using System.Net;
 
 namespace InsightDocs.Services;
 
-public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFactory, UrlCheckerOptions options) : IUrlChecker
+public partial class UrlChecker(
+    IPublisher publisher,
+    ILoggerFactory loggerFactory,
+    UrlCheckerOptions options) : IUrlChecker
 {
     protected readonly ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> _urlSources = [];
 
@@ -25,7 +28,7 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
     [LoggerMessage(LogLevel.Warning, "Unable to download the contents of URL {url}: {message}")]
     public static partial void LogWarningFailedToDownloadUrl(ILogger logger, string url, string message);
 
-    public async Task CheckUrls()
+    public virtual async Task CheckUrls()
     {
         ILogger logger = loggerFactory.CreateLogger<UrlChecker>();
         Dictionary<string, List<string>> externalUrlReferences = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
@@ -149,7 +152,7 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
         LogFinishedCheckingUrls(logger);
     }
 
-    public void RegisterUrl(string url, string sourceUrl)
+    public virtual void RegisterUrl(string url, string sourceUrl)
     {
         if (String.IsNullOrEmpty(url))
         {
@@ -165,7 +168,7 @@ public partial class UrlChecker(IPublisher publisher, ILoggerFactory loggerFacto
         sources.GetOrAdd(sourceUrl, true);
     }
 
-    private static HashSet<string> ExtractAnchors(string html)
+    protected virtual HashSet<string> ExtractAnchors(string html)
     {
         HashSet<string> anchors = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         int currentIndex = 0;

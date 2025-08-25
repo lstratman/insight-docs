@@ -18,7 +18,7 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
         set;
     } = options;
 
-    public Task Initialize()
+    public virtual Task Initialize()
     {
         if (!Directory.Exists(Options.OutputDirectory))
         {
@@ -42,7 +42,7 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
         return Task.CompletedTask;
     }
 
-    public async Task Publish(string url, object contents, string mimeType, string? title = null)
+    public virtual async Task Publish(string url, object contents, string mimeType, string? title = null)
     {
         if (PublishedUrls.ContainsKey(url))
         {
@@ -68,13 +68,13 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
         await File.WriteAllBytesAsync(outputPath, contentBytes);
     }
 
-    public void RegisterPublishedAnchor(string url, string anchor)
+    public virtual void RegisterPublishedAnchor(string url, string anchor)
     {
         string fullUrl = url + "#" + anchor;
         PublishedUrls.AddOrUpdate(fullUrl, true, (key, oldValue) => true);
     }
 
-    public Task<bool> UrlWasPublished(string url)
+    public virtual Task<bool> UrlWasPublished(string url)
     {
         return Task.FromResult(PublishedUrls.ContainsKey(url));
     }

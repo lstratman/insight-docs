@@ -15,7 +15,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InsightDocs.Services;
 
-public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefixProvider urlPrefixProvider, IMicrosoftDocsUrlResolver microsoftDocsUrlResolver, IMDNUrlResolver mdnUrlResolver, DotNetOptions dotNetOptions, TypeScriptOptions typeScriptOptions)
+public class KebabCaseUrlProvider(
+    KebabCaseUrlProviderOptions options,
+    IUrlPrefixProvider urlPrefixProvider,
+    IMicrosoftDocsUrlResolver microsoftDocsUrlResolver,
+    IMDNUrlResolver mdnUrlResolver,
+    DotNetOptions dotNetOptions,
+    TypeScriptOptions typeScriptOptions)
     : IUrlProvider<DotNetType>,
       IUrlProvider<DotNetIndex>,
       IUrlProvider<DotNetNamespace>,
@@ -48,7 +54,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
 
     protected static Regex NonAlphanumericCharacters = new Regex(@"[^a-zA-Z0-9\-]");
 
-    public string GetUrl(DotNetType item)
+    public virtual string GetUrl(DotNetType item)
     {
         if (item.IsExternal)
         {
@@ -85,7 +91,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(DotNetIndex item)
+    public virtual string GetUrl(DotNetIndex item)
     {
         StringBuilder url = new();
 
@@ -105,7 +111,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(DotNetNamespace item)
+    public virtual string GetUrl(DotNetNamespace item)
     {
         if (item.IsExternal)
         {
@@ -130,7 +136,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(DotNetMethod item)
+    public virtual string GetUrl(DotNetMethod item)
     {
         StringBuilder url = new();
 
@@ -169,7 +175,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(DotNetProperty item)
+    public virtual string GetUrl(DotNetProperty item)
     {
         if (item.DeclaringType != null && item.DeclaringType.Type != null && item.DeclaringType.Type.IsExternal)
         {
@@ -213,7 +219,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(DotNetField item)
+    public virtual string GetUrl(DotNetField item)
     {
         if (item.DeclaringType != null && item.DeclaringType.Type != null && item.DeclaringType.Type.IsExternal)
         {
@@ -257,7 +263,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(DotNetMethodOverload item)
+    public virtual string GetUrl(DotNetMethodOverload item)
     {
         if (item.DeclaringType != null && item.DeclaringType.Type != null && item.DeclaringType.Type.IsExternal)
         {
@@ -338,7 +344,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(SiteToc item)
+    public virtual string GetUrl(SiteToc item)
     {
         StringBuilder url = new();
 
@@ -358,7 +364,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(SiteIndex item)
+    public virtual string GetUrl(SiteIndex item)
     {
         StringBuilder url = new();
 
@@ -378,12 +384,12 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(IAsset item)
+    public virtual string GetUrl(IAsset item)
     {
         return $"/_assets/{item.FilePath.Replace("\\", "/")}";
     }
 
-    public string GetUrl(DotNetIndexer item)
+    public virtual string GetUrl(DotNetIndexer item)
     {
         StringBuilder url = new();
 
@@ -422,7 +428,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(MarkdownFile item)
+    public virtual string GetUrl(MarkdownFile item)
     {
         StringBuilder url = new();
 
@@ -442,7 +448,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(MarkdownImage item)
+    public virtual string GetUrl(MarkdownImage item)
     {
         StringBuilder url = new();
 
@@ -459,7 +465,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(TypeScriptModule item)
+    public virtual string GetUrl(TypeScriptModule item)
     {
         if (item.Exports != null)
         {
@@ -484,7 +490,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(TypeScriptTypeDeclaration item)
+    public virtual string GetUrl(TypeScriptTypeDeclaration item)
     {
         if (item.BuiltIn)
         {
@@ -509,7 +515,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(TypeScriptInterface item)
+    public virtual string GetUrl(TypeScriptInterface item)
     {
         if (item.BuiltIn)
         {
@@ -534,7 +540,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(TypeScriptMethod item)
+    public virtual string GetUrl(TypeScriptMethod item)
     {
         if (item.SourceTypeId != 0)
         {
@@ -572,7 +578,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(TypeScriptProperty item)
+    public virtual string GetUrl(TypeScriptProperty item)
     {
         if (item.SourceTypeId != 0)
         {
@@ -610,7 +616,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(TypeScriptMethodSignature item)
+    public virtual string GetUrl(TypeScriptMethodSignature item)
     {
         if (item.SourceTypeId != 0)
         {
@@ -663,7 +669,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(TypeScriptNamespace item)
+    public virtual string GetUrl(TypeScriptNamespace item)
     {
         StringBuilder url = new();
 
@@ -683,12 +689,12 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(IntrinsicType item)
+    public virtual string GetUrl(IntrinsicType item)
     {
         return typeScriptOptions.ResolveMDNUrls ? mdnUrlResolver.GetUrl(item) : "";
     }
 
-    public string GetUrl(OpenApiOperation item)
+    public virtual string GetUrl(OpenApiOperation item)
     {
         StringBuilder url = new();
 
@@ -704,7 +710,7 @@ public class KebabCaseUrlProvider(KebabCaseUrlProviderOptions options, IUrlPrefi
         return url.ToString();
     }
 
-    public string GetUrl(OpenApiSchema item)
+    public virtual string GetUrl(OpenApiSchema item)
     {
         StringBuilder url = new();
 

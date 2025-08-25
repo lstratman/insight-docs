@@ -1,6 +1,7 @@
 ﻿using InsightDocs.OpenApi.Abstractions;
 using InsightDocs.OpenApi.Model;
 using Markdig;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 using InsightDocsOpenApiOperation = InsightDocs.OpenApi.Model.OpenApiOperation;
@@ -10,7 +11,7 @@ using OpenApiResponse = InsightDocs.OpenApi.Model.OpenApiResponse;
 
 namespace InsightDocs.OpenApi.Services;
 
-public class OpenApiLoader : IOpenApiLoader
+public class OpenApiLoader(ILoggerFactory loggerFactory) : IOpenApiLoader
 {
     private static readonly MarkdownPipeline Pipeline;
 
@@ -19,8 +20,10 @@ public class OpenApiLoader : IOpenApiLoader
         Pipeline = new MarkdownPipelineBuilder().UseCustomContainers().UsePipeTables().Build();
     }
 
-    public async Task<OpenApiSpec> LoadOpenApiSpecFile(string openApiSpecFilePath)
+    public virtual async Task<OpenApiSpec> LoadOpenApiSpecFile(string openApiSpecFilePath)
     {
+        // TODO: add logging messages
+        ILogger logger = loggerFactory.CreateLogger<OpenApiLoader>();
         (OpenApiDocument? openApiDocument, OpenApiDiagnostic? _) = await OpenApiDocument.LoadAsync(openApiSpecFilePath);
 
         if (openApiDocument == null)

@@ -6,7 +6,11 @@ using System.Xml;
 
 namespace InsightDocs.DotNet.Services;
 
-public partial class DotNetLoader(IXmlDocUrlResolver xmlDocUrlResolver, IXmlDocProcessor xmlDocProcessor, ILoggerFactory loggerFactory, DotNetOptions dotNetOptions) : IDotNetLoader
+public partial class DotNetLoader(
+    IXmlDocUrlResolver xmlDocUrlResolver,
+    IXmlDocProcessor xmlDocProcessor,
+    ILoggerFactory loggerFactory,
+    DotNetOptions dotNetOptions) : IDotNetLoader
 {
     protected readonly Dictionary<string, DotNetType> TypeCache = [];
     protected readonly Dictionary<string, DotNetTypeReference> TypeReferenceCache = [];

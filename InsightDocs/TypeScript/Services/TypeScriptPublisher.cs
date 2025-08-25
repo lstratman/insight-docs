@@ -195,7 +195,7 @@ public partial class TypeScriptPublisher(
         }
     }
 
-    public virtual async Task ProcessType(TypeScriptTypeDeclaration type, string url, TocItem tocItem)
+    protected virtual async Task ProcessType(TypeScriptTypeDeclaration type, string url, TocItem tocItem)
     {
         if (type is TypeScriptInterface typeScriptInterface)
         {
@@ -265,7 +265,7 @@ public partial class TypeScriptPublisher(
         }
     }
 
-    public static TocItem GetOrAddModulePathFolders(TocItem modulesRoot, Dictionary<string, TocItem> modulePathFolders, string modulePath)
+    protected virtual TocItem GetOrAddModulePathFolders(TocItem modulesRoot, Dictionary<string, TocItem> modulePathFolders, string modulePath)
     {
         if (!modulePathFolders.TryGetValue(modulePath, out TocItem? tocItem))
         {
