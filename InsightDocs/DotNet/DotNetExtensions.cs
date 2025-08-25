@@ -31,7 +31,11 @@ public class DotNetOptions
         set;
     } = true;
 
-    // TODO: add option to omit protected members for external types
+    public bool OmitNonPublicMembersForExternalTypes
+    {
+        get;
+        set;
+    } = true;
 }
 
 public static class DotNetExtensions
