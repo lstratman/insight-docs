@@ -47,13 +47,7 @@ public partial class XmlDocProcessor(
 
                 else if (xmlElement.GetAttribute("type") == "table")
                 {
-                    components.Add(new XmlDocCommentHtmlTagComponent("table", xmlElement, serviceProvider)
-                    {
-                        Attributes = new Dictionary<string, string>
-                        {
-                            { "class", "table table-sm table-complex" }
-                        }
-                    });
+                    components.Add(new XmlDocCommentHtmlTagComponent("table", xmlElement, serviceProvider));
                 }
 
                 else
