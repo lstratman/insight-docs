@@ -707,6 +707,11 @@ public class KebabCaseUrlProvider(
         url.Append(item.Url.StartsWith('/') ? item.Url[1..] : item.Url);
         url.Append($"/{item.Method.ToLowerInvariant()}");
 
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
+
         return url.ToString();
     }
 
@@ -721,6 +726,11 @@ public class KebabCaseUrlProvider(
         }
 
         url.Append(item.Name);
+
+        if (Options.IncludeFileExtensions)
+        {
+            url.Append(".html");
+        }
 
         return url.ToString();
     }
