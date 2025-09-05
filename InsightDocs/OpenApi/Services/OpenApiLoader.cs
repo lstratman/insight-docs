@@ -82,6 +82,14 @@ public class OpenApiLoader(ILoggerFactory loggerFactory) : IOpenApiLoader
                             {
                                 InsightDocsOpenApiParameter formFieldParameter = new InsightDocsOpenApiParameter(formField.Key, String.IsNullOrEmpty(formField.Value.Description) ? null : Markdig.Markdown.ToHtml(formField.Value.Description, Pipeline), OpenApiParameterLocation.Form, schema.Required != null && schema.Required.Contains(formField.Key), formField.Value);
                                 operationMetadata.Parameters.Add(formFieldParameter);
+
+                                if (formField.Value is OpenApiSchemaReference formFieldSchemaReference)
+                                {
+                                    if (!referencedSchemas.Contains(formFieldSchemaReference))
+                                    {
+                                        referencedSchemas.Add(formFieldSchemaReference);
+                                    }
+                                }
                             }
                         }
                     }
