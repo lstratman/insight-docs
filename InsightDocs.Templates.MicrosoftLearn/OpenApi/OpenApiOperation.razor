@@ -68,9 +68,17 @@
                                                 <dd>
                                                     @if (requiredParameters[i].Schema != null)
                                                     {
-                                                        if (requiredParameters[i].Schema is Microsoft.OpenApi.OpenApiSchemaReference)
+                                                        if (requiredParameters[i].Schema is Microsoft.OpenApi.OpenApiSchemaReference schemaReference)
                                                         {
-                                                            <!-- TODO: reference link -->
+                                                            string schemaName = schemaReference.Reference.Id!;
+                                                            InsightDocs.OpenApi.Model.OpenApiSchema? targetSchema = Item!.AllSchemas.FirstOrDefault(s => s.Name == schemaName);
+
+                                                            if (targetSchema == null)
+                                                            {
+                                                                throw new Exception("Schema not found: " + schemaName);
+                                                            }
+
+                                                            @GetLink(targetSchema)
                                                         }
 
                                                         else if (requiredParameters[i].Schema!.Type != null && requiredParameters[i].Schema!.Enum != null)
