@@ -158,6 +158,11 @@ public partial class TypeScriptPublisher(
 
                         LogPublishingNamespace(logger, ns);
 
+                        if (typeFilter != null)
+                        {
+                            api.Namespaces[ns].Types = [.. api.Namespaces[ns].Types.Where(typeFilter)];
+                        }
+
                         string namespaceHtml = await namespaceTemplate.GetContent(api.Namespaces[ns], namespaceUrl);
                         await publisher.Publish(namespaceUrl, namespaceHtml, "text/html", api.Namespaces![ns].Title);
 
