@@ -62,9 +62,11 @@ public class OpenApiLoader(ILoggerFactory loggerFactory) : IOpenApiLoader
 
                             if (parameter.Schema is OpenApiSchemaReference parameterSchemaReference)
                             {
-                                if (!referencedSchemas.Contains(parameterSchemaReference))
+                                Model.OpenApiSchema? parameterSchema = openApiSpec.Schemas.FirstOrDefault(s => s.Name == parameterSchemaReference.Reference?.Id);
+
+                                if (parameterSchema != null && !referencedSchemas.Contains(parameterSchema.SchemaDefinition))
                                 {
-                                    referencedSchemas.Add(parameterSchemaReference);
+                                    referencedSchemas.Add(parameterSchema.SchemaDefinition);
                                 }
                             }
                         }
@@ -85,9 +87,11 @@ public class OpenApiLoader(ILoggerFactory loggerFactory) : IOpenApiLoader
 
                                 if (formField.Value is OpenApiSchemaReference formFieldSchemaReference)
                                 {
-                                    if (!referencedSchemas.Contains(formFieldSchemaReference))
+                                    Model.OpenApiSchema? formFieldSchema = openApiSpec.Schemas.FirstOrDefault(s => s.Name == formFieldSchemaReference.Reference?.Id);
+
+                                    if (formFieldSchema != null && !referencedSchemas.Contains(formFieldSchema.SchemaDefinition))
                                     {
-                                        referencedSchemas.Add(formFieldSchemaReference);
+                                        referencedSchemas.Add(formFieldSchema.SchemaDefinition);
                                     }
                                 }
                             }
