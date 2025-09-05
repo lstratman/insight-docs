@@ -13,10 +13,31 @@
 				<div>
                     <div class="content">
                         <h1>@Item!.Title</h1>
+
+                        <div class="heading-wrapper" data-heading-level="h2">
+                            <h2 class="heading-anchor">Types</h2>
+                        </div>
+
+                        <div class="has-inner-focus">
+                            <table class="table table-sm margin-top-none">
+                                <tbody>
+                                    @foreach (InsightDocs.TypeScript.Model.TypeScriptTypeDeclaration type in Item.Types.OrderBy(t => t.Name))
+                                    {
+                                        <tr>
+                                            <td><span class="break-text">@GetLink(type)</span></td>
+                                            <td>
+                                                @if (type.Comment != null && !String.IsNullOrEmpty(type.Comment.SummaryHtml))
+                                                {
+                                                    @Raw(type.Comment.SummaryHtml)
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-
-                <!-- TODO: add types -->
             </div>
         </main>
     </body>
