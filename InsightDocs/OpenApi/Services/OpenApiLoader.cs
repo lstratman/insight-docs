@@ -66,7 +66,7 @@ public class OpenApiLoader(ILoggerFactory loggerFactory) : IOpenApiLoader
 
                                 if (parameterSchema != null && !referencedSchemas.Contains(parameterSchema.SchemaDefinition))
                                 {
-                                    ApplyMimeTypeToSchema(parameterSchema.SchemaDefinition.Xml == null ? "application/json" : "text/xml", parameterSchema.SchemaDefinition, openApiSpec.Schemas, referencedSchemas, []);
+                                    ApplyMimeTypeToSchema(parameterSchema.SchemaDefinition.Xml == null ? "application/json" : "text/xml", parameterSchemaReference, openApiSpec.Schemas, referencedSchemas, []);
                                     referencedSchemas.Add(parameterSchema.SchemaDefinition);
                                 }
                             }
@@ -92,7 +92,7 @@ public class OpenApiLoader(ILoggerFactory loggerFactory) : IOpenApiLoader
 
                                     if (formFieldSchema != null && !referencedSchemas.Contains(formFieldSchema.SchemaDefinition))
                                     {
-                                        ApplyMimeTypeToSchema(formFieldSchema.SchemaDefinition.Xml == null ? "application/json" : "text/xml", formFieldSchema.SchemaDefinition, openApiSpec.Schemas, referencedSchemas, []);
+                                        ApplyMimeTypeToSchema(formFieldSchema.SchemaDefinition.Xml == null ? "application/json" : "text/xml", formFieldSchemaReference, openApiSpec.Schemas, referencedSchemas, []);
                                         referencedSchemas.Add(formFieldSchema.SchemaDefinition);
                                     }
                                 }
