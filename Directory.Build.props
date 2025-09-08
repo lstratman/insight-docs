@@ -4,7 +4,6 @@
     <BaseVersion>0.9</BaseVersion>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IncludeSymbols>true</IncludeSymbols>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
