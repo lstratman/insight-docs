@@ -22,7 +22,7 @@
 	
 	<Target Name="NPMInstall" Condition=" '$(RunNPMInstall)' == 'true' " Inputs="$(ProjectDir)package.json;$(ProjectDir)package-lock.json" Outputs="$(ProjectDir)obj\$(MSBuildProjectName).npm.install.timestamp.txt" BeforeTargets="CoreCompile">
 		<Message Text="Installing NPM packages..." Importance="high" />
-		<Exec Command="npm install --no-color --scripts-prepend-node-path=true" ConsoleToMsBuild="true" EchoOff="true" IgnoreExitCode="true" WorkingDirectory="$(ProjectDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8">
+		<Exec Command="npm install --no-color" ConsoleToMsBuild="true" EchoOff="true" IgnoreExitCode="true" WorkingDirectory="$(ProjectDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8">
 			<Output TaskParameter="ConsoleOutput" ItemName="NPMInstallOutput" />
 			<Output TaskParameter="ExitCode" PropertyName="NPMInstallErrorCode" />
 		</Exec>
@@ -35,7 +35,7 @@
 
 	<Target Name="NPMBuild" DependsOnTargets="GetNPMBuildFiles" AfterTargets="CoreBuild" Condition=" '$(RunNPMBuild)' == 'true' " Inputs="@(NPMBuildFiles)" Outputs="$(ProjectDir)obj\$(Configuration)\$(MSBuildProjectName).npm.build.timestamp.txt">
 		<Message Text="Running NPM build..." Importance="high"/>
-		<Exec Command="npm run-script $(NPMBuildScriptName) --scripts-prepend-node-path=true" WorkingDirectory="$(ProjectDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8" IgnoreExitCode="true">
+		<Exec Command="npm run-script $(NPMBuildScriptName)" WorkingDirectory="$(ProjectDir)" StdOutEncoding="utf-8" StdErrEncoding="utf-8" IgnoreExitCode="true">
 			<Output TaskParameter="ExitCode" PropertyName="NPMBuildErrorCode" />
 		</Exec>
 		<Touch Condition="'$(NPMBuildErrorCode)' == '0'" AlwaysCreate="true" Files="$(ProjectDir)obj\$(Configuration)\$(MSBuildProjectName).npm.build.timestamp.txt" />

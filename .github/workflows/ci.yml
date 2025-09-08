@@ -26,7 +26,7 @@ jobs:
         cd get-typescript-api-json
         npm install
     - name: Build projects
-      run: dotnet build -c Release -p:BuildNumber=${{github.run_number}} --no-restore
+      run: dotnet build -c Release -p:BuildNumber=${{github.run_number}} -p:RunNPMInstall=false --no-restore
     - name: Build NuGet packages
       run: |
         cd InsightDocs
