@@ -21,14 +21,12 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
-    - name: Build get-typescript-api-json
       run: |
+        dotnet restore
         cd get-typescript-api-json
         npm install
-        npm run build
-    - name: Build .NET assemblies
-      run: dotnet build -c Release -p:BuildNumber=${{github.run_number}} -p:RunNPMBuild=false -p:RunNPMInstall=false --no-restore
+    - name: Build projects
+      run: dotnet build -c Release -p:BuildNumber=${{github.run_number}} --no-restore
     - name: Build NuGet packages
       run: |
         cd InsightDocs
