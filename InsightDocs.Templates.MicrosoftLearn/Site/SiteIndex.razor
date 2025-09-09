@@ -7,6 +7,12 @@
 <head>
     <title>@Item!.Title</title>
 
+    @if (Item.FaviconAsset != null)
+    {
+        <link rel="icon" type="image/png" href="@GetUrl(Item.FaviconAsset)" />
+        <link rel="apple-touch-icon" href="@GetUrl(Item.FaviconAsset)" />
+    }
+
     <script type="text/javascript" src="@GetUrl(TemplateAssets.SiteIndexScript)"></script>
 
     <link rel="stylesheet" href="@GetUrl(TemplateAssets.MicrosoftLearnCss)" />

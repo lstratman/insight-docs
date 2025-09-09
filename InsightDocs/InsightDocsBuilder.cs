@@ -22,6 +22,12 @@ public class InsightDocsOptions
         set;
     }
 
+    public IAsset? FaviconAsset
+    {
+        get;
+        set;
+    }
+
     public bool EnableParallelism
     {
         get;
@@ -106,7 +112,7 @@ public class InsightDocsBuilder
             IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetRequiredService<IItemTemplateProvider<SiteIndex>>();
             InsightDocsOptions options = serviceProvider.GetRequiredService<InsightDocsOptions>();
             IEnumerable<IAssetProvider> assetProviders = serviceProvider.GetServices<IAssetProvider>();
-            SiteIndex siteIndex = new SiteIndex(options.SiteTitle, options.InitialUrl);
+            SiteIndex siteIndex = new SiteIndex(options.SiteTitle, options.InitialUrl, options.FaviconAsset);
 
             await publisher.Initialize();
             await TocRoot.Execute(serviceProvider);
