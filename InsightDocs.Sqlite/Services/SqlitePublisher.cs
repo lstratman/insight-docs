@@ -119,7 +119,7 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         if (_transaction != null)
         {
@@ -141,7 +141,7 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
-    public async Task Initialize()
+    public virtual async Task Initialize()
     {
         if (ClearExistingDatabase)
         {
@@ -175,7 +175,7 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
-    public async Task Publish(string url, object contents, string mimeType, string? title = null)
+    public virtual async Task Publish(string url, object contents, string mimeType, string? title = null)
     {
         if (contents is not byte[] contentBytes)
         {
@@ -263,12 +263,12 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
-    public Task<bool> UrlWasPublished(string url)
+    public virtual Task<bool> UrlWasPublished(string url)
     {
         return Task.FromResult(PublishedUrls.ContainsKey(url));
     }
 
-    public void RegisterPublishedAnchor(string url, string anchor)
+    public virtual void RegisterPublishedAnchor(string url, string anchor)
     {
         string fullUrl = url + "#" + anchor;
         PublishedUrls.AddOrUpdate(fullUrl, true, (key, oldValue) => true);
