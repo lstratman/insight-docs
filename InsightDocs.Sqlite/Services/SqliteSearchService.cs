@@ -468,7 +468,7 @@ public class SqliteSearchService(SqliteSearchServiceOptions options, IServicePro
                 return ScoreSearchResults(offsets, query, title, titleScoringFunction);
             });
 
-            using (SqliteCommand command = new SqliteCommand(@"SELECT Url, snippet(Search, '<b>', '</b>', '...', 1), snippet(Search, '<b>', '</b>', '...', 2), score(offsets(Search), @query) AS score
+            using (SqliteCommand command = new SqliteCommand(@"SELECT Url, snippet(Search, '<b>', '</b>', '...', 1), snippet(Search, '<b>', '</b>', '...', 2), score(offsets(Search), @query, Title) AS score
                                                                FROM Search 
                                                                WHERE Search MATCH @queryFlex 
                                                                ORDER BY score DESC
