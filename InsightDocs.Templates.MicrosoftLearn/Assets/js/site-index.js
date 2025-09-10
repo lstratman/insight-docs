@@ -192,7 +192,7 @@
             navbar.scrollTop = tocItem.offsetTop - (navbarClientHeight / 2);
         }
 
-        navbar.dispatchEvent(new Event('tocitemselected', {
+        navbar.dispatchEvent(new CustomEvent('tocitemselected', {
             detail: {
                 tocItem: tocItem,
                 data: tocData.Items[tocItemIndex],
