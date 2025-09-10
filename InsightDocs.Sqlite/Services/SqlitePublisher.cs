@@ -284,9 +284,28 @@ public class SqlitePublisher : IPublisher, IDisposable
 
                 using (SqliteDataReader reader = command.ExecuteReader())
                 {
-                    return reader.Read()
-                        ? Task.FromResult((byte[])reader.GetValue(0))
-                        : throw new Exception($"The URL {url} was not found in the database.");
+                    if (reader.Read())
+                    {
+                        byte[] data = (byte[])reader[0];
+
+                        if (GzipContent)
+                        {
+                            using (MemoryStream memoryStream = new MemoryStream(data))
+                            using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+                            using (MemoryStream decompressedStream = new MemoryStream())
+                            {
+                                gzipStream.CopyTo(decompressedStream);
+                                return Task.FromResult(decompressedStream.ToArray());
+                            }
+                        }
+
+                        else
+                        {
+                            return Task.FromResult(data);
+                        }
+                    }
+
+                    throw new Exception($"The URL {url} was not found in the database.");
                 }
             }
         }
