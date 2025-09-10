@@ -315,7 +315,7 @@ public class SqlitePublisher : IPublisher, IDisposable
     {
         lock (_connectionLock)
         {
-            using (SqliteCommand command = new SqliteCommand("SELECT MimeType FROM Urls JOIN MimeTypes WHERE Urls.MimeTypeId = MimeTypes.MimeTypeId WHERE url = @url", Connection, Transaction))
+            using (SqliteCommand command = new SqliteCommand("SELECT MimeType FROM Urls JOIN MimeTypes ON Urls.MimeTypeId = MimeTypes.MimeTypeId WHERE url = @url", Connection, Transaction))
             {
                 command.Parameters.AddWithValue("@url", url);
 
