@@ -67,6 +67,12 @@ public class TocItem
         private set;
     } = [];
 
+    public virtual Dictionary<string, string>? AdditionalData
+    {
+        get;
+        set;
+    }
+
     protected virtual List<Func<IServiceProvider, Task>>? Executors
     {
         get;
@@ -142,5 +148,11 @@ public class TocItem
     {
         PostExecutors ??= [];
         PostExecutors.Add(executor);
+    }
+
+    public virtual void AddData(string key, string value)
+    {
+        AdditionalData ??= [];
+        AdditionalData[key] = value;
     }
 }

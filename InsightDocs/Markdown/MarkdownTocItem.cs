@@ -63,6 +63,19 @@ public partial class MarkdownTocItem : TocItem
         }
     }
 
+    public override Dictionary<string, string>? AdditionalData
+    {
+        get
+        {
+            return _baseTocItem.AdditionalData;
+        }
+
+        set
+        {
+            _baseTocItem.AdditionalData = value;
+        }
+    }
+
     public List<string>? ExclusionGlobs
     {
         get;

@@ -34,6 +34,11 @@ public class SiteToc : ILinkTarget
             }
         }
 
+        if (item.AdditionalData != null)
+        {
+            siteTocItem.AdditionalData = item.AdditionalData;
+        }
+
         return itemIndex;
     }
 
@@ -89,6 +94,13 @@ public class SiteTableOfContentsItem(TocItem tocItem, int? parentIndex)
 
     [JsonPropertyName("c")]
     public List<int>? ChildIndices
+    {
+        get;
+        set;
+    }
+
+    [JsonPropertyName("d")]
+    public Dictionary<string, string>? AdditionalData
     {
         get;
         set;

@@ -62,6 +62,19 @@ public partial class OpenApiTocItem : TocItem
         }
     }
 
+    public override Dictionary<string, string>? AdditionalData
+    {
+        get
+        {
+            return _baseTocItem.AdditionalData;
+        }
+
+        set
+        {
+            _baseTocItem.AdditionalData = value;
+        }
+    }
+
     public override void RegisterExecutor(Func<IServiceProvider, Task> executor)
     {
         _baseTocItem.RegisterExecutor(executor);
