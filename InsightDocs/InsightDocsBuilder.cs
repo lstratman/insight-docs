@@ -120,10 +120,6 @@ public class InsightDocsBuilder
             string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
             await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex, siteIndexUrl), "text/html", siteIndex.Title);
 
-            SiteToc siteTableOfContents = new(TocRoot);
-            string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
-            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json", null);
-
             if (assetProviders != null && assetProviders.Any())
             {
                 IUrlProvider<IAsset> assetUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<IAsset>>();
@@ -136,6 +132,12 @@ public class InsightDocsBuilder
                     }
                 }
             }
+
+            await TocRoot.PostExecute(serviceProvider);
+
+            SiteToc siteTableOfContents = new(TocRoot);
+            string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
+            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json", null);
 
             if (urlChecker != null)
             {

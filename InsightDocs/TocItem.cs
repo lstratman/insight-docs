@@ -73,6 +73,12 @@ public class TocItem
         private set;
     }
 
+    protected virtual List<Func<IServiceProvider, Task>>? PostExecutors
+    {
+        get;
+        private set;
+    }
+
     public virtual void SortChildren(Comparison<TocItem> comparison, bool recursive = false)
     {
         Children.Sort(comparison);
@@ -102,6 +108,22 @@ public class TocItem
         }
     }
 
+    public virtual async Task PostExecute(IServiceProvider serviceProvider)
+    {
+        if (PostExecutors != null)
+        {
+            foreach (Func<IServiceProvider, Task> executor in PostExecutors)
+            {
+                await executor(serviceProvider);
+            }
+        }
+
+        foreach (TocItem child in Children)
+        {
+            await child.PostExecute(serviceProvider);
+        }
+    }
+
     public TocItem AddTocItem(string title, string? url = null, string? urlPrefix = null)
     {
         TocItem newTocItem = new(title, this, url, urlPrefix);
@@ -114,5 +136,11 @@ public class TocItem
     {
         Executors ??= [];
         Executors.Add(executor);
+    }
+
+    public virtual void RegisterPostExecutor(Func<IServiceProvider, Task> executor)
+    {
+        PostExecutors ??= [];
+        PostExecutors.Add(executor);
     }
 }
