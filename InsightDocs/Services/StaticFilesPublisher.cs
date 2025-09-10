@@ -18,6 +18,16 @@ public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublis
         set;
     } = options;
 
+    public async Task<byte[]> GetUrlContents(string url)
+    {
+        return await File.ReadAllBytesAsync(Path.Combine(Options.OutputDirectory, url.StartsWith('/') ? url[1..] : url));
+    }
+
+    public Task<string> GetUrlMimeType(string url)
+    {
+        return Task.FromResult(MimeTypes.GetMimeType(url));
+    }
+
     public virtual Task Initialize()
     {
         if (!Directory.Exists(Options.OutputDirectory))

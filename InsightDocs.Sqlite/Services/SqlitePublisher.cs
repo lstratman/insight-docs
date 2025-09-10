@@ -273,4 +273,38 @@ public class SqlitePublisher : IPublisher, IDisposable
         string fullUrl = url + "#" + anchor;
         PublishedUrls.AddOrUpdate(fullUrl, true, (key, oldValue) => true);
     }
+
+    public virtual Task<byte[]> GetUrlContents(string url)
+    {
+        lock (_connectionLock)
+        {
+            using (SqliteCommand command = new SqliteCommand("SELECT Data FROM Urls WHERE url = @url", Connection, Transaction))
+            {
+                command.Parameters.AddWithValue("@url", url);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    return reader.Read()
+                        ? Task.FromResult((byte[])reader.GetValue(0))
+                        : throw new Exception($"The URL {url} was not found in the database.");
+                }
+            }
+        }
+    }
+
+    public virtual Task<string> GetUrlMimeType(string url)
+    {
+        lock (_connectionLock)
+        {
+            using (SqliteCommand command = new SqliteCommand("SELECT MimeType FROM Urls JOIN MimeTypes WHERE Urls.MimeTypeId = MimeTypes.MimeTypeId WHERE url = @url", Connection, Transaction))
+            {
+                command.Parameters.AddWithValue("@url", url);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    return reader.Read() ? Task.FromResult(reader.GetString(0)) : throw new Exception($"The URL {url} was not found in the database.");
+                }
+            }
+        }
+    }
 }
