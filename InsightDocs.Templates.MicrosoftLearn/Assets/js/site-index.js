@@ -191,6 +191,14 @@
         if (tocItem.offsetTop < navbar.scrollTop || tocItem.offsetTop > navbar.scrollTop + navbarClientHeight) {
             navbar.scrollTop = tocItem.offsetTop - (navbarClientHeight / 2);
         }
+
+        navbar.dispatchEvent(new Event('tocitemselected', {
+            detail: {
+                tocItem: tocItem,
+                data: tocData.Items[tocItemIndex],
+                allData: tocData
+            }
+        }));
     }
 
     topicContent.addEventListener('load', () => {
