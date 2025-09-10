@@ -74,6 +74,11 @@ public partial class MarkdownTocItem : TocItem
         _baseTocItem.RegisterExecutor(executor);
     }
 
+    public override void RegisterPostExecutor(Func<IServiceProvider, Task> executor)
+    {
+        _baseTocItem.RegisterPostExecutor(executor);
+    }
+
     protected async Task MarkdownExecutor(IServiceProvider serviceProvider)
     {
         if (!String.IsNullOrEmpty(DirectoryPath))

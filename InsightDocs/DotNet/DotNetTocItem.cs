@@ -70,6 +70,11 @@ public partial class DotNetTocItem : TocItem
         _baseTocItem.RegisterExecutor(executor);
     }
 
+    public override void RegisterPostExecutor(Func<IServiceProvider, Task> executor)
+    {
+        _baseTocItem.RegisterPostExecutor(executor);
+    }
+
     protected async Task DotNetExecutor(IServiceProvider serviceProvider)
     {
         if (RootedAssemblyGlobMatchers != null)

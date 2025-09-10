@@ -87,6 +87,11 @@ public class TypeScriptTocItem : TocItem
         _baseTocItem.RegisterExecutor(executor);
     }
 
+    public override void RegisterPostExecutor(Func<IServiceProvider, Task> executor)
+    {
+        _baseTocItem.RegisterPostExecutor(executor);
+    }
+
     protected async Task TypeScriptExecutor(IServiceProvider serviceProvider)
     {
         if (RootedDefinitionGlobMatchers != null)
