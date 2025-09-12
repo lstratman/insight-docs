@@ -2,7 +2,7 @@ using InsightDocs.Abstractions;
 
 namespace InsightDocs.Site.Model;
 
-public class SiteIndex(string title, string? initialUrl, IAsset? faviconAsset = null) : ILinkTarget
+public class SiteIndex(string title, string? initialUrl, SiteToc toc, IAsset? faviconAsset = null, bool useDynamicToc = false, string? dynamicTocUrl = null) : ILinkTarget
 {
     public string LinkText
     {
@@ -16,6 +16,12 @@ public class SiteIndex(string title, string? initialUrl, IAsset? faviconAsset = 
         set;
     } = title;
 
+    public SiteToc Toc
+    {
+        get;
+        set;
+    } = toc;
+
     public string? InitialUrl
     {
         get;
@@ -27,4 +33,16 @@ public class SiteIndex(string title, string? initialUrl, IAsset? faviconAsset = 
         get;
         set;
     } = faviconAsset;
+
+    public bool UseDynamicToc
+    {
+        get;
+        set;
+    } = useDynamicToc;
+
+    public string? DynamicTocUrl
+    {
+        get;
+        set;
+    } = dynamicTocUrl;
 }

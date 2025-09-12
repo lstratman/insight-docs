@@ -2,6 +2,7 @@
 @using Microsoft.Extensions.DependencyInjection
 
 @inherits InsightDocs.RazorTemplate<InsightDocs.Site.Model.SiteIndex>
+@inject InsightDocs.Abstractions.IUrlProvider<InsightDocs.Site.Model.SiteToc> TocUrlProvider
 
 <html>
 <head>
@@ -41,7 +42,7 @@
         </script>
     }
 </head>
-<body onload="onSiteIndexLoad(); loadInitialUrl();">
+<body onload="onSiteIndexLoad(); loadInitialUrl();" data-toc-url="@(Item.UseDynamicToc ? Item.DynamicTocUrl : TocUrlProvider.GetUrl(Item.Toc))" data-use-dynamic-toc="@(Item.UseDynamicToc.ToString().ToLower())">
     @{
         ISiteHeaderProvider? headerProvider = ServiceProvider.GetService<ISiteHeaderProvider>();
 

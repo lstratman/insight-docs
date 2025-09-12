@@ -119,6 +119,14 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
+    public bool SupportsDynamicToc
+    {
+        get
+        {
+            return true;
+        }
+    }
+
     public virtual void Dispose()
     {
         if (_transaction != null)

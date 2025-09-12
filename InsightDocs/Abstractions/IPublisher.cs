@@ -8,4 +8,9 @@ public interface IPublisher
     Task<string> GetUrlMimeType(string url);
     void RegisterPublishedAnchor(string url, string anchor);
     Task<bool> UrlWasPublished(string url);
+
+    bool SupportsDynamicToc
+    {
+        get;
+    }
 }

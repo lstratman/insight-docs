@@ -45,6 +45,18 @@ public class InsightDocsOptions
         get;
         set;
     } = ErrorBehavior.Error;
+
+    public bool UseDynamicToc
+    {
+        get;
+        set;
+    } = false;
+
+    public string? DynamicTocUrl
+    {
+        get;
+        set;
+    } = "/_toc";
 }
 
 public class InsightDocsBuilder
@@ -112,13 +124,19 @@ public class InsightDocsBuilder
             IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetRequiredService<IItemTemplateProvider<SiteIndex>>();
             InsightDocsOptions options = serviceProvider.GetRequiredService<InsightDocsOptions>();
             IEnumerable<IAssetProvider> assetProviders = serviceProvider.GetServices<IAssetProvider>();
-            SiteIndex siteIndex = new SiteIndex(options.SiteTitle, options.InitialUrl, options.FaviconAsset);
+
+            if (options.UseDynamicToc && !publisher.SupportsDynamicToc)
+            {
+                throw new InvalidOperationException("The configured publisher does not support dynamic table of contents.");
+            }
+
+            if (options.UseDynamicToc && String.IsNullOrEmpty(options.DynamicTocUrl))
+            {
+                throw new InvalidOperationException("A dynamic table of contents URL must be specified if dynamic table of contents is enabled.");
+            }
 
             await publisher.Initialize();
             await TocRoot.Execute(serviceProvider);
-
-            string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
-            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex, siteIndexUrl), "text/html", siteIndex.Title);
 
             if (assetProviders != null && assetProviders.Any())
             {
@@ -135,9 +153,13 @@ public class InsightDocsBuilder
 
             await TocRoot.PostExecute(serviceProvider);
 
-            SiteToc siteTableOfContents = new(TocRoot);
+            SiteToc siteTableOfContents = new SiteToc(TocRoot);
             string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
             await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json", null);
+
+            SiteIndex siteIndex = new SiteIndex(options.SiteTitle, options.InitialUrl, siteTableOfContents, options.FaviconAsset, options.UseDynamicToc, options.DynamicTocUrl);
+            string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
+            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex, siteIndexUrl), "text/html", siteIndex.Title);
 
             if (urlChecker != null)
             {

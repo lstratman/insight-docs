@@ -7,6 +7,14 @@ namespace InsightDocs.Services;
 
 public class StaticFilesPublisher(StaticFilesPublisherOptions options) : IPublisher
 {
+    public bool SupportsDynamicToc
+    {
+        get
+        {
+            return false;
+        }
+    }
+
     protected ConcurrentDictionary<string, bool> PublishedUrls
     {
         get;

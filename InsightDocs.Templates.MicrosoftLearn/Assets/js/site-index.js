@@ -1,7 +1,8 @@
 ﻿async function onSiteIndexLoad() {
-    // TODO: get URL dynamically
-    let tocResponse = await fetch('./table-of-contents.json');
-    let tocData = await tocResponse.json();
+    let useDynamicToc = document.body.getAttribute('data-use-dynamic-toc') == 'true';
+    let tocUrl = document.body.getAttribute('data-toc-url');
+    let tocData = null;
+
     let navbar = document.getElementById('navbar');
     let topicContent = document.getElementById('topicContentIFrame');
     let tocItemLookup = {};
@@ -61,7 +62,7 @@
         }
     }
 
-    navbar.addEventListener('click', (evt) => {
+    navbar.addEventListener('click', async (evt) => {
         let target = null;
 
         if (evt.target.tagName === 'LI') {
@@ -90,7 +91,24 @@
 
             target.appendChild(childList);
 
-            addTocItemChildren(tocData.Items[parseInt(target.getAttribute('data-toc-item-index'))].c, childList);
+            let itemIndex = parseInt(target.getAttribute('data-toc-item-index'));
+            let childIndices = tocData.Items[itemIndex].c;
+
+            if (useDynamicToc && childIndices && childIndices.length > 0 && !tocData.Items[childIndices[0]]) {
+                let childrenResponse = await fetch(`${tocUrl}/children/${itemIndex}`);
+                let childrenData = await childrenResponse.json();
+
+                for (let childIndexString of Object.keys(childrenData)) {
+                    let childIndex = parseInt(childIndexString);
+                    tocData.Items[childIndex] = childrenData[childIndex];
+
+                    if (childrenData[childIndex].u) {
+                        tocData.UrlLookups[childrenData[childIndex].u] = childIndex;
+                    }
+                }
+            }
+
+            addTocItemChildren(childIndices, childList);
             target.classList.add('is-collapsed');
         }
 
@@ -201,9 +219,47 @@
         }));
     }
 
-    topicContent.addEventListener('load', () => {
+    topicContent.addEventListener('load', async () => {
         if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23')) {
             document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
+        }
+
+        if (useDynamicToc && !tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] && !tocData.UrlLookups[topicContent.contentDocument.location.pathname]) {
+            let indexResponse = await fetch(`${tocUrl}/index?url=${encodeURIComponent(topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash)}`);
+            let index = await indexResponse.json();
+
+            if (index >= 0) {
+                tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] = index;
+
+                let ancestorsResponse = await fetch(`${tocUrl}/ancestors/${index}`);
+                let ancestors = await ancestorsResponse.json();
+                let ancestorsToFetch = [];
+
+                for (let ancestorIndex of ancestors) {
+                    if (!tocData.Items[ancestorIndex] || (tocData.Items[ancestorIndex].c && tocData.Items[ancestorIndex].c.length > 0 && !tocData.Items[tocData.Items[ancestorIndex].c[0]])) {
+                        ancestorsToFetch.push(ancestorIndex);
+                    }
+                }
+
+                let ancestorChildrenResponse = await fetch(`${tocUrl}/children`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(ancestorsToFetch)
+                });
+
+                let ancestorChildren = await ancestorChildrenResponse.json();
+
+                for (let indexString of Object.keys(ancestorChildren)) {
+                    let index = parseInt(indexString);
+                    tocData.Items[index] = ancestorChildren[index];
+
+                    if (ancestorChildren[index].u) {
+                        tocData.UrlLookups[ancestorChildren[index].u] = index;
+                    }
+                }
+            }
         }
 
         selectNavbarListItem(tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] ? topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash : topicContent.contentDocument.location.pathname);
@@ -220,10 +276,38 @@
     navbarRootList.classList.add('tree', 'table-of-contents', 'flex-grow-1', 'flex-shrink-1');
 
     navbar.appendChild(navbarRootList);
+
+    if (useDynamicToc) {
+        tocData = {
+            Items: [],
+            UrlLookups: {},
+            RootItems: []
+        };
+
+        let rootItemsResponse = await fetch(`${tocUrl}/root-items`);
+        let rootItems = await rootItemsResponse.json();
+
+        for (let rootItemIndexString of Object.keys(rootItems)) {
+            let rootItemIndex = parseInt(rootItemIndexString);
+
+            tocData.RootItems.push(rootItemIndex);
+            tocData.Items[rootItemIndex] = rootItems[rootItemIndex];
+
+            if (rootItems[rootItemIndex].u) {
+                tocData.UrlLookups[rootItems[rootItemIndex].u] = rootItemIndex;
+            }
+        }
+    }
+
+    else {
+        let tocResponse = await fetch(tocUrl);
+        tocData = await tocResponse.json();
+    }
+
     addTocItemChildren(tocData.RootItems, navbarRootList);
 
     if (document.location.hash) {
-        topicContent.src = document.location.hash.substr(1).replace('%23', '#');
+        topicContent.src = document.location.hash.substring(1).replace('%23', '#');
     }
 }
 

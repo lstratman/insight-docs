@@ -5,6 +5,10 @@ namespace InsightDocs.Site.Model;
 
 public class SiteToc : ILinkTarget
 {
+    public SiteToc()
+    {
+    }
+
     public SiteToc(TocItem root)
     {
         foreach (TocItem rootChild in root.Children)
@@ -69,28 +73,40 @@ public class SiteToc : ILinkTarget
     }
 }
 
-public class SiteTableOfContentsItem(TocItem tocItem, int? parentIndex)
+public class SiteTableOfContentsItem
 {
+    public SiteTableOfContentsItem()
+    {
+        Title = "";
+    }
+
+    public SiteTableOfContentsItem(TocItem tocItem, int? parentIndex)
+    {
+        Title = tocItem.Title;
+        Url = tocItem.Url;
+        ParentIndex = parentIndex;
+    }
+
     [JsonPropertyName("t")]
     public string Title
     {
         get;
         set;
-    } = tocItem.Title;
+    }
 
     [JsonPropertyName("u")]
     public string? Url
     {
         get;
         set;
-    } = tocItem.Url;
+    }
 
     [JsonPropertyName("p")]
     public int? ParentIndex
     {
         get;
         set;
-    } = parentIndex;
+    }
 
     [JsonPropertyName("c")]
     public List<int>? ChildIndices
