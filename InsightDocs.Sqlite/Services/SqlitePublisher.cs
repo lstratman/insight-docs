@@ -90,7 +90,7 @@ public class SqlitePublisher : IPublisher, IDisposable
         get;
     } = new ConcurrentDictionary<string, bool>();
 
-    internal static SqliteTransaction Transaction
+    public static SqliteTransaction Transaction
     {
         get
         {
@@ -99,7 +99,7 @@ public class SqlitePublisher : IPublisher, IDisposable
         }
     }
 
-    internal static SqliteConnection Connection
+    public static SqliteConnection Connection
     {
         get
         {
