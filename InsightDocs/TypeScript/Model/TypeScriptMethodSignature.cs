@@ -113,7 +113,7 @@ public class TypeScriptMethodSignature : TypeScriptTypeMember
 
         if (Parameters != null && Parameters.Count > 0)
         {
-            output.Append(String.Join(", ", Parameters.Select(p => p.Name + ": " + p.Type.ToString())));
+            output.Append(String.Join(", ", Parameters.Select(p => p.Name + (p.Flags != null && p.Flags.IsOptional ? "?" : "") + ": " + p.Type.ToString())));
         }
 
         output.Append(')');
