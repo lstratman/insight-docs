@@ -17,5 +17,5 @@ public class JsonSearchResult
 
 public interface ILocalSearchService
 {
-    Task<List<JsonSearchResult>> ExecuteSearch(string query);
+    Task<List<JsonSearchResult>> ExecuteSearch(string query, Func<string, string, bool>? additionalFilter = null);
 }
