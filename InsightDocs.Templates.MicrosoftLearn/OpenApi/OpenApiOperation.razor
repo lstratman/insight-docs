@@ -6,6 +6,7 @@
 @using InsightDocs.OpenApi
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @using Microsoft.Extensions.DependencyInjection
+@using System.Text.Json.Nodes
 
 <html>
     <head>
@@ -96,8 +97,21 @@
 
                                             <p>
                                                 <b>Location:</b> @requiredParameters[i].Location.ToString("G")
-                                                <!-- TODO: enum values -->
                                             </p>
+
+                                            @if (requiredParameters[i].Schema != null && requiredParameters[i].Schema!.Type != null && requiredParameters[i].Schema!.Enum != null)
+                                            {
+                                                <p>
+                                                    <b>Allowed values:</b>
+                                                </p>
+
+                                                <ul>
+                                                    @foreach (JsonNode enumValue in requiredParameters[i].Schema!.Enum!)
+                                                    {
+                                                        <li>@enumValue.ToString()</li>
+                                                    }
+                                                </ul>
+                                            }
 
                                             @if (requiredParameters[i].Description != null)
                                             {
@@ -141,7 +155,23 @@
                                                 </dd>
                                             </dl>
 
-                                            <p><b>Location:</b> @optionalParameters[i].Location.ToString("G")</p>
+                                            <p>
+                                                <b>Location:</b> @optionalParameters[i].Location.ToString("G")
+                                            </p>
+
+                                            @if (optionalParameters[i].Schema != null && optionalParameters[i].Schema!.Type != null && optionalParameters[i].Schema!.Enum != null)
+                                            {
+                                                <p>
+                                                    <b>Allowed values:</b>
+                                                </p>
+
+                                                <ul>
+                                                    @foreach (JsonNode enumValue in optionalParameters[i].Schema!.Enum!)
+                                                    {
+                                                        <li>@enumValue.ToString()</li>
+                                                    }
+                                                </ul>
+                                            }
 
                                             @if (optionalParameters[i].Description != null)
                                             {
