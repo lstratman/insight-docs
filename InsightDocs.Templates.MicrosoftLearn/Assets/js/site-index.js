@@ -121,7 +121,7 @@
             target.classList.remove('is-collapsed');
         }
 
-        else if (evt.target.classList.contains('tree-expander-indicator')) {
+        else if (target.classList.contains('is-expanded')) {
             target.classList.remove('is-expanded');
             target.classList.add('is-collapsed');
         }
