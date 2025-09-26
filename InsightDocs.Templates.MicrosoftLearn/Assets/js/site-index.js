@@ -122,8 +122,12 @@
         }
 
         else if (target.classList.contains('is-expanded')) {
-            target.classList.remove('is-expanded');
-            target.classList.add('is-collapsed');
+            let itemIndex = parseInt(target.getAttribute('data-toc-item-index'));
+
+            if (!tocData.Items[itemIndex].u) {
+                target.classList.remove('is-expanded');
+                target.classList.add('is-collapsed');
+            }
         }
     });
 
