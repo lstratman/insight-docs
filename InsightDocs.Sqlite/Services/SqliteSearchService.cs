@@ -448,7 +448,7 @@ public class SqliteSearchService(SqliteSearchServiceOptions options, IServicePro
         return score;
     }
 
-    public virtual Task<List<JsonSearchResult>> ExecuteSearch(string query, Func<string, string, bool>? additionalFilter = null)
+    public virtual Task<List<JsonSearchResult>> ExecuteSearch(string query)
     {
         SqliteMiddlewareOptions sqliteMiddlewareOptions = serviceProvider.GetRequiredService<SqliteMiddlewareOptions>();
 
@@ -468,14 +468,9 @@ public class SqliteSearchService(SqliteSearchServiceOptions options, IServicePro
                 return ScoreSearchResults(offsets, query, title, titleScoringFunction);
             });
 
-            if (additionalFilter != null)
-            {
-                connection.CreateFunction("extraFilter", additionalFilter);
-            }
-
             using (SqliteCommand command = new SqliteCommand($@"SELECT Url, snippet(Search, '<b>', '</b>', '...', 1), snippet(Search, '<b>', '</b>', '...', 2), score(offsets(Search), @query, Title) AS score
                                                                 FROM Search 
-                                                                WHERE Search MATCH @queryFlex {(additionalFilter == null ? "" : " AND extraFilter(Url, Title)")}
+                                                                WHERE Search MATCH @queryFlex
                                                                 ORDER BY score DESC
                                                                 LIMIT " + options.SearchResultsLimit, connection))
             {
