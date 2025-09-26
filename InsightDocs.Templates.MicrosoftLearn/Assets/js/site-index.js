@@ -81,7 +81,7 @@
             target = evt.target.parentElement.parentElement;
         }
 
-        if (!target) {
+        if (!target || target.classList.contains('is-loading')) {
             return;
         }
 
@@ -95,6 +95,8 @@
             let childIndices = tocData.Items[itemIndex].c;
 
             if (useDynamicToc && childIndices && childIndices.length > 0 && !tocData.Items[childIndices[0]]) {
+                target.classList.add('is-loading');
+
                 let childrenResponse = await fetch(`${tocUrl}/children/${itemIndex}`);
                 let childrenData = await childrenResponse.json();
 
@@ -106,6 +108,8 @@
                         tocData.UrlLookups[childrenData[childIndex].u] = childIndex;
                     }
                 }
+
+                target.classList.remove('is-loading');
             }
 
             addTocItemChildren(childIndices, childList);
