@@ -119,7 +119,7 @@ public partial class MarkdownPublisher(
         }
     }
 
-    protected virtual async Task ProcessTopic(TocItem? tocRoot, TocItem? tocItem, string markdownFilePath, ILogger logger)
+    protected virtual async Task<MarkdownFile> ProcessTopic(TocItem? tocRoot, TocItem? tocItem, string markdownFilePath, ILogger logger)
     {
         LogPublishingMarkdownFile(logger, markdownFilePath);
 
@@ -211,13 +211,15 @@ public partial class MarkdownPublisher(
 
         if (markdownTemplateProvider != null)
         {
-            string markdownHtml = await markdownTemplateProvider.GetContent(markdownFile, url);
-            await publisher.Publish(url, markdownHtml, "text/html", markdownFile.Title);
+            markdownFile.Html = await markdownTemplateProvider.GetContent(markdownFile, url);
+            await publisher.Publish(url, markdownFile.Html, "text/html", markdownFile.Title);
         }
 
         else
         {
             await publisher.Publish(url, Encoding.UTF8.GetBytes(markdownFile.Html), "text/html", markdownFile.Title);
         }
+
+        return markdownFile;
     }
 }
