@@ -232,7 +232,7 @@
             document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
         }
 
-        if (useDynamicToc && !tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] && !tocData.UrlLookups[topicContent.contentDocument.location.pathname]) {
+        if (useDynamicToc && typeof tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] === 'undefined') {
             let indexResponse = await fetch(`${tocUrl}/index?url=${encodeURIComponent(topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash)}`);
             let index = await indexResponse.json();
 
@@ -270,12 +270,12 @@
             }
         }
 
-        selectNavbarListItem(tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] ? topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash : topicContent.contentDocument.location.pathname);
+        selectNavbarListItem(topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash);
 
         topicContent.contentWindow.addEventListener('hashchange', () => {
             if (topicContent.contentDocument.location.href !== 'about:blank' && document.location.hash !== '#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23')) {
                 document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
-                selectNavbarListItem(tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] ? topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash : topicContent.contentDocument.location.pathname);
+                selectNavbarListItem(topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash);
             }
         });
     });
