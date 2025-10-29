@@ -232,7 +232,9 @@
             document.location.replace('#' + topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash.replace('#', '%23'));
         }
 
-        if (useDynamicToc && typeof tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash] === 'undefined') {
+        let tocIndex = tocData.UrlLookups[topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash];
+
+        if (useDynamicToc && (typeof tocIndex === 'undefined' || tocItemLookup[tocIndex].lastElementChild.tagName !== 'UL')) {
             let indexResponse = await fetch(`${tocUrl}/index?url=${encodeURIComponent(topicContent.contentDocument.location.pathname + topicContent.contentDocument.location.hash)}`);
             let index = await indexResponse.json();
 
