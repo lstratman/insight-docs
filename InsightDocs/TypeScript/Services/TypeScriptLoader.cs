@@ -1,4 +1,5 @@
-﻿using InsightDocs.TypeScript.Abstractions;
+﻿using InsightDocs.Abstractions;
+using InsightDocs.TypeScript.Abstractions;
 using InsightDocs.TypeScript.Model;
 using InsightDocs.TypeScript.Model.Types;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ using System.Diagnostics;
 
 namespace InsightDocs.TypeScript.Services;
 
-public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScriptLoader
+public partial class TypeScriptLoader(ILoggerFactory loggerFactory, IApplicationExitService applicationExitService) : ITypeScriptLoader
 {
     [LoggerMessage(LogLevel.Information, "Loading {definitionFilePath}")]
     public static partial void LogDefinitionFileLoad(ILogger logger, string definitionFilePath);
@@ -67,6 +68,12 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory) : ITypeScrip
 
         DefinitionFileProcessorPath = Path.Combine(outputDirectory, "get-typescript-api-json.js");
         DefinitionFileProcessorExtracted = true;
+
+        applicationExitService.RegisterExitAction(() =>
+        {
+            Directory.Delete(outputDirectory, true);
+            return Task.CompletedTask;
+        });
 
         LogFinishedExtractingDefinitionFileProcessor(logger);
     }
