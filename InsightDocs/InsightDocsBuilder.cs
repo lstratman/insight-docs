@@ -89,6 +89,7 @@ public class InsightDocsBuilder
         Services = new ServiceCollection();
         Services.AddScoped<IUrlPrefixProvider, UrlPrefixProvider>();
         Services.AddSingleton<ICodeLanguageService, CodeLanguageService>();
+        Services.AddSingleton(ApplicationExitService);
     }
 
     public TocItem TocRoot
@@ -103,6 +104,12 @@ public class InsightDocsBuilder
         private set;
     }
 
+    public IApplicationExitService ApplicationExitService
+    {
+        get;
+        private set;
+    } = new ApplicationExitService();
+
     public TocItem AddTocItem(string title, string? url = null, string? urlPrefix = null)
     {
         return TocRoot.AddTocItem(title, url, urlPrefix);
@@ -115,56 +122,64 @@ public class InsightDocsBuilder
 
     public async Task Execute()
     {
-        using (ServiceProvider serviceProvider = Services.BuildServiceProvider())
+        try
         {
-            IUrlChecker? urlChecker = serviceProvider.GetService<IUrlChecker>();
-            IPublisher publisher = serviceProvider.GetRequiredService<IPublisher>();
-            IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteToc>>();
-            IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteIndex>>();
-            IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetRequiredService<IItemTemplateProvider<SiteIndex>>();
-            InsightDocsOptions options = serviceProvider.GetRequiredService<InsightDocsOptions>();
-            IEnumerable<IAssetProvider> assetProviders = serviceProvider.GetServices<IAssetProvider>();
-
-            if (options.UseDynamicToc && !publisher.SupportsDynamicToc)
+            using (ServiceProvider serviceProvider = Services.BuildServiceProvider())
             {
-                throw new InvalidOperationException("The configured publisher does not support dynamic table of contents.");
-            }
+                IUrlChecker? urlChecker = serviceProvider.GetService<IUrlChecker>();
+                IPublisher publisher = serviceProvider.GetRequiredService<IPublisher>();
+                IUrlProvider<SiteToc> tableOfContentsUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteToc>>();
+                IUrlProvider<SiteIndex> siteIndexUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<SiteIndex>>();
+                IItemTemplateProvider<SiteIndex> siteIndexTemplateProvider = serviceProvider.GetRequiredService<IItemTemplateProvider<SiteIndex>>();
+                InsightDocsOptions options = serviceProvider.GetRequiredService<InsightDocsOptions>();
+                IEnumerable<IAssetProvider> assetProviders = serviceProvider.GetServices<IAssetProvider>();
 
-            if (options.UseDynamicToc && String.IsNullOrEmpty(options.DynamicTocUrl))
-            {
-                throw new InvalidOperationException("A dynamic table of contents URL must be specified if dynamic table of contents is enabled.");
-            }
-
-            await publisher.Initialize();
-            await TocRoot.Execute(serviceProvider);
-
-            if (assetProviders != null && assetProviders.Any())
-            {
-                IUrlProvider<IAsset> assetUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<IAsset>>();
-
-                foreach (IAssetProvider assetProvider in assetProviders)
+                if (options.UseDynamicToc && !publisher.SupportsDynamicToc)
                 {
-                    foreach (IAsset templateAsset in assetProvider.GetAssets())
+                    throw new InvalidOperationException("The configured publisher does not support dynamic table of contents.");
+                }
+
+                if (options.UseDynamicToc && String.IsNullOrEmpty(options.DynamicTocUrl))
+                {
+                    throw new InvalidOperationException("A dynamic table of contents URL must be specified if dynamic table of contents is enabled.");
+                }
+
+                await publisher.Initialize();
+                await TocRoot.Execute(serviceProvider);
+
+                if (assetProviders != null && assetProviders.Any())
+                {
+                    IUrlProvider<IAsset> assetUrlProvider = serviceProvider.GetRequiredService<IUrlProvider<IAsset>>();
+
+                    foreach (IAssetProvider assetProvider in assetProviders)
                     {
-                        await publisher.Publish(assetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents(), templateAsset.MimeType, null);
+                        foreach (IAsset templateAsset in assetProvider.GetAssets())
+                        {
+                            await publisher.Publish(assetUrlProvider.GetUrl(templateAsset), await templateAsset.GetContents(), templateAsset.MimeType, null);
+                        }
                     }
                 }
+
+                await TocRoot.PostExecute(serviceProvider);
+
+                SiteToc siteTableOfContents = new SiteToc(TocRoot);
+                string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
+                await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json", null);
+
+                SiteIndex siteIndex = new SiteIndex(options.SiteTitle, options.InitialUrl, siteTableOfContents, options.FaviconAsset, options.UseDynamicToc, options.DynamicTocUrl);
+                string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
+                await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex, siteIndexUrl), "text/html", siteIndex.Title);
+
+                if (urlChecker != null)
+                {
+                    await urlChecker.CheckUrls();
+                }
             }
+        }
 
-            await TocRoot.PostExecute(serviceProvider);
-
-            SiteToc siteTableOfContents = new SiteToc(TocRoot);
-            string tableOfContentsUrl = tableOfContentsUrlProvider.GetUrl(siteTableOfContents);
-            await publisher.Publish(tableOfContentsUrl, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(siteTableOfContents, typeof(SiteToc), SerializerOptions)), "application/json", null);
-
-            SiteIndex siteIndex = new SiteIndex(options.SiteTitle, options.InitialUrl, siteTableOfContents, options.FaviconAsset, options.UseDynamicToc, options.DynamicTocUrl);
-            string siteIndexUrl = siteIndexUrlProvider.GetUrl(siteIndex);
-            await publisher.Publish(siteIndexUrl, await siteIndexTemplateProvider.GetContent(siteIndex, siteIndexUrl), "text/html", siteIndex.Title);
-
-            if (urlChecker != null)
-            {
-                await urlChecker.CheckUrls();
-            }
+        finally
+        {
+            await ApplicationExitService.Exit();
         }
     }
 }
