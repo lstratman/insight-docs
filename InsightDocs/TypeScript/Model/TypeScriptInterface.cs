@@ -119,7 +119,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
     }
 
     [JsonProperty("functionSignatures")]
-    public List<TypeScriptMethodSignature>? FunctionSignatures
+    public TypeScriptMethod? FunctionSignatures
     {
         get;
         set;
@@ -293,9 +293,12 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
 
         if (FunctionSignatures != null)
         {
-            foreach (TypeScriptMethodSignature functionSignature in FunctionSignatures)
+            FunctionSignatures.SourceTypeId = id;
+
+            foreach (TypeScriptMethodSignature functionSignature in FunctionSignatures.Signatures)
             {
                 functionSignature.SourceTypeId = id;
+                functionSignature.MethodCollection = FunctionSignatures;
             }
         }
 

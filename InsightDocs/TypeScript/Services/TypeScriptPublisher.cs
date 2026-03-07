@@ -207,6 +207,15 @@ public partial class TypeScriptPublisher(
             string html = await interfaceTemplate.GetContent(typeScriptInterface, url);
             await publisher.Publish(url, html, "text/html", type.Title);
 
+            if (typeScriptInterface.FunctionSignatures != null && typeScriptInterface.FunctionSignatures.SourceTypeId == typeScriptInterface.Id)
+            {
+                string functionSignaturesUrl = methodUrlProvider.GetUrl(typeScriptInterface.FunctionSignatures);
+                TocItem functionSignaturesTocItem = tocItem.AddTocItem("Function Signatures", functionSignaturesUrl);
+
+                string functionSignaturesHtml = await methodTemplate.GetContent(typeScriptInterface.FunctionSignatures, functionSignaturesUrl);
+                await publisher.Publish(functionSignaturesUrl, functionSignaturesHtml, "text/html", typeScriptInterface.FunctionSignatures.Title);
+            }
+
             if (typeScriptInterface.Constructor != null && typeScriptInterface.Constructor.SourceTypeId == typeScriptInterface.Id)
             {
                 string constructorUrl = methodUrlProvider.GetUrl(typeScriptInterface.Constructor);

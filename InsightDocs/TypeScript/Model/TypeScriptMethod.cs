@@ -14,11 +14,23 @@ public class TypeScriptMethod : TypeScriptTypeMember
         set;
     }
 
+    [JsonProperty("isFunctionSignatures")]
+    public bool IsFunctionSignatures
+    {
+        get;
+        set;
+    }
+
     public override string Title
     {
         get
         {
             string displayName = Name;
+
+            if (IsFunctionSignatures)
+            {
+                return "Function Signatures";
+            }
 
             if (Name == "constructor" && SourceTypeId != 0)
             {

@@ -184,6 +184,39 @@
                                     </div>
                                 }
 
+                                @if (Item.FunctionSignatures != null && Item.FunctionSignatures.Signatures != null && Item.FunctionSignatures.Signatures.Any())
+                                {
+                                    Publisher.RegisterPublishedAnchor(Url, "function-signatures");
+
+                                    <h2 id="function-signatures">Function Signatures</h2>
+
+                                    <div class="has-inner-focus">
+                                        <table class="table table-sm margin-top-none" aria-label="Function Signatures">
+        	                                <tbody>
+                                                @foreach (TypeScriptMethodSignature methodOverload in Item.FunctionSignatures.Signatures.OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="break-text">@GetLink(methodOverload)</span>
+                                                        </td>
+                                                        <td>
+                                                            @if (!String.IsNullOrEmpty(methodOverload.Comment?.SummaryHtml))
+                                                            {
+                                                                @Raw(methodOverload.Comment.SummaryHtml)
+                                                            }
+
+                                                            @if (methodOverload.SourceTypeId != 0 && methodOverload.SourceTypeId != Item.Id)
+                                                            {
+                                                                <div>(Inherited from @GetLink(ReferenceType.AllTypes[methodOverload.SourceTypeId]))</div>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
                                 @if (Item.Methods != null && Item.Methods.Any(m => m.Value.Signatures != null && m.Value.Signatures.Any()))
                                 {
                                     Publisher.RegisterPublishedAnchor(Url, "methods");

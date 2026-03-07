@@ -305,12 +305,19 @@ export function registerSymbolForReflection(symbol: ts.Symbol, typeChecker: ts.T
                             }
                         }
 
+                        callSignatureMetadata.name = typeMetadata.name.substr(0, 1).toLowerCase() + typeMetadata.name.substr(1);
+
                         if (!typeMetadata.functionSignatures) {
-                            typeMetadata.functionSignatures = [];
+                            typeMetadata.functionSignatures = {
+                                kind: 'method',
+                                name: callSignatureMetadata.name,
+                                signatures: [],
+                                id: codeElementIdCounter++,
+                                isFunctionSignatures: true
+                            };
                         }
         
-                        callSignatureMetadata.name = typeMetadata.name.substr(0, 1).toLowerCase() + typeMetadata.name.substr(1);
-                        typeMetadata.functionSignatures.push(callSignatureMetadata);
+                        typeMetadata.functionSignatures.signatures.push(callSignatureMetadata);
                     }
         
                     else if (memberDeclaration.kind === ts.SyntaxKind.GetAccessor) {
@@ -368,10 +375,16 @@ export function registerSymbolForReflection(symbol: ts.Symbol, typeChecker: ts.T
             functionSignatureMetadata.name = typeLookup.typeMetadata.name.substr(0, 1).toLowerCase() + typeLookup.typeMetadata.name.substr(1);
 
             if (!typeMetadata.functionSignatures) {
-                typeMetadata.functionSignatures = [];
+                typeMetadata.functionSignatures = {
+                    kind: 'method',
+                    id: codeElementIdCounter++,
+                    name: functionSignatureMetadata.name,
+                    isFunctionSignatures: true,
+                    signatures: []
+                }
             }
 
-            typeMetadata.functionSignatures.push(functionSignatureMetadata);
+            typeMetadata.functionSignatures.signatures.push(functionSignatureMetadata);
 
             break;
         }

@@ -565,10 +565,22 @@ public class KebabCaseUrlProvider(
             TypeScriptTypeDeclaration sourceType = ReferenceType.AllTypes[item.SourceTypeId];
 
             url.Append(sourceType.FullName);
-            url.Append('.');
+
+            if (!item.IsFunctionSignatures)
+            {
+                url.Append('.');
+            }
         }
 
-        url.Append(item.Name);
+        if (item.IsFunctionSignatures)
+        {
+            url.Append("()");
+        }
+
+        else
+        {
+            url.Append(item.Name);
+        }
 
         if (Options.IncludeFileExtensions)
         {
@@ -618,9 +630,11 @@ public class KebabCaseUrlProvider(
 
     public virtual string GetUrl(TypeScriptMethodSignature item)
     {
+        TypeScriptTypeDeclaration? sourceType = null;
+
         if (item.SourceTypeId != 0)
         {
-            TypeScriptTypeDeclaration sourceType = ReferenceType.AllTypes[item.SourceTypeId];
+            sourceType = ReferenceType.AllTypes[item.SourceTypeId];
 
             if (sourceType.BuiltIn)
             {
@@ -636,15 +650,25 @@ public class KebabCaseUrlProvider(
             url.Append('/');
         }
 
-        if (item.SourceTypeId != 0)
+        if (sourceType != null)
         {
-            TypeScriptTypeDeclaration sourceType = ReferenceType.AllTypes[item.SourceTypeId];
-
             url.Append(sourceType.FullName);
-            url.Append('.');
+
+            if (item.MethodCollection == null || !item.MethodCollection.IsFunctionSignatures)
+            {
+                url.Append('.');
+            }
         }
 
-        url.Append(item.Name);
+        if (item.MethodCollection != null && item.MethodCollection.IsFunctionSignatures)
+        {
+            url.Append("()");
+        }
+
+        else
+        {
+            url.Append(item.Name);
+        }
 
         if (Options.IncludeFileExtensions)
         {

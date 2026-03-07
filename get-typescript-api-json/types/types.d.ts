@@ -45,9 +45,7 @@ interface TypeScriptInterface extends TypeScriptTypeDeclaration {
 
     extends?: TypeScriptType[];
     typeParameters?: TypeScriptTypeParameter[];
-
-    functionSignatures?: TypeScriptMethodSignature[];
-
+    functionSignatures?: TypeScriptMethod;
     constructorMetadata?: TypeScriptMethod;
     indexSignatures?: TypeScriptMethodSignature[];
     methods?: { [methodName: string]: TypeScriptMethod };
@@ -80,6 +78,7 @@ interface TypeScriptProperty extends CodeElement {
 interface TypeScriptMethod extends CodeElement {
     kind: 'method';
     name: string;
+    isFunctionSignatures?: boolean;
     signatures: TypeScriptMethodSignature[];
 }
 
