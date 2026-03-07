@@ -25325,3 +25325,7 @@ html.episode .shaka-video-container, html.episode .lazy-load-container, html.eve
   width: 100%;
   position: absolute;
 }
+
+.propertiesList {
+    padding-left: 24px;
+}

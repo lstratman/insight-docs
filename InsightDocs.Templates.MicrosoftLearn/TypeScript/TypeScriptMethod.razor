@@ -160,7 +160,7 @@
                                             <div class="@(i == 0 ? "propertyInfo" : "propertyInfo stack")">
                                                 <dl class="parameterList">
                                                     <dt>@overload.Parameters[i].Name</dt>
-                                                    <dd>@GetLink(overload.Parameters[i].Type)</dd>
+                                                    <dd>@GetLink(overload.Parameters[i].Type, true)</dd>
                                                 </dl>
 
                                                 @if (!String.IsNullOrEmpty(overload.Parameters[i].Comment?.SummaryHtml))
@@ -184,7 +184,7 @@
                                             <h3 class="propertyInfoTitle stack heading-anchor" id="returns">Returns</h3>
                                         }
 
-                                        <div class="propertyInfo">@GetLink(overload.ReturnType)</div>
+                                        <div class="propertyInfo">@GetLink(overload.ReturnType, true)</div>
 
                                         @if (!String.IsNullOrEmpty(overload.Comment?.ReturnsHtml))
                                         {

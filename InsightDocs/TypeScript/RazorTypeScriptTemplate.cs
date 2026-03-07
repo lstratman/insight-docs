@@ -36,8 +36,10 @@ public class RazorTypeScriptTemplate<T> : RazorTemplate<T>
         };
     }
 
-    public void BuildLinkTag(TypeScriptType item, StringBuilder linkTagBuilder)
+    public void BuildLinkTag(TypeScriptType item, StringBuilder linkTagBuilder, bool prettyPrint = false)
     {
+        bool noBreaks = false;
+
         foreach (TypeToStringComponent component in item.GetToStringComponents())
         {
             if (component is TypeToStringReferenceTypeComponent referenceTypeComponent)
@@ -98,16 +100,44 @@ public class RazorTypeScriptTemplate<T> : RazorTemplate<T>
 
             else if (component is TypeToStringTextComponent textComponent)
             {
+                if (textComponent.Text.EndsWith(": ("))
+                {
+                    noBreaks = true;
+                }
+
+                else if (textComponent.Text == ") => ")
+                {
+                    noBreaks = false;
+                }
+
+                if (prettyPrint && item is ReflectionType && textComponent.Text == " }")
+                {
+                    linkTagBuilder.Append("</div>");
+                }
+
                 linkTagBuilder.Append(textComponent.Text.Replace("<", "&lt;").Replace(">", "&gt;"));
+
+                if (prettyPrint && item is ReflectionType)
+                {
+                    if (textComponent.Text == "{ ")
+                    {
+                        linkTagBuilder.Append("<div class=\"propertiesList\">");
+                    }
+
+                    else if (textComponent.Text == ", " && !noBreaks)
+                    {
+                        linkTagBuilder.Append("<br/>");
+                    }
+                }
             }
         }
     }
 
-    public virtual RenderFragment GetLink(TypeScriptType item)
+    public virtual RenderFragment GetLink(TypeScriptType item, bool prettyPrint = false)
     {
         StringBuilder linkTagBuilder = new();
 
-        BuildLinkTag(item, linkTagBuilder);
+        BuildLinkTag(item, linkTagBuilder, prettyPrint);
         string linkTag = linkTagBuilder.ToString();
 
         return (builder) =>
