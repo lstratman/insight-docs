@@ -37,7 +37,7 @@ public class ReflectionType : TypeScriptType
 
                 first = false;
 
-                components.Add(new TypeToStringTextComponent(param.Name + ": "));
+                components.Add(new TypeToStringTextComponent(param.Name + (param.Flags != null && param.Flags.IsOptional ? "?" : "") + ": "));
                 components.Add(new TypeToStringTypeComponent(param.Type));
             }
 
@@ -65,7 +65,7 @@ public class ReflectionType : TypeScriptType
 
                 if (member is TypeScriptProperty property)
                 {
-                    components.Add(new TypeToStringTextComponent(property.Name + ": "));
+                    components.Add(new TypeToStringTextComponent(property.Name + (property.Flags != null && property.Flags.IsOptional ? "?" : "") + ": "));
                     components.Add(new TypeToStringTypeComponent(property.Type));
                 }
 
@@ -86,7 +86,7 @@ public class ReflectionType : TypeScriptType
 
                             firstParam = false;
 
-                            components.Add(new TypeToStringTextComponent(param.Name + ": "));
+                            components.Add(new TypeToStringTextComponent(param.Name + (param.Flags != null && param.Flags.IsOptional ? "?" : "") + ": "));
                             components.Add(new TypeToStringTypeComponent(param.Type));
                         }
                     }
