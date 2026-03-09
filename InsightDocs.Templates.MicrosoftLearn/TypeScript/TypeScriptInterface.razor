@@ -1,7 +1,7 @@
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @using InsightDocs.TypeScript.Model
 @using InsightDocs.TypeScript.Model.Types
-@inherits InsightDocs.TypeScript.RazorTypeScriptTemplate<InsightDocs.TypeScript.Model.TypeScriptInterface>
+@inherits TypeScriptInterfaceBase
 @inject InsightDocs.Abstractions.IPublisher Publisher
 
 <html>
@@ -114,6 +114,8 @@
                                     </dd>
                                 </dl>
                             }
+
+                            @AddAdditionalInterfaceProperties(Item)
 
                             <!-- TODO: support example JSDoc tags -->
 
