@@ -1,4 +1,4 @@
-@inherits InsightDocs.TypeScript.RazorTypeScriptTemplate<InsightDocs.TypeScript.Model.TypeScriptMethod>
+@inherits TypeScriptMethodBase
 @using InsightDocs.Templates.MicrosoftLearn.Components
 @using InsightDocs.TypeScript.Model
 @using InsightDocs.TypeScript.Model.Types
@@ -191,6 +191,8 @@
                                             @Raw(overload.Comment.ReturnsHtml)
                                         }
                                     }
+
+                                    @AddAdditionalMethodSignatureProperties(overload)
 
                                     <!-- TODO: support example JSDoc tag -->
 
