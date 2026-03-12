@@ -84,7 +84,7 @@
                                 bool reduceHeaderSize = hasOverloads;
                             }
 
-                            @foreach (TypeScriptMethodSignature overload in Item.Signatures.Where(o => o.SourceTypeId == Item.SourceTypeId))
+                            @foreach (TypeScriptMethodSignature overload in Item.Signatures.Where(o => o.SourceTypeId == Item.SourceTypeId).OrderBy(m => m.Parameters == null ? 0 : m.Parameters.Count).ThenBy(m => m.MemberDisplayName))
                             {
                                 <div>
                                     @if (Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1)
@@ -192,9 +192,9 @@
                                         }
                                     }
 
-                                    @AddAdditionalMethodSignatureProperties(overload)
-
                                     <!-- TODO: support example JSDoc tag -->
+
+                                    @AddAdditionalMethodSignatureProperties(overload)
 
                                     @if (Item.Signatures.Count(o => o.SourceTypeId == Item.SourceTypeId) > 1)
                                     {
