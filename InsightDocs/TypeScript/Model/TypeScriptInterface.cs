@@ -294,6 +294,7 @@ public class TypeScriptInterface : TypeScriptNamespacedTypeDeclaration
         if (FunctionSignatures != null)
         {
             FunctionSignatures.SourceTypeId = id;
+            FunctionSignatures.Signatures = [.. FunctionSignatures.Signatures.Distinct(methodSignatureComparer)];
 
             foreach (TypeScriptMethodSignature functionSignature in FunctionSignatures.Signatures)
             {
