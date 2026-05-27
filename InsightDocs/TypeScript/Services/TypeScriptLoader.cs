@@ -8,7 +8,12 @@ using System.Diagnostics;
 
 namespace InsightDocs.TypeScript.Services;
 
-public partial class TypeScriptLoader(ILoggerFactory loggerFactory, IApplicationExitService applicationExitService) : ITypeScriptLoader
+public partial class TypeScriptLoader(
+    ILoggerFactory loggerFactory,
+    IApplicationExitService applicationExitService,
+    IUrlProvider<TypeScriptMethodSignature> methodSignatureUrlProvider,
+    IUrlProvider<TypeScriptProperty> propertyUrlProvider
+) : ITypeScriptLoader
 {
     [LoggerMessage(LogLevel.Information, "Loading {definitionFilePath}")]
     public static partial void LogDefinitionFileLoad(ILogger logger, string definitionFilePath);
@@ -111,6 +116,9 @@ public partial class TypeScriptLoader(ILoggerFactory loggerFactory, IApplication
 
     public virtual async Task<TypeScriptProject> LoadDefinitionFiles(List<string> definitionFilePaths, bool excludePackageRoot)
     {
+        ReferenceType.MethodSignatureUrlProvider = methodSignatureUrlProvider;
+        ReferenceType.PropertyUrlProvider = propertyUrlProvider;
+
         ILogger logger = loggerFactory.CreateLogger<TypeScriptLoader>();
 
         foreach (string definitionFilePath in definitionFilePaths)

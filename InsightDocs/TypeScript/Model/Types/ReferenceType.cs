@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using InsightDocs.Abstractions;
+using Newtonsoft.Json;
 
 namespace InsightDocs.TypeScript.Model.Types;
 
@@ -6,6 +7,32 @@ public class ReferenceType : TypeScriptType
 {
     public static Dictionary<int, TypeScriptTypeDeclaration> AllTypes = [];
     public static Dictionary<string, TypeScriptTypeDeclaration> AllTypesByName = [];
+    public static IUrlProvider<TypeScriptMethodSignature>? MethodSignatureUrlProvider;
+    public static IUrlProvider<TypeScriptProperty>? PropertyUrlProvider;
+
+    public static string GetUrl(TypeScriptCodeElement element)
+    {
+#pragma warning disable IDE0046 // Convert to conditional expression
+        if (element is TypeScriptMethodSignature methodSignature)
+        {
+            return MethodSignatureUrlProvider == null
+                ? throw new Exception("No URL provider registered for TypeScriptMethodSignature")
+                : MethodSignatureUrlProvider.GetUrl(methodSignature);
+        }
+
+        else if (element is TypeScriptProperty property)
+        {
+            return PropertyUrlProvider == null
+                ? throw new Exception("No URL provider registered for TypeScriptProperty")
+                : PropertyUrlProvider.GetUrl(property);
+        }
+
+        else
+        {
+            throw new Exception("Unsupported TypeScript code element type: " + element.GetType().FullName);
+        }
+#pragma warning restore IDE0046 // Convert to conditional expression
+    }
 
     [JsonProperty("id")]
     public int Target

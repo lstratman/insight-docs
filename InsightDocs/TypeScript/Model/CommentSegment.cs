@@ -125,11 +125,13 @@ public class LinkTagCommentSegment : CommentSegment
                     if (targetType.Methods != null && targetType.Methods.TryGetValue(memberName, out TypeScriptMethod? value))
                     {
                         TargetElement = value.Signatures[0];
+                        Url = ReferenceType.GetUrl(TargetElement);
                     }
 
                     else if (targetType.Properties != null && targetType.Properties.Any(p => p.Name == memberName))
                     {
                         TargetElement = targetType.Properties.First(p => p.Name == memberName);
+                        Url = ReferenceType.GetUrl(TargetElement);
                     }
 
                     else
@@ -145,7 +147,10 @@ public class LinkTagCommentSegment : CommentSegment
                 }
             }
 
-            Url = TargetElement.Url;
+            if (String.IsNullOrEmpty(Url))
+            {
+                Url = TargetElement.Url;
+            }
         }
 
         string text = (string.IsNullOrEmpty(LinkText) ? Text : LinkText) + (TargetElement is not null and TypeScriptMethodSignature ? "()" : "");
